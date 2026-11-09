@@ -10,13 +10,14 @@
 #    If the check or sync fails, the site still starts with its previous content
 #    and the reason is written to the container log. Sample evidence rules arrive as drafts.
 set -e
+# Live-site settings unless the platform says otherwise.
+export DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE:-config.settings.prod}"
 # The project folder: APP_DIR if set, otherwise the folder above this script.
 cd "${APP_DIR:-$(dirname "$0")/..}"
 
-if [ ! -d staticfiles ]; then
-  echo "== Preparing the styling files (first start on this image)"
-  python manage.py collectstatic --noinput
-fi
+echo "== Preparing the styling files"
+python manage.py collectstatic --noinput \
+  || echo "!! Couldn't prepare the styling files (see above). The site will serve them straight from the code instead."
 
 echo "== Updating the database"
 python manage.py migrate --noinput

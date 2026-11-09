@@ -225,7 +225,7 @@ If the check finds a mistake, the pod still starts with the previous content and
 
 ### What the pod does each time it starts
 
-`docker/start.sh`, in order: prepares the styling files if the image doesn't have them yet; updates the database; creates the admin account the first time; adds any new topics and platforms; checks the content files; if they pass, syncs them into the site (published straight away when `ALLOW_SELF_APPROVAL=true`, otherwise as proposed updates to approve); then starts the web server on port 8000. Sample evidence rules arrive as drafts to fill in and approve.
+`docker/start.sh`, in order: uses the live-site settings (`config.settings.prod`) unless `DJANGO_SETTINGS_MODULE` says otherwise; prepares the styling files (a buildpack's own build step can't, because it runs before the settings are available); updates the database; creates the admin account the first time; adds any new topics and platforms; checks the content files; if they pass, syncs them into the site (published straight away when `ALLOW_SELF_APPROVAL=true`, otherwise as proposed updates to approve); then starts the web server on port 8000. Sample evidence rules arrive as drafts to fill in and approve.
 
 ### Settings
 

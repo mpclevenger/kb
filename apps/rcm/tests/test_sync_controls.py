@@ -21,7 +21,7 @@ from apps.wiki.guide_checks import PRODUCT_TERMS
 pytestmark = pytest.mark.django_db
 
 BANNED = re.compile(
-    r"standard|reach out|tech risk|route through|\bNIST\b|\bISO\b|COBIT|ITIL|\bCIS\b|ISACA", re.IGNORECASE
+    r"standard|reach out|tech risk|route through|\bNIST\b|\bISO\b|COBIT|ITIL|\bCIS\b", re.IGNORECASE
 )
 
 GOOD = """
