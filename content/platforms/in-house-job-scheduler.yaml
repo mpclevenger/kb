@@ -1,0 +1,29 @@
+platform: In-house job scheduler
+intro: The scheduling and jobs application built in-house, which runs on-premises on Windows Server. Read
+  this with the Application and Jobs categories. The name and exact setup are not described here.
+considerations:
+  Access: |
+    - Roles separate who defines jobs, who approves changes to them and who only views or reruns them. Administrator rights are held by named people.
+    - Because the firm built the scheduler, its role definitions and any override or impersonation features are documented and reviewed.
+  Service accounts: |
+    - Each job definition names the account it runs as, and the scheduler stores credentials in a secret store or encrypted.
+    - The ability for a job to run as another account is limited and logged.
+  Change: |
+    - Changes to the scheduler's code follow the CI/CD pipelines as change control guide. Changes to job definitions also pass through change control.
+    - The scheduler keeps a history of each job definition, with who changed it and when. This is the source for change reconciliation.
+  Configuration: |
+    - Calendars, dependencies and retry settings are documented and exported on a schedule. Time zone and holiday calendar settings are reviewed, because errors change when jobs run.
+  Logging: |
+    - The scheduler writes audit records for job creation, edits, deletion, manual runs, reruns, overrides and user changes, and forwards them to Splunk. Its administrators can't change or delete the records.
+    - Alerts cover missed schedules and the scheduler being down, and not only failed runs.
+  Patching: |
+    - The application's libraries and framework are tracked and patched, as well as the Windows Server it runs on.
+  Recovery: |
+    - The scheduler database, job definitions, calendars and credentials are backed up, and the application can be redeployed from its repository.
+    - Recovery tests check that jobs resume in the right order, with no duplicate or skipped runs.
+  Data: |
+    - The scheduler's database can hold credentials or sensitive parameters. It is classified and limited to administrators.
+  Network: |
+    - Connections from the scheduler to target servers are restricted by firewall rules, authenticated and encrypted.
+  Vendor: |
+    - No vendor supports this platform, so the firm's own team maintains the documentation, code and knowledge of how it works. Record who can support it, and a plan for when key people leave.

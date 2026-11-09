@@ -1,0 +1,1 @@
+<ol class="step-list">{% if items_html %}{{ items_html }}{% else %}{% for item in steps %}{% include "components/step_item.html" with role=item.role content=item.text %}{% endfor %}{% endif %}</ol>

@@ -1,0 +1,32 @@
+platform: Windows Server
+intro: Windows Server hosts, including servers that run SQL Server, the in-house job scheduler and other
+  platforms. Read this with the Operating system category and, for scheduled tasks, the Jobs category.
+considerations:
+  Access: |
+    - Local Administrators membership is set by Group Policy, so manual additions are removed at the next refresh.
+    - Windows LAPS gives each server a unique, rotated password for the built-in administrator account.
+    - Domain-wide administrator groups aren't members of local Administrators on application servers.
+    - A dated export of local Administrators and Remote Desktop Users membership across in-scope servers makes good evidence.
+  Service accounts: |
+    - Windows services and scheduled tasks use group managed service accounts where supported. Others are listed with owner, purpose and password rotation.
+  Change: |
+    - Server settings are applied by Group Policy or desired state configuration from a repository.
+    - Scheduled tasks created on a server are part of the job inventory, and new or changed tasks are detected from the task scheduler event log.
+  Configuration: |
+    - Audit policy is set through Group Policy.
+    - Endpoint protection is installed and reporting, and SMBv1, unneeded shares and the print spooler are turned off where not needed.
+  Logging: |
+    - Security, System and PowerShell logs are collected into Splunk, including logon, privilege use, account change and log clearing.
+    - Task Scheduler logs are collected for servers that run scheduled tasks.
+  Patching: |
+    - Patching is managed centrally, with a deployment report by server.
+    - Pending reboots are tracked, since a patch that is installed but not active is not complete.
+  Recovery: |
+    - Backups include system state and the data volumes. Clustered servers have failover tested.
+    - For servers that run SQL Server or other platforms, the operating system recovery order is part of that platform's plan.
+  Data: |
+    - Local folders for exports, reports and job output have restricted permissions and clean-up schedules.
+  Network: |
+    - Windows Firewall rules are set by Group Policy. Remote administration is allowed only from administration networks.
+  Vendor: |
+    - The Windows Server release is checked against its lifecycle dates, with a plan for versions nearing end of support.

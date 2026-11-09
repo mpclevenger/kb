@@ -1,0 +1,8 @@
+{% if references %}
+<section class="references" aria-labelledby="references-heading">
+  <h2 id="references-heading">References</h2>
+  <ul>
+    {% for reference in references %}<li><a href="{{ reference.url }}" target="_blank" rel="noopener noreferrer">{{ reference.label }}</a></li>{% endfor %}
+  </ul>
+</section>
+{% endif %}

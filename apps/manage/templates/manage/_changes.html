@@ -1,0 +1,22 @@
+<table class="trac-table">
+  <caption>{{ caption }}</caption>
+  <thead><tr><th scope="col">When</th><th scope="col">Who</th><th scope="col">Change</th></tr></thead>
+  <tbody>
+  {% for change in changes %}
+    <tr>
+      <td class="text-nowrap">{{ change.occurred_at|date:"M j, Y g:i A" }}</td>
+      <td class="text-nowrap">{{ change.actor.get_full_name|default:change.actor.get_username }}</td>
+      <td>
+        {{ change.get_action_display }}{% if show_object %} {{ change.get_object_type_display|lower }} <strong>{{ change.object_label }}</strong>{% endif %}
+        {% if change.change_rows %}
+        <ul class="list-unstyled mb-0 small">
+          {% for field, before, after in change.change_rows %}<li>{{ field }}: {{ before }} &rarr; {{ after }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="3">No changes yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>

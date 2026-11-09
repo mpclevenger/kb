@@ -1,0 +1,96 @@
+# The list of platforms and the risk-area questions every platform page answers.
+#
+# `seed_platforms` (run by setup_trac) adds anything new from this file. It never deletes, and it leaves
+# platforms and questions that already exist alone, so edits made in the site (Manage) are kept.
+# Check this file with: .\trac.ps1 check
+#
+# platforms: the order here is the order on the site.
+#   name        Exactly as it should appear on the site. Guidance files refer to it by this name.
+#   categories  One or more of: application, database, operating_system, jobs, network, identity, cloud,
+#               engineering_tools, logging. The first one sets the platform's color.
+#   hosting     Optional. One of: cloud, on_prem, saas, hybrid. Leave it out where it is not yet known.
+#   runs_on     Optional. The name of another platform in this list, for example SQL Server runs on Windows Server.
+#   docs        Optional. A link to the vendor documentation.
+platforms:
+  - name: AWS
+    categories: [cloud, identity, database, operating_system]
+    hosting: cloud
+    docs: https://docs.aws.amazon.com/
+  - name: Azure
+    categories: [cloud, identity, database]
+    hosting: cloud
+    docs: https://learn.microsoft.com/azure/
+  - name: Databricks
+    categories: [cloud, database, jobs]
+    hosting: cloud
+    docs: https://docs.databricks.com/
+  - name: GitHub Enterprise Server
+    categories: [engineering_tools, jobs]
+    docs: https://docs.github.com/en/enterprise-server@latest
+  - name: Splunk
+    categories: [logging, jobs]
+    hosting: saas
+    docs: https://help.splunk.com/
+  - name: Windows Server
+    categories: [operating_system, jobs]
+    hosting: on_prem
+    docs: https://learn.microsoft.com/windows-server/
+  - name: SQL Server
+    categories: [database, jobs]
+    hosting: on_prem
+    runs_on: Windows Server
+    docs: https://learn.microsoft.com/sql/sql-server/
+  - name: In-house job scheduler
+    categories: [jobs, application]
+    hosting: on_prem
+    runs_on: Windows Server
+  - name: Active Directory
+    categories: [identity]
+    hosting: on_prem
+    docs: https://learn.microsoft.com/windows-server/identity/ad-ds/
+  - name: Entra ID
+    categories: [identity]
+    hosting: saas
+    docs: https://learn.microsoft.com/entra/
+  - name: Kubernetes
+    categories: [cloud]
+    hosting: hybrid
+    docs: https://kubernetes.io/docs/
+  - name: VPN
+    categories: [network]
+
+# aspects: plain technical questions, one or more per topic. The order here is the order on the site.
+#   topic     The topic's ID prefix (AC = Access management, CM = Change management, ...).
+#   label     Short name shown in the checklist. Guidance files use this word as their heading.
+#   question  The question itself.
+aspects:
+  - topic: AC
+    label: Access
+    question: Who can log in as an admin, and how is that access granted and removed?
+  - topic: AC
+    label: Service accounts
+    question: Which service accounts exist, who owns them, and what can they do?
+  - topic: CM
+    label: Change
+    question: How are code, configuration and upgrades changed, and who approves each change?
+  - topic: PI
+    label: Configuration
+    question: Is it set up to the baseline, and can you prove it with dated evidence?
+  - topic: LA
+    label: Logging
+    question: Are audit logs sent to Splunk, and would you know if they stopped?
+  - topic: VM
+    label: Patching
+    question: Is it scanned and patched on schedule, including the servers used to administer it?
+  - topic: DR
+    label: Recovery
+    question: Is it backed up, and has a restore been tested?
+  - topic: DP
+    label: Data
+    question: What data does it hold or move, and is it classified and protected?
+  - topic: NW
+    label: Network
+    question: How is it reached over the network, and is that path restricted?
+  - topic: TP
+    label: Vendor
+    question: Does a vendor run or support it, and is their assurance reviewed?

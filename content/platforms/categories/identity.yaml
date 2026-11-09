@@ -1,0 +1,40 @@
+category: identity
+intro: Directory and sign-in services that decide who a person is and what they can reach. The main risk
+  is that whoever controls the directory controls every system that trusts it.
+practices:
+  Access: |
+    - Highly privileged roles and groups have few members, all named individuals.
+    - Privileged accounts are separate from everyday accounts and aren't used for email or browsing.
+    - Membership of privileged groups and roles is reviewed on the schedule in your team's written procedure, and changes are approved by someone other than the requester.
+    - Joiner, mover and leaver processes disable or change accounts promptly, checked by comparing a complete HR list of leavers and movers with account dates.
+    - Accounts for vendors, contractors and guests have a sponsor and an end date, and unused accounts are disabled.
+  Service accounts: |
+    - Service accounts are listed with an owner, purpose and where they are used, and compared with the directory so unowned accounts are found.
+    - Service accounts have no privileged group membership unless documented, and have long, rotated or managed passwords.
+    - Built-in and default accounts are renamed or disabled where possible.
+  Change: |
+    - Changes to directory structure, policy, trusts and tenant settings go through change control with a record and an approval.
+    - Changes to privileged groups are compared with approved requests, so changes outside the process are found.
+  Configuration: |
+    - The directory is set to a baseline covering password policy, multi-factor authentication, legacy authentication and trusts.
+    - A dated export of those settings is kept, and drift is checked on a schedule.
+    - Identity synchronization between systems is monitored and limited to the objects that need it.
+  Logging: |
+    - Sign-in, directory change, group membership change and administrative role logs are collected into Splunk.
+    - Alerts fire for changes to privileged groups, new administrative role assignments and failed sign-in spikes.
+    - Administrators can't change or delete the logs that record their own actions, and an alert fires if the feed stops.
+  Patching: |
+    - Directory servers and identity components are patched on the schedule in your team's written procedure, as are the servers used to administer them.
+    - Software past vendor support is on an approved plan or exception.
+  Recovery: |
+    - The directory is backed up and a restore is tested on a schedule.
+    - A recovery plan exists for a damaged or encrypted directory.
+    - Emergency access accounts are protected, tested and monitored for any use.
+  Data: |
+    - Directory data about people, groups and credentials is restricted to those who administer it.
+    - Attributes used for access decisions, such as department and manager, have an owner and a source of truth.
+  Network: |
+    - Administration is possible only from administration networks.
+    - Sign-in from outside the firm's network requires multi-factor authentication.
+  Vendor: |
+    - Cloud identity services are on the vendor risk team's list, and the system owner reviews its assurance report each year (see the Reading a vendor's SOC report guide), including the controls the report expects the firm to run itself.

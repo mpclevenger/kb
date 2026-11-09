@@ -1,0 +1,37 @@
+platform: Splunk
+intro: Splunk Cloud Platform, the destination for audit logs, which also runs scheduled searches and
+  DB Connect inputs. Splunk runs the platform itself (indexers, search heads, storage and their upgrades).
+  The firm owns its forwarders and HEC tokens, roles and capabilities, index retention settings, and apps
+  such as DB Connect and their credentials. Read this with the Logging category and, for DB Connect inputs,
+  the Jobs category.
+considerations:
+  Access: |
+    - Powerful roles and capabilities, such as the admin role and the ability to delete events, are limited to a few named administrators.
+    - Index access is set per role, so audit data can be searched or exported only by the groups that need it.
+    - Authentication uses SSO with roles mapped from directory groups. Local accounts are limited to emergency use.
+  Service accounts: |
+    - Forwarder, HEC token and DB Connect identities are listed with owner, purpose and the index they write to.
+    - HEC tokens are limited to specific indexes and sources.
+    - DB Connect database accounts hold read-only access to the audit tables and no more, with credentials stored in DB Connect's identities, not in queries.
+  Change: |
+    - Apps, saved searches and alerts are kept in a repository and deployed through review, not edited in the web interface.
+    - Splunk upgrades the cloud platform itself. The team follows its maintenance notices and checks inputs and alerts afterward.
+  Configuration: |
+    - Index retention is set to the period in the firm's [records retention schedule](#todo-records-retention-schedule), with a dated export of index settings.
+    - Each in-scope source has an input and an expected volume, so a source that goes quiet is visible.
+    - DB Connect inputs record the table, the checkpoint column and the schedule.
+  Logging: |
+    - Changes to roles, inputs, searches and indexes are searched and alerted on.
+    - Stopped-feed alerts apply to DB Connect inputs as well as forwarders. For DB Connect, the alert also checks that the checkpoint keeps advancing, so missed rows are noticed and not only a failed job.
+  Patching: |
+    - Splunk patches the cloud platform. The firm keeps forwarders within supported versions and patches them on the schedule in your team's written procedure.
+    - Installed apps and add-ons have a recorded version and are kept updated.
+  Recovery: |
+    - Splunk is responsible for the platform's availability and stored data. The firm keeps its apps, searches, alerts and inputs in a repository so they can be redeployed.
+    - Forwarders buffer data so a short outage doesn't lose events, and recovery includes DB Connect checkpoints so a restored input does not duplicate or skip audit rows.
+  Data: |
+    - Audit indexes hold only what is needed, and sensitive fields are masked at ingest where the source allows.
+  Network: |
+    - Forwarders and DB Connect connections use TLS. Access to the search head and REST API is limited by IP allow lists to the networks that need it.
+  Vendor: |
+    - Splunk is on the vendor risk team's list, and the system owner reviews its assurance report each year (see the Reading a vendor's SOC report guide), including the controls the report expects the firm to run itself, such as roles, retention settings and forwarder security.

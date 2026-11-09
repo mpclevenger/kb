@@ -1,0 +1,36 @@
+{% extends "rcm/entity_form.html" %}
+{% block extra_head %}{% if form %}{{ form.media.css }}{% endif %}{% endblock %}
+{% block form_fields %}
+<section class="trac-form-section" aria-labelledby="sec-about">
+  <h2 id="sec-about">About this page</h2>
+  {% include "components/field_form.html" with field=form.section %}
+  {% include "components/field_form.html" with field=form.title %}
+  {% include "components/field_form.html" with field=form.platform %}
+</section>
+
+<section class="trac-form-section" aria-labelledby="sec-content">
+  <h2 id="sec-content">Content</h2>
+  {% include "components/field_form.html" with field=form.body %}
+</section>
+
+<section class="trac-form-section" aria-labelledby="sec-owner">
+  <h2 id="sec-owner">Ownership and review</h2>
+  <div class="row">
+    <div class="col-md-6">{% include "components/field_form.html" with field=form.owner_role %}</div>
+    <div class="col-md-6">{% include "components/field_form.html" with field=form.review_by %}</div>
+  </div>
+</section>
+
+<section class="trac-form-section" aria-labelledby="sec-references">
+  <h2 id="sec-references">References</h2>
+  {% include "components/references_editor.html" with field=form.references %}
+</section>
+
+{% if form.change_summary %}
+<section class="trac-form-section" aria-labelledby="sec-change">
+  <h2 id="sec-change">Your change</h2>
+  {% include "components/field_form.html" with field=form.change_summary %}
+</section>
+{% endif %}
+{% endblock %}
+{% block extra_js %}{{ block.super }}{% if form %}{{ form.media.js }}{% endif %}{% endblock %}

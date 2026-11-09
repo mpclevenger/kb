@@ -1,0 +1,6 @@
+<ol class="lifecycle-arrows" aria-label="Lifecycle stages">
+  {% for arrow in arrows %}<li class="lifecycle-arrows-item lifecycle-step-{{ arrow.step }}{% if arrow.active %} is-active{% endif %}">
+    <a class="lifecycle-arrow" href="{{ arrow.url }}" hx-get="{{ arrow.url }}" hx-target="{{ target }}" hx-swap="outerHTML" hx-push-url="true"{% if arrow.active %} aria-current="step"{% endif %}><span class="lifecycle-arrow-num">{{ arrow.number }}</span> {{ arrow.name }}</a>
+  </li>
+  {% endfor %}
+</ol>

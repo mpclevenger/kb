@@ -1,0 +1,32 @@
+platform: VPN
+intro: Remote access VPN that lets staff and vendors reach internal systems. Read this with the Network
+  category. How and where the VPN is hosted is not described here.
+considerations:
+  Access: |
+    - VPN access is granted to named users through directory groups, with SSO and multi-factor authentication.
+    - Different groups get different network access, so a user reaches only what the role needs and not the whole network.
+    - Vendor and contractor accounts have an owner and an end date, and are reviewed more often than employee access.
+    - Gateway administrators are few, named people, reviewed on the schedule in the common practices above.
+  Service accounts: |
+    - Site-to-site tunnels, shared secrets and certificates are listed with an owner and expiry, and rotated.
+  Change: |
+    - Changes to access policies, split tunneling and group-to-network mappings go through change control.
+    - New network access for a group is approved by the owner of the systems being opened up.
+  Configuration: |
+    - The gateway is set to the baseline, with a dated export of its configuration and a check for drift.
+    - Certificates and keys are tracked with their expiry dates.
+  Logging: |
+    - Connection logs, authentication failures, policy changes and administrator actions are sent to Splunk.
+    - Alerts exist for repeated failures, sign-ins from unusual places and a gateway that stops sending logs.
+  Patching: |
+    - VPN gateways are a common entry point, so firmware and appliance software are tracked and patched on the schedule in your team's written procedure.
+    - Unsupported clients are blocked.
+  Recovery: |
+    - Gateway configuration is backed up, and a spare or second gateway exists to match the BCP tier of the systems that depend on remote access. Failover is tested.
+  Data: |
+    - Connection logs identify users and the systems they reach, so access is limited and they are kept for the period in the firm's [records retention schedule](#todo-records-retention-schedule).
+  Network: |
+    - Remote access ends in a restricted zone, and traffic passes through firewall rules to internal systems.
+    - Gateway administration interfaces are not exposed to the internet.
+  Vendor: |
+    - The VPN vendor's support and security notices are tracked. If the VPN is a hosted service, its provider is on the vendor risk team's list, and the system owner reviews its assurance report each year (see the Reading a vendor's SOC report guide), including the controls the report expects the firm to run itself.

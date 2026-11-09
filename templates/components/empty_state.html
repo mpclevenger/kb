@@ -1,0 +1,5 @@
+<div class="empty-state">
+  <h2 class="empty-state-headline">{{ headline }}</h2>
+  {% if text %}<p class="empty-state-text">{{ text }}</p>{% endif %}
+  {% if action_label %}<a class="btn btn-primary" href="{{ action_url }}">{{ action_label }}</a>{% endif %}
+</div>

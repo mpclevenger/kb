@@ -1,0 +1,36 @@
+platform: Entra ID
+intro: Microsoft Entra ID, the cloud identity service that receives accounts from Active Directory through
+  Microsoft Entra Connect Sync or Microsoft Entra Cloud Sync. Read this with the Identity category, and with
+  the Azure platform where it governs Azure access.
+considerations:
+  Access: |
+    - Privileged roles, such as Global Administrator, are assigned as eligible through Privileged Identity Management, with approval and a reason on activation.
+    - Administrator accounts are cloud-only, not synchronized from on-premises Active Directory.
+    - Two or more emergency access accounts exist, are excluded from conditional access in a controlled way, and raise an alert on any use.
+    - Access reviews cover privileged roles, group memberships and guest users, with a dated record of the decisions.
+  Service accounts: |
+    - App registrations and enterprise applications are listed with an owner. Secrets and certificates have expiry dates and are rotated.
+    - Application permissions with admin consent are reviewed, and user consent is restricted.
+    - Managed identities are preferred over secrets.
+  Change: |
+    - Changes to conditional access, authentication methods and tenant settings are approved and recorded, and report-only mode is used to test conditional access changes.
+    - Changes to the sync from Active Directory, such as filtering, are part of change control.
+  Configuration: |
+    - Conditional access requires multi-factor authentication for all users, with stronger methods for administrators. Legacy authentication is blocked.
+    - Guest access and self-service password reset settings are documented and exported.
+  Logging: |
+    - Sign-in, audit and provisioning logs are exported to Splunk, because the tenant keeps them only for a short time.
+    - Alerts exist for new privileged role assignments, conditional access changes, emergency account use and sync failures.
+  Patching: |
+    - Microsoft patches the service. The firm patches the servers that run its sync tool and any private network connectors, and keeps the sync tool on a supported version.
+    - Deprecated features and retiring settings are tracked using the message center.
+  Recovery: |
+    - The recovery plan covers loss of access: emergency accounts, rebuilding conditional access from configuration code, and restoring soft-deleted objects.
+    - Sync from Active Directory can be rebuilt, for example from a staging server or a second agent.
+  Data: |
+    - Logs in Splunk are kept for the period in the firm's [records retention schedule](#todo-records-retention-schedule), since the tenant's own retention is short.
+  Network: |
+    - Conditional access limits administrator sign-in to approved locations and compliant devices.
+    - Sync servers and agents are protected like domain controllers and reachable only from administration networks.
+  Vendor: |
+    - Microsoft is on the vendor risk team's list, and the system owner reviews its assurance reports each year (see the Reading a vendor's SOC report guide), including the controls the report expects the firm to run itself, such as conditional access and access reviews.

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load trac_labels trac_ui %}
+{% block title %}{{ v.title }} - TRAC{% endblock %}
+
+{% block content %}
+{% include "components/version_notices.html" %}
+{% include "components/version_workflow.html" %}
+<div class="library-meta">
+  <p class="applies-to">
+    {% if v.platform %}<span class="applies-to-label">Platform:</span>{% platform_chip v.platform %}{% endif %}
+  </p>
+  {% include "components/page_actions.html" %}
+</div>
+{% if not body %}
+<article class="trac-paper library-body"><p class="library-none">This page has no content yet.</p></article>
+{% elif not sections %}
+<article class="trac-paper library-body">{{ body }}</article>
+{% else %}
+{% if intro.strip %}<article class="trac-paper library-body library-intro">{{ intro }}</article>{% endif %}
+{% section_toolbar %}
+{% for section in sections %}
+  {% include "components/section_card.html" with title=section.title heading_id=section.id content=section.html tone="neutral" open=start_open body_class="library-body" %}
+{% endfor %}
+{% endif %}
+{% include "components/references.html" with references=v.references %}
+{% include "components/version_footer.html" %}
+{% endblock %}
+
+{% block rail %}
+{% if toc %}
+<aside class="page-rail" aria-labelledby="toc-title">
+  <p class="page-rail-title" id="toc-title">On this page</p>
+  <ul>
+    {% for entry in toc %}<li class="library-toc-{{ entry.level }}"><a href="#{{ entry.id }}">{{ entry.text }}</a></li>
+    {% endfor %}
+  </ul>
+</aside>
+{% endif %}
+{% endblock %}

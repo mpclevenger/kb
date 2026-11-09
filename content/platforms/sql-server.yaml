@@ -1,0 +1,39 @@
+platform: SQL Server
+intro: On-premises SQL Server instances, which also run SQL Server Agent jobs. Read this with the Database
+  and Jobs categories. SQL Server runs on Windows Server, so the host is covered there.
+considerations:
+  Access: |
+    - The `sysadmin` role and `CONTROL SERVER` permission are limited to named database administrators, through Windows groups from the directory.
+    - The `sa` login is disabled or renamed and has a long password in the secret store.
+    - `db_owner` membership is listed per in-scope database.
+    - SQL logins are the exception, each with an owner and purpose. Mixed-mode authentication is on only where an application needs it.
+    - A dated export of role members and permissions makes good evidence.
+  Service accounts: |
+    - The Database Engine and Agent services run as group managed service accounts where possible, or dedicated accounts with vaulted passwords, not as a domain administrator.
+    - Agent job owners and proxy accounts are listed. Jobs don't run as `sysadmin` when a proxy with fewer rights will do.
+    - Linked servers use a named remote login with the least rights needed.
+  Change: |
+    - Changes to Agent jobs, schema and server configuration come through change control. Job definitions are held in the repository.
+    - Direct data fixes go through a change record, and the audit record in Splunk is matched to the approval, as in the "Direct database changes are reviewed" control.
+  Configuration: |
+    - Baseline items include `xp_cmdshell` and other unneeded features off, no databases marked `TRUSTWORTHY` without a reason, and `remote admin connections` off unless remote use is documented.
+    - Instance settings are exported by script on a schedule, with dated results.
+  Logging: |
+    - Server and database audit specifications record logins, changes to access and structure, and direct data changes on in-scope tables.
+    - The audit writes to the Windows Security log or a protected file, and Splunk collects it. Where it writes to a table, Splunk DB Connect brings it in, and a check shows the feed keeps advancing.
+    - Only a short list of named administrators can change or stop the audit, and an alert fires when it changes.
+    - Privileged activity is reviewed on the schedule in your team's written procedure by someone who isn't a `sysadmin` on that instance.
+  Patching: |
+    - Cumulative and security updates follow the schedule in your team's written procedure, and the build number is recorded for each instance.
+    - Versions past vendor support have an approved exception or a plan to upgrade.
+  Recovery: |
+    - Backups cover full, differential and log as the BCP tier needs. A restore test is more than verifying the backup file.
+    - Failover is tested where availability groups, log shipping or clusters are used.
+    - Encryption certificates are backed up with their private keys and stored apart from the data, so an encrypted backup can be restored on another server.
+  Data: |
+    - Transparent data encryption or column-level encryption is used where classification requires.
+    - Masking or restricted views are used for non-privileged readers of sensitive columns.
+  Network: |
+    - The SQL Server port is limited by firewall to application servers and administration networks. Force encryption is on.
+  Vendor: |
+    - Vendor support dates are checked for each SQL Server version. Third-party tools that connect as `sysadmin` are listed and approved.

@@ -1,0 +1,9 @@
+{% load trac_ui %}{% if item.is_draft %}
+{% callout "warning" title="Draft, not official" %}<p>This version has not been approved. Do not rely on it. Status: {{ v.get_status_display|lower }}.</p>{% endcallout %}
+{% endif %}
+{% if item.is_retired %}
+{% callout "note" title="Retired" %}<p>This item is retired and no longer in use.{% if v.change_summary %} Reason: {{ v.change_summary }}{% endif %}</p>{% endcallout %}
+{% endif %}
+{% if item.review_notice %}
+{% callout "note" title="Edit in progress" %}<p>{% if item.review_notice.drafting %}Someone is preparing an edit to this page.{% else %}An edit to this page is in review.{% endif %}{% if item.review_notice.proposer %} Proposed by {{ item.review_notice.proposer }}.{% endif %}{% if item.review_notice.number %} <a href="?version={{ item.review_notice.number }}">View the proposed version</a>.{% endif %}</p>{% endcallout %}
+{% endif %}

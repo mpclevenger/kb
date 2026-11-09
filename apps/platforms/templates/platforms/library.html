@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static platform_cards %}
+{% block title %}Library - TRAC{% endblock %}
+
+{% block content %}
+<div class="filter-box">
+  <label class="form-label" for="technology-filter">Find your technology</label>
+  <input class="form-control" type="search" id="technology-filter" data-filter-input placeholder="For example: SQL Server" autocomplete="off">
+  <p class="form-text" data-filter-empty hidden>Nothing matches. Try a shorter name, or browse by risk topic.</p>
+</div>
+{% include "components/library_tabs.html" with active="technology" %}
+{% category_cards %}
+<p class="mt-4">Is your app on the SOX in-scope list? See the <a href="{% url 'rcm:sox' %}">key controls for SOX in-scope apps</a>.</p>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'js/filter.js' %}" defer></script>{% endblock %}

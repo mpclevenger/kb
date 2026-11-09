@@ -1,0 +1,390 @@
+# Controls and risks for one topic. Plain text; edit with any text editor.
+# After editing: python manage.py check_controls, then
+# python manage.py sync_controls --user <you> --publish. See README.md in this folder.
+# A control or risk is matched to the site by its title. Renaming a title makes a NEW item.
+#
+# FILE
+#   topic          Name of the topic exactly as it appears on the site.
+#   risks          What could go wrong. Each risk lists the controls that cover it.
+#   controls       The controls themselves.
+#
+# RISK (each entry under "risks")
+#   title          Short name of the risk.
+#   statement      What could go wrong, why, and what it would lead to.
+#   owned_by       Role accountable for the risk (a role, not a name).
+#   stage          Lifecycle stage the risk belongs to. Use "theme" instead to
+#                  place it under a theme. Never both.
+#   in_sox_scope   yes or no. Is this a risk for SOX in-scope apps?
+#   covered_by     Controls that reduce this risk. Each has:
+#                    control   the short name ("ref") of a control in this file
+#                    coverage  full or partial
+#                    why       one line saying how the control helps
+#
+# CONTROL (each entry under "controls")
+#   ref            Short name used only inside this file, so risks can point to it.
+#                  The site gives the control its real ID (for example CM-01).
+#   title          Name of the control.
+#   why            Why the control exists, in two or three sentences.
+#   applies_when   Plain statements. The control applies if any one is true.
+#   nature         preventive (stops it happening) or detective (finds it afterward).
+#   method         manual, automated, or it_dependent (a person works from a system report).
+#   frequency      event (each time it happens), daily, weekly, monthly, quarterly,
+#                  semiannual or annual.
+#   level          key, non-key, compensating or supporting, most important first (see levels.yaml):
+#                    key           relied on to address the risk, tested by auditors
+#                    non-key       matters, but is not relied on alone
+#                    compensating  covers for a control that is missing or not working, usually for a limited time
+#                    supporting    helps other controls work (documentation, baselines, tuning)
+#   owned_by       Role accountable for the control.
+#   performed_by   Role that does the work day to day.
+#   reviewed_by    Role that checks the work (optional).
+#   stage / theme  Where it sits in the topic: one stage, or one theme.
+#   categories     Kinds of technology it applies to: application, database,
+#                  operating_system, jobs, network, identity, cloud,
+#                  engineering_tools or logging.
+#   platforms      Optional. Platform names exactly as on the site. A name the
+#                  site doesn't have is skipped with a warning.
+#   criteria       What good looks like, in groups. Each group has:
+#                    heading   what the group is about
+#                    part      optional: configuration (set up correctly) or
+#                              monitoring (checked on an ongoing basis)
+#                    items     plain sentences. Write "text:" and "sox_only: true"
+#                              for an item needed only for SOX in-scope apps.
+#   steps          How to run it, in order. Each has:
+#                    who       role doing the step
+#                    do        what to do
+#                    evidence  what to keep as proof
+#                    part      optional: configuration or monitoring
+#   references     Optional. A list of "label" and "link" (starting with https://).
+
+topic: Logging and alerting
+
+risks:
+  - title: Audit logs are missing or incomplete
+    statement: >-
+      Activity on in-scope systems is not recorded, or is recorded without enough detail. This can
+      happen when logging is never turned on, covers only some events, or is kept only on the system it
+      records. The result could be that nobody can show who changed financial data or access, and an
+      investigation has nothing to work from.
+    owned_by: Application owner
+    stage: Configure and evidence
+    in_sox_scope: yes
+    covered_by:
+      - control: audit-logging
+        coverage: full
+        why: The events that matter are logged with enough detail, sent to central logging, protected from change and evidenced with dates.
+      - control: log-feed-monitoring
+        coverage: partial
+        why: A systems list compared with the feeds actually arriving shows any system that was never set up.
+
+  - title: Logging stops and nobody notices
+    statement: >-
+      Logs from an in-scope system stop reaching the central logging tool, or logging is switched off.
+      This can happen when a feed breaks after a change, or when nobody checks that logs are still
+      arriving. The result could be a blind spot where misuse or errors go unseen for days, with no
+      record to review afterward.
+    owned_by: Application owner
+    stage: Keep it on
+    in_sox_scope: yes
+    covered_by:
+      - control: log-feed-monitoring
+        coverage: full
+        why: Alerts fire when a feed stops or logging settings change, someone actively checks them, and each gap is fixed and recorded.
+      - control: audit-logging
+        coverage: partial
+        why: Dated evidence of the intended settings makes an unexpected change easy to see.
+
+  - title: Logs are lost when a system fails over or is recovered
+    statement: >-
+      Logs from an in-scope system are not recorded after it moves to a standby server or is rebuilt.
+      This can happen when the standby is not set up to log in the same way, or logging is not checked
+      after the switch. The result could be a gap in the record exactly when the system is least stable.
+    owned_by: Application owner
+    theme: Failover
+    in_sox_scope: yes
+    covered_by:
+      - control: log-feed-monitoring
+        coverage: partial
+        why: Logging is confirmed from the new server after a failover or restore, and a stopped feed raises an alert.
+      - control: audit-logging
+        coverage: partial
+        why: Standby and failover servers are set up to log in the same way as the main one.
+
+  - title: Alerts are ignored or sit unreviewed
+    statement: >-
+      Alerts about in-scope systems are raised but not looked at in time. This can happen when nobody
+      owns the queue, cover is missing out of hours, or the rules are so noisy that real signals are
+      lost. The result could be a real fault or attack carrying on unchecked while the alert waits.
+    owned_by: Application owner
+    stage: Triage alerts
+    in_sox_scope: yes
+    covered_by:
+      - control: alert-triage
+        coverage: full
+        why: Every alert has an owner who looks at it within the time for the system's BCP tier and records a first decision.
+      - control: incident-support
+        coverage: partial
+        why: Alerts that look like a security incident are passed on to the security team straight away.
+
+  - title: Alerts are closed without being fixed or explained
+    statement: >-
+      An alert is closed without the cause being found or the problem fixed. This can happen when
+      closing is a single click with no notes, or when nobody reads closed alerts. The result could be
+      the same fault or misuse coming back, and no way to show what was done about it.
+    owned_by: Application owner
+    stage: Resolve and close
+    in_sox_scope: yes
+    covered_by:
+      - control: alert-resolution
+        coverage: full
+        why: Each alert that needs action has an owner and a due time, and closes with notes that someone else reads.
+      - control: alert-triage
+        coverage: partial
+        why: The first decision on each alert is recorded, so it is clear which ones needed action.
+
+  - title: A security incident is reported late or its evidence is lost
+    statement: >-
+      A security incident affecting an in-scope system is reported to the security team late, or its
+      evidence is lost. This can happen when system owners don't know who to contact, logs are not kept
+      long enough, or someone cleans up before the evidence is saved. The result could be a wider breach,
+      a slower response and no reliable record of what happened.
+    owned_by: Head of Engineering
+    stage: Resolve and close
+    in_sox_scope: no
+    covered_by:
+      - control: incident-support
+        coverage: full
+        why: Logs are kept and available, contacts are known, suspected incidents are reported straight away and evidence is left as it was.
+      - control: audit-logging
+        coverage: partial
+        why: Logs that were kept and protected give the security team something to work from.
+
+controls:
+  - ref: audit-logging
+    title: Audit logging is configured and evidenced
+    why: >-
+      Logs are the record of who did what on a system. If the right events are not logged, or the logs
+      sit only on the system itself, there is nothing to review or investigate later. Dated evidence of the
+      settings shows the logging was set up on purpose and still matches.
+    applies_when:
+      - The system holds, processes or controls access to financial or sensitive data, or administers a system that does.
+    nature: preventive
+    method: it_dependent
+    frequency: event
+    level: supporting
+    owned_by: Application owner
+    performed_by: Platform engineer
+    reviewed_by: Control owner
+    stage: Configure and evidence
+    categories: [application, database, operating_system, identity, cloud, engineering_tools, jobs, logging]
+    criteria:
+      - heading: What is logged
+        part: configuration
+        items:
+          - Sign-ins and failed sign-ins, changes to access and permissions, administrator and privileged activity, changes to data structure and settings, and changes to the logging itself are logged for every in-scope system.
+          - Each entry shows who, what, when and from where, and system clocks are kept in sync so entries from different systems line up.
+          - Logs reach Splunk soon after they are written, not only the system that wrote them. Standby and failover servers are set up to log in the same way.
+      - heading: Protecting the logs
+        part: configuration
+        items:
+          - The people who administer a system can't change or delete the logs of their own actions.
+          - Logs are kept for the period in the firm's [records retention schedule](#todo-records-retention-schedule).
+      - heading: Evidence
+        part: monitoring
+        items:
+          - For each in-scope system, a dated export of the logging settings and a recent entry from Splunk are kept. The logging-changed alert in "Log feeds are actively monitored and a stopped feed is fixed" shows the settings held for the rest of the period.
+          - The evidence is refreshed when a system is added or its logging settings change.
+          - text: The evidence is kept for the period in the firm's records retention schedule.
+            sox_only: true
+    steps:
+      - who: Platform engineer
+        do: List the events the system should log, turn them on, and send them to Splunk.
+        evidence: A dated export of the logging settings; the logging-changed alert and its history cover the rest of the period
+        part: configuration
+      - who: Platform engineer
+        do: Limit who can change or delete logs and the logging settings, and confirm administrators can't alter their own entries.
+        evidence: The permissions on the log store, with the date
+        part: configuration
+      - who: Platform engineer
+        do: Find a recent entry for the system in Splunk and save it with the settings export.
+        evidence: A Splunk search result showing the entry and the time it arrived
+        part: monitoring
+      - who: Control owner
+        do: When a system is added or its logging changes, confirm the evidence was refreshed.
+        evidence: The updated evidence and the change record
+        part: monitoring
+
+  - ref: log-feed-monitoring
+    title: Log feeds are actively monitored and a stopped feed is fixed
+    why: >-
+      Logging that was set up correctly can still stop quietly, after a change, a failover or an expired
+      credential. This control only works if someone actively checks that logs are still arriving and
+      acts when they are not. An alert nobody reads does not count.
+    applies_when:
+      - The system sends logs to Splunk or another central logging tool.
+    nature: detective
+    method: it_dependent
+    frequency: daily
+    level: key
+    owned_by: Application owner
+    performed_by: Log feed owner
+    reviewed_by: Control owner
+    stage: Keep it on
+    categories: [application, database, operating_system, identity, cloud, engineering_tools, jobs, logging]
+    criteria:
+      - heading: Noticing a problem
+        part: monitoring
+        items:
+          - Each in-scope system has an alert that fires when its logs stop arriving, within the time set in your team's written procedure (our recommendation is in [Recommended timelines by BCP tier](/guides/recommended-timelines-by-bcp-tier/)). Where a feed reads from a database table, the alert checks that the reader keeps advancing, not only that the table exists.
+          - An alert also fires when logging is turned off or its settings are changed.
+          - A named person actively checks the alerts and a feed status view on the schedule set in your procedure, and has cover when away.
+      - heading: Fixing it
+        part: monitoring
+        items:
+          - A stopped feed is raised as a ticket, fixed, and confirmed by seeing new entries arrive. After a failover or restore, logging is confirmed from the new server.
+          - The gap is recorded with its start and end, and the activity in that period is checked another way where possible, for example from the system's own local logs.
+          - Each gap is reported to the owners of any control that uses these logs as evidence, so they can record the effect on their control.
+      - heading: Nothing left out
+        part: monitoring
+        items:
+          - On the schedule set in your procedure, the list of in-scope systems is compared with the systems actually sending logs, so a system that was never set up or was added later is found.
+          - text: The alerts, checks, tickets and gap records are kept for the period in the firm's records retention schedule.
+            sox_only: true
+    steps:
+      - who: Platform engineer
+        do: Create the stopped-feed alert and the logging-changed alert for each in-scope system, and send them to a queue someone reads.
+        evidence: The alert definitions and the queue they go to
+        part: configuration
+      - who: Log feed owner
+        do: Check the alerts and the feed status view on the schedule set in your procedure, and raise a ticket for each stopped feed.
+        evidence: A dated record of the check, and the tickets
+        part: monitoring
+      - who: Log feed owner
+        do: Fix the feed, confirm new entries are arriving, record the gap, and tell the owners of controls that use these logs.
+        evidence: The ticket with the fix, and a search result showing entries resumed
+        part: monitoring
+      - who: Control owner
+        do: On the schedule set in your procedure, compare the list of in-scope systems with the systems sending logs and follow up on any difference.
+        evidence: The comparison with notes on each gap
+        part: monitoring
+
+  - ref: alert-triage
+    title: Alerts are triaged within the time for the system's tier
+    why: >-
+      An alert is only useful if a person looks at it soon enough to matter. A named owner, a recorded
+      first decision and cover when people are away mean alerts do not sit unread.
+    applies_when:
+      - The system has alert rules that notify a person or a queue.
+    nature: detective
+    method: manual
+    frequency: daily
+    level: non-key
+    owned_by: Application owner
+    performed_by: Alert reviewer
+    reviewed_by: Control owner
+    stage: Triage alerts
+    categories: [application, database, operating_system, identity, cloud, engineering_tools, jobs, logging]
+    criteria:
+      - heading: Looking at every alert
+        items:
+          - Every alert goes to a named queue or owner, with a backup, and is looked at within the time set in your team's written procedure (our recommendation is in [Recommended timelines by BCP tier](/guides/recommended-timelines-by-bcp-tier/)).
+          - Cover for absences and out-of-hours matches the system's BCP tier.
+          - Each alert gets a recorded first decision with a short reason, such as a false alarm, something to fix or a possible security incident.
+          - A possible security incident is passed to the security team straight away, as described in "System owners are ready to support a security incident".
+      - heading: Keeping the rules useful
+        items:
+          - Alert rules are reviewed at least once a year and after major changes, so noisy rules are tuned and gaps are filled.
+          - text: The alerts, first decisions and queue history are kept for the period in the firm's records retention schedule.
+            sox_only: true
+    steps:
+      - who: Alert reviewer
+        do: Look at each alert in the queue and record whether it is a false alarm, something to fix or a possible security incident.
+        evidence: The alert record with the decision, the reason and the time
+      - who: Alert reviewer
+        do: For a possible security incident, report it to the security team straight away.
+        evidence: The report and the time it was sent
+      - who: Control owner
+        do: At least once a year, review the alert rules for noise and gaps.
+        evidence: The review notes and any rule changes
+
+  - ref: alert-resolution
+    title: Alerts are resolved and closed with notes
+    why: >-
+      Closing an alert should mean the cause was found and dealt with. Notes that someone else can follow,
+      and a second person reading a sample of closed alerts, keep alerts from being closed only to clear the queue.
+    applies_when:
+      - The system has alerts that need action from the team.
+    nature: detective
+    method: manual
+    frequency: weekly
+    level: non-key
+    owned_by: Application owner
+    performed_by: Alert reviewer
+    reviewed_by: Control owner
+    stage: Resolve and close
+    categories: [application, database, operating_system, identity, cloud, engineering_tools, jobs, logging]
+    criteria:
+      - heading: Fixing the cause
+        items:
+          - Each alert that needs action has a ticket with an owner and a due time, linked to the alert.
+          - The work is finished within the time set in your team's written procedure (our recommendation is in [Recommended timelines by BCP tier](/guides/recommended-timelines-by-bcp-tier/)). Late items are recorded with a reason and raised with the system owner.
+      - heading: Closing with notes
+        items:
+          - A closed alert says what was found, what was done, who did it and when, clearly enough for someone who wasn't there.
+          - On the schedule set in your procedure, someone other than the person who closed them reads a set number of closed alerts chosen from across the period, and confirms the notes support the decision. Your procedure says how many and how they are chosen.
+          - Open alerts are listed and reviewed on the same schedule, and none stays open past its due time without a recorded reason.
+          - text: The tickets, closing notes and reviews are kept for the period in the firm's records retention schedule.
+            sox_only: true
+    steps:
+      - who: Alert reviewer
+        do: Raise a ticket for each alert that needs action, fix the cause, and close the alert with notes.
+        evidence: The ticket and the closing notes
+      - who: Control owner
+        do: On the schedule set in your procedure, read the chosen closed alerts and the list of open ones, and follow up on weak notes or late items.
+        evidence: The alerts reviewed, how they were chosen, and the review notes with any follow-up
+
+  - ref: incident-support
+    title: System owners are ready to support a security incident
+    why: >-
+      The security team runs incident handling. The system owner's part is to have logs and contacts ready,
+      to report a suspected incident quickly, and to leave the evidence as it was. Teams that have
+      already done these things make the security team's work faster.
+    applies_when:
+      - The system could be involved in a security incident, for example through misuse of access, malware or exposed data.
+    nature: preventive
+    method: manual
+    frequency: event
+    level: supporting
+    owned_by: Head of Engineering
+    performed_by: System owner
+    reviewed_by: Control owner
+    stage: Resolve and close
+    categories: [application, database, operating_system, identity, cloud, engineering_tools, jobs, logging]
+    criteria:
+      - heading: Being ready
+        items:
+          - Logs for the system are kept for the period in the firm's records retention schedule and can be provided to the security team quickly, including from before an alert fired.
+          - The system has named contacts, with backups, who can answer questions or take action at short notice. The list is checked at least once a year.
+          - Everyone who runs the system knows where to report a suspected incident, using [the security team's incident reporting page](#todo-security-incident-reporting).
+      - heading: When something looks wrong
+        items:
+          - A suspected incident is reported to the security team straight away through their process, even when it is not yet certain.
+          - Evidence is left as it was, and nothing is deleted or tidied up until the security team says it is safe.
+          - Actions the security team asks of the system owner are tracked until done, with who did them and when.
+      - heading: Afterward
+        items:
+          - Gaps the incident showed, such as missing logs or alerts, are fixed and the logging evidence is refreshed.
+          - The report time, the evidence kept and the follow-up are recorded and kept for the period in the firm's records retention schedule.
+    steps:
+      - who: System owner
+        do: Keep a list of the system's contacts and where its logs are held, and check it at least once a year.
+        evidence: The contact list and log locations, with the date
+      - who: System owner
+        do: Report a suspected incident to the security team straight away, using their process.
+        evidence: The report and the time it was sent
+      - who: System owner
+        do: Keep the logs and other evidence as they were, and provide them when the security team asks.
+        evidence: A note of what was kept and handed over
+      - who: System owner
+        do: Track each action the security team asks for until it is done, and fix any logging gap the incident showed.
+        evidence: The action list with completion dates

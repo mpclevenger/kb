@@ -1,0 +1,73 @@
+{% extends "rcm/entity_form.html" %}
+{% block form_fields %}
+<section class="trac-form-section" aria-labelledby="sec-about">
+  <h2 id="sec-about">About this risk</h2>
+  {% include "components/field_form.html" with field=form.title %}
+  <div class="row">
+    <div class="col-md-6">
+      {% include "components/field_form.html" with field=form.topic %}
+    </div>
+    <div class="col-md-6">{% include "components/field_form.html" with field=form.stage %}</div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">{% include "components/field_form.html" with field=form.theme %}</div>
+  </div>
+  {% include "components/field_form.html" with field=form.owner_role %}
+  {% include "components/field_form.html" with field=form.review_by %}
+  {% include "components/field_form.html" with field=form.in_sox_scope %}
+  {% include "components/field_form.html" with field=form.statement %}
+</section>
+
+<section class="trac-form-section" aria-labelledby="sec-controls">
+  <h2 id="sec-controls">Controls that cover this risk</h2>
+  <p class="section-help">Pick each control that helps manage this risk. Say whether it covers the risk fully or only in part, and why.</p>
+  <div data-rows-editor>
+    {{ form.controls }}
+    <div data-rows-wrap>
+      <ol class="trac-rows" data-list data-shape="objects" data-noun="control"></ol>
+      <template>
+        <li class="trac-row" data-row>
+          <span class="trac-row-num" aria-hidden="true"></span>
+          <div class="trac-row-body trac-link-grid">
+            <label>Control
+              <select class="form-select" data-field="control">
+                <option value="">Select a control</option>
+                {% for ident, label in form.control_choices %}<option value="{{ ident }}">{{ label }}</option>{% endfor %}
+              </select>
+            </label>
+            <label>How much it covers
+              <select class="form-select" data-field="coverage">
+                <option value="full">Fully</option>
+                <option value="partial">Partly</option>
+              </select>
+            </label>
+            <label class="wide">Why does it cover this risk?<input class="form-control" data-field="rationale" maxlength="300"></label>
+          </div>
+          <div class="trac-row-tools" data-tools></div>
+        </li>
+      </template>
+      <button type="button" class="btn btn-sm btn-outline-primary" data-action="add">Add a control</button>
+    </div>
+  </div>
+  {% for error in form.controls.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+</section>
+
+<section class="trac-form-section" aria-labelledby="sec-drivers">
+  <h2 id="sec-drivers">Drivers</h2>
+  <p class="section-help">Optional. Pick the conditions that make this risk more likely.</p>
+  {% include "components/field_form.html" with field=form.drivers %}
+</section>
+
+<section class="trac-form-section" aria-labelledby="sec-refs">
+  <h2 id="sec-refs">References</h2>
+  {% include "components/references_editor.html" with field=form.references %}
+</section>
+
+{% if form.change_summary %}
+<section class="trac-form-section" aria-labelledby="sec-change">
+  <h2 id="sec-change">Your change</h2>
+  {% include "components/field_form.html" with field=form.change_summary %}
+</section>
+{% endif %}
+<noscript><p class="text-danger">This form needs JavaScript to add and edit the controls list.</p></noscript>
+{% endblock %}

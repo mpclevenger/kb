@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load trac_ui trac_labels %}
+{% block title %}{{ ident }} {{ v.title }} - TRAC{% endblock %}
+
+{% block content %}
+{% include "components/version_notices.html" %}
+{% include "components/version_workflow.html" %}
+<header class="page-header">
+  <div class="page-header-top">
+    <div>
+      <div class="mb-2">{% control_pill ident %}</div>
+      <h1 class="page-header-title">{{ v.title }}</h1>
+    </div>
+    {% include "components/page_actions.html" %}
+  </div>
+  <div class="page-header-meta">
+    {% attribute_pill "Nature" v.get_nature_display tone=v.nature|pill_tone:"nature" %}
+    {% attribute_pill "Method" v.get_method_display tone=v.method|pill_tone:"method" %}
+    {% attribute_pill "Frequency" v.get_frequency_display tone=v.frequency|pill_tone:"frequency" %}
+    {% attribute_pill "Level" level_label tone="key" %}
+    {% if level_is_top %}<a class="small" href="{% url 'rcm:sox' %}">Key controls for SOX in-scope apps</a>{% endif %}
+    {% for key in category_keys %}{% category_pill key %}{% endfor %}
+    {% attribute_pill "Owner role" v.owner_role tone="owner" %}
+  </div>
+  {% if v.performer_role or v.reviewer_role %}
+  <p class="sod-line">
+    {% if v.performer_role %}Performed by: <strong>{{ v.performer_role }}</strong>{% endif %}{% if v.performer_role and v.reviewer_role %} &middot; {% endif %}{% if v.reviewer_role %}Reviewed by: <strong>{{ v.reviewer_role }}</strong>{% endif %}
+  </p>
+  {% endif %}
+  {% if platform_list %}
+  <p class="applies-to"><span class="applies-to-label">Applies to:</span>
+    {% for platform in platform_list %}{% platform_chip platform %}{% endfor %}
+  </p>
+  {% endif %}
+</header>
+
+{% section_toolbar %}
+
+{% section_card "Why this control exists" tone="why" id="why" %}
+  <div class="prose">{{ v.why|linebreaks }}</div>
+  {% if addresses %}<p class="mb-0"><strong>Addresses:</strong>
+    {% for row in addresses %}<a href="{{ row.risk.get_absolute_url }}">{{ row.risk.ident }}</a> {{ row.version.title }}{% if not forloop.last %}; {% endif %}{% endfor %}</p>{% endif %}
+{% endsection_card %}
+
+{% if v.applies_when %}
+{% section_card "Do I need this?" tone="need" id="applies" %}
+  <p>This control applies if any of these are true.</p>
+  <ul class="mb-0">{% for item in v.applies_when %}<li>{{ item }}</li>{% endfor %}</ul>
+{% endsection_card %}
+{% endif %}
+
+{% if criteria_sections %}
+{% section_card "What good looks like" tone="good" id="good" %}
+  <p>This is recommended practice. Your team's written procedure sets out how you meet it on your systems, and that procedure is what reviewers test.</p>
+  {% if has_sox_only %}<p class="criteria-legend">Lines marked For SOX apps apply when the system is on the firm's SOX in-scope list; otherwise they are recommended.</p>{% endif %}
+  {% for sec in criteria_sections %}
+  {% if sec.heading %}{% include "rcm/_part_heading.html" %}{% endif %}
+  {% criteria_list sec.groups %}
+  {% endfor %}
+{% endsection_card %}
+{% endif %}
+
+{% if step_sections or v.reviewer_role %}
+{% section_card "How to run it" tone="how" id="run" %}
+  {% if v.reviewer_role %}{% callout type="note" title="Independent review" %}The reviewer must be independent of what they review. If that isn't possible in your team, add a compensating check — for example, a second reviewer from another team looks at a sample — and write it into your procedure.{% endcallout %}{% endif %}
+  {% for sec in step_sections %}
+  {% if sec.heading %}{% include "rcm/_part_heading.html" %}{% endif %}
+  {% step_list %}
+    {% for s in sec.steps %}{% step role=s.role %}<p class="mb-0">{{ s.text }}</p>{% if s.evidence %}<p class="small text-secondary mt-1 mb-0"><strong>Keep:</strong> {{ s.evidence }}</p>{% endif %}{% endstep %}
+    {% endfor %}
+  {% endstep_list %}
+  {% endfor %}
+{% endsection_card %}
+{% endif %}
+
+{% include "components/references.html" with references=v.references %}
+{% include "components/version_footer.html" %}
+{% endblock %}

@@ -1,0 +1,34 @@
+platform: GitHub Enterprise Server
+intro: The GHES environment, where the firm stores code and runs pipelines, including Databricks deployments.
+  Read this with the Engineering tools and Jobs categories, and with the GitHub Actions runners and Repository
+  management guides.
+considerations:
+  Access: |
+    - Site administrators and enterprise owners are few named people.
+    - Sign-in uses SSO with team membership synchronized from the directory, so removing a person from a group removes repository access.
+    - Organization owners are a small named group of platform administrators.
+  Service accounts: |
+    - Automation uses GitHub Apps or machine users with an owner and a purpose, and fine-grained or short-lived tokens. Personal access tokens belong to people, not to pipelines.
+    - Deploy keys are listed per repository, and write access deploy keys are the exception.
+  Change: |
+    - Repository protections and workflow security follow [Repository management](/guides/repository-management/) and [GitHub Actions runners](/guides/github-actions-runners/).
+    - Upgrades of the server itself are planned changes with testing and rollback steps.
+  Configuration: |
+    - Secret scanning and push protection need the GHES secret protection license. Where it isn't licensed, a scanner runs as a required check on every pull request.
+    - A dated export of rulesets, environment settings and Actions policy is kept.
+  Logging: |
+    - The enterprise audit log is streamed to Splunk, including repository, permission, runner and secret changes.
+    - Workflow run history is kept for deployments to production.
+  Patching: |
+    - The appliance is upgraded within the supported release window, through change control.
+    - Self-hosted runner hosts are patched and, where possible, ephemeral.
+  Recovery: |
+    - Appliance backups are taken on a schedule and kept away from the instance. A restore to a test appliance is done and recorded.
+    - The recovery plan covers repositories, user data, Actions configuration and secrets, and runners.
+  Data: |
+    - Repository visibility is private or internal unless approved.
+    - Artifact and log retention is set and limited.
+  Network: |
+    - The server and runners reach each other and the systems they deploy to over specified paths only.
+  Vendor: |
+    - Vendor support for the installed release is current, and the vendor's release notes are watched for security fixes. GHES is self-hosted, so there is no vendor assurance report for the service itself.

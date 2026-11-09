@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load trac_ui %}
+{% block title %}Tech Risk sign-in | TRAC{% endblock %}
+{% block content %}
+{% page_header "Tech Risk sign-in" %}{% endpage_header %}
+<p class="mb-4">For the Tech Risk team, to edit and approve content. Everyone else can read and comment without signing in.</p>
+<form method="post" class="trac-paper mb-3">
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+  {% for field in form %}{% include "components/field_form.html" %}{% endfor %}
+  <button type="submit" class="btn btn-primary">Sign in</button>
+</form>
+{% endblock %}

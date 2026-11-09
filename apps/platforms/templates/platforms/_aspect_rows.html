@@ -1,0 +1,21 @@
+{% load trac_labels trac_ui %}{# One row per aspect question. Pass rows; show_gaps adds "Guidance coming soon" and "No control yet" where a row has none. The category color comes from the surrounding element. #}
+<ul class="place-list">
+  {% for row in rows %}
+  <li class="place-row">
+    <div>
+      <a class="place-label" href="{% url 'topics:detail' row.question.topic.slug %}">{{ row.question.label }}</a>
+      <span class="place-question">{{ row.question.text }}</span>
+    </div>
+    <div class="place-guidance">
+      {% if row.line %}{{ row.line|bullets }}{% elif show_gaps %}<p class="text-secondary">Guidance coming soon</p>{% endif %}
+    </div>
+    <div class="place-controls">
+      {% for control, version in row.controls %}{% control_pill control.ident version.title control.get_absolute_url %}
+      {% empty %}{% if show_gaps and not row.more %}<span class="gap-badge">No control yet</span>{% endif %}{% endfor %}
+      {% if row.more %}{% more_controls row.more %}{% for group in row.more %}<p class="more-controls-level">{{ group.label }}</p>
+      {% for control, version in group.items %}{% control_pill control.ident version.title control.get_absolute_url %}
+      {% endfor %}{% endfor %}{% endmore_controls %}{% endif %}
+    </div>
+  </li>
+  {% endfor %}
+</ul>

@@ -1,0 +1,125 @@
+# Controls and risks for one topic. Plain text; edit with any text editor.
+# After editing: python manage.py check_controls, then
+# python manage.py sync_controls --user <you> --publish. See README.md in this folder.
+# A control or risk is matched to the site by its title. Renaming a title makes a NEW item.
+#
+# FILE
+#   topic          Name of the topic exactly as it appears on the site.
+#   risks          What could go wrong. Each risk lists the controls that cover it.
+#   controls       The controls themselves.
+#
+# RISK (each entry under "risks")
+#   title          Short name of the risk.
+#   statement      What could go wrong, why, and what it would lead to.
+#   owned_by       Role accountable for the risk (a role, not a name).
+#   stage          Lifecycle stage the risk belongs to. Use "theme" instead to
+#                  place it under a theme. Never both.
+#   in_sox_scope   yes or no. Is this a risk for SOX in-scope apps?
+#   covered_by     Controls that reduce this risk. Each has:
+#                    control   the short name ("ref") of a control in this file
+#                    coverage  full or partial
+#                    why       one line saying how the control helps
+#
+# CONTROL (each entry under "controls")
+#   ref            Short name used only inside this file, so risks can point to it.
+#                  The site gives the control its real ID (for example CM-01).
+#   title          Name of the control.
+#   why            Why the control exists, in two or three sentences.
+#   applies_when   Plain statements. The control applies if any one is true.
+#   nature         preventive (stops it happening) or detective (finds it afterward).
+#   method         manual, automated, or it_dependent (a person works from a system report).
+#   frequency      event (each time it happens), daily, weekly, monthly, quarterly,
+#                  semiannual or annual.
+#   level          key, non-key, compensating or supporting, most important first (see levels.yaml):
+#                    key           relied on to address the risk, tested by auditors
+#                    non-key       matters, but is not relied on alone
+#                    compensating  covers for a control that is missing or not working, usually for a limited time
+#                    supporting    helps other controls work (documentation, baselines, tuning)
+#   owned_by       Role accountable for the control.
+#   performed_by   Role that does the work day to day.
+#   reviewed_by    Role that checks the work (optional).
+#   stage / theme  Where it sits in the topic: one stage, or one theme.
+#   categories     Kinds of technology it applies to: application, database,
+#                  operating_system, jobs, network, identity, cloud,
+#                  engineering_tools or logging.
+#   platforms      Optional. Platform names exactly as on the site. A name the
+#                  site doesn't have is skipped with a warning.
+#   criteria       What good looks like, in groups. Each group has:
+#                    heading   what the group is about
+#                    part      optional: configuration (set up correctly) or
+#                              monitoring (checked on an ongoing basis)
+#                    items     plain sentences. Write "text:" and "sox_only: true"
+#                              for an item needed only for SOX in-scope apps.
+#   steps          How to run it, in order. Each has:
+#                    who       role doing the step
+#                    do        what to do
+#                    evidence  what to keep as proof
+#                    part      optional: configuration or monitoring
+#   references     Optional. A list of "label" and "link" (starting with https://).
+
+topic: Third parties
+
+risks:
+  - title: A vendor's control failures go unseen
+    statement: >-
+      A vendor that runs part of a system or service the firm relies on, such as a cloud provider or a
+      hosted application, has weak or failed controls that nobody at the firm sees. This can happen when
+      its assurance report is not obtained or read, does not cover the service or the period, or lists
+      controls the firm is expected to run and does not. The result could be errors, outages or exposed
+      data at the vendor affecting the firm's financial or sensitive data.
+    owned_by: System or service owner
+    theme: SOC report review
+    in_sox_scope: yes
+    covered_by:
+      - control: soc-report-review
+        coverage: full
+        why: The owner of the system or service reads the vendor's report each year, assesses its test exceptions and maps the complementary user entity controls to named owners.
+
+controls:
+  - ref: soc-report-review
+    title: Vendor SOC reports are reviewed each year
+    why: >-
+      When a vendor runs part of a system, the vendor's controls are part of the firm's control story. The
+      independent report on those controls shows whether they worked, and what the firm is expected to do
+      on its side. Reading it is the job of the owner of the system or service that relies on the vendor.
+    applies_when:
+      - A vendor hosts, runs or supports a system or service the firm relies on, and the vendor has an independent assurance report.
+    nature: detective
+    method: manual
+    frequency: annual
+    level: key
+    owned_by: System or service owner
+    performed_by: System or service owner
+    reviewed_by: Head of Engineering
+    theme: SOC report review
+    categories: [application, cloud, identity, engineering_tools, logging]
+    criteria:
+      - heading: The right report
+        items:
+          - Each year the owner gets the vendor's latest report. It is a type 2 report (one that tests the vendor's controls over a period, not just on one day) and it covers the service the firm uses.
+          - Most of the firm's period falls inside the report's period. A bridge letter (the vendor's statement that nothing significant changed since the report ended) covers a short gap; for a longer gap the owner records what else the firm relies on.
+          - text: For a system that feeds financial reporting, the report covers controls relevant to financial reporting.
+            sox_only: true
+      - heading: What the report says
+        items:
+          - Each test exception the vendor's auditor reported, and the vendor's response, is read and assessed for its effect on the firm. The decision, who made it and what was done are recorded.
+          - Other companies the vendor relies on and that the report leaves out (subservice organizations) are noted, with whether they have their own report or what else the firm relies on.
+      - heading: The firm's side
+        items:
+          - Each complementary user entity control in the report (a control the vendor expects the firm to run) is mapped to a firm control that runs, with a named owner role. One that can't be mapped is fixed or recorded as an accepted risk.
+          - The review happens soon after the report arrives and before year-end, and records the reviewer and the date (see "Reading a vendor's SOC report").
+          - text: The report, the bridge letter, the review and the control mapping are kept for the period in the firm's [records retention schedule](#todo-records-retention-schedule).
+            sox_only: true
+    steps:
+      - who: System or service owner
+        do: Get the vendor's latest report and, if needed, a bridge letter, and check the kind of report, the service covered and the period.
+        evidence: The report and letter, with the date received
+      - who: System or service owner
+        do: Read the test exceptions and the vendor's responses, note carved-out subservice organizations, and record the decision on each.
+        evidence: The completed checks and decisions, with names and dates
+      - who: System or service owner
+        do: List each complementary user entity control, map it to a firm control, and name its owner.
+        evidence: The mapping with an owner for each control
+      - who: Head of Engineering
+        do: Review the checks, the decisions and the mapping, and sign off.
+        evidence: The sign-off with the date

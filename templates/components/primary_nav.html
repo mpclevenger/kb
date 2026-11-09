@@ -1,0 +1,6 @@
+<nav class="trac-nav" aria-label="Primary">
+  <ul>
+    {% for key, label, href, active in items %}<li><a href="{{ href }}"{% if active %} aria-current="page"{% endif %}>{{ label }}</a></li>
+    {% endfor %}
+  </ul>
+</nav>

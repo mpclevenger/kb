@@ -1,0 +1,40 @@
+category: jobs
+intro: Scheduled jobs and interfaces that move or process data on a timetable, wherever the scheduler
+  lives. The main risk is that a job runs with too much authority, changes without review, or fails without
+  anyone noticing.
+practices:
+  Access: |
+    - Only a small, named group can create, edit, run or delete jobs in the scheduler. Rights to edit a job are separate from rights to view its history.
+    - The list of who can change jobs is reviewed on the schedule in your team's access review procedure, and updated when people move or leave.
+    - Support staff who need to rerun a job have run-only rights.
+  Service accounts: |
+    - Each job runs as an account that is listed, owned and limited to what the job does. Jobs do not run as a person.
+    - Credentials are held in a secret store or the scheduler's credential store, not in job scripts.
+    - Jobs that move financial data do not run as an administrator unless there is a documented reason.
+  Change: |
+    - A job's definition, schedule, script and parameters are changed through change control, with a review by someone other than the author.
+    - Job definitions are kept in a repository or exported on a schedule, so a change shows as a difference between versions.
+    - Changes made directly in the scheduler are detected by comparing the live definition with the approved one.
+  Configuration: |
+    - There is an inventory of jobs that lists purpose, owner, schedule, source and target, and the controls that depend on the job.
+    - A dated export of job definitions is kept.
+    - Jobs no longer needed are disabled and removed.
+  Logging: |
+    - Job runs are recorded with start, end, status and who changed or started them, for as long as the control it supports requires.
+    - Job failures and changes to job definitions are sent to Splunk.
+    - A job that should have run and did not raises an alert, not only a failed one.
+  Patching: |
+    - The scheduler, its agents and the hosts they run on are scanned and patched on the schedule in your team's written procedure.
+    - Scripts and packages that jobs depend on are tracked and kept supported.
+  Recovery: |
+    - Job definitions and schedules are backed up or held in a repository, so the scheduler can be rebuilt with its jobs.
+    - After recovery, the job order and dependencies are known, so jobs do not run twice or skip a day. Restoring job definitions is part of the recovery test.
+  Data: |
+    - Jobs that move data between systems show completeness and accuracy: record counts or control totals reconcile between source and target.
+    - Failed and partial runs are reviewed and resolved, and rerun rules are documented so data is not loaded twice.
+  Network: |
+    - Scheduler servers and agents communicate over restricted, encrypted paths, and agents accept instructions only from the scheduler.
+    - Jobs reach source and target systems over approved paths only.
+  Vendor: |
+    - If the scheduler is a vendor product, vendor support is current. If a vendor hosts it, the vendor is on the vendor risk team's list, and the system owner reviews its assurance report each year (see the Reading a vendor's SOC report guide), including the controls the report expects the firm to run itself.
+    - If a vendor builds or runs the jobs, their access is approved, time-limited and logged.

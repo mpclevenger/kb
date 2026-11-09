@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Who am I - TRAC</title></head>
+<body>
+<h1>Current user</h1>
+{% if user.is_authenticated %}
+<dl>
+<dt>Username</dt><dd>{{ user.username }}</dd>
+<dt>Name</dt><dd>{{ user.get_full_name|default:"-" }}</dd>
+<dt>Email</dt><dd>{{ user.email|default:"-" }}</dd>
+<dt>Roles</dt><dd>{{ roles_list|join:", "|default:"none" }}</dd>
+<dt>Auth mode</dt><dd>{{ auth_mode }}</dd>
+</dl>
+{% else %}
+<p>Not signed in.</p>
+{% endif %}
+</body>
+</html>

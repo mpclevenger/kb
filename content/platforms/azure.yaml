@@ -1,0 +1,36 @@
+platform: Azure
+intro: Microsoft Azure subscriptions and the services in them. Read this with the Cloud category, and
+  with the Identity category because Azure access is managed through Entra ID.
+considerations:
+  Access: |
+    - Azure RBAC role assignments go to groups, not individuals, at the narrowest scope that works: resource group or resource before subscription.
+    - Owner and User Access Administrator are assigned through Entra Privileged Identity Management as eligible roles that people activate with a reason. Any permanent assignment has a documented reason.
+    - Guest and vendor access has a sponsor and an end date.
+  Service accounts: |
+    - Workloads use managed identities. App registrations and service principals have an owner, and their secrets and certificates have an expiry.
+    - Service principal permissions in Entra ID are reviewed on the schedule in your team's written procedure.
+  Change: |
+    - Only the pipeline's identity holds write roles in production (see the Infrastructure as code guide). Changes made by any other identity are found from the Activity Log and followed up.
+  Configuration: |
+    - Management groups apply Azure Policy initiatives for the baseline, such as allowed regions, encryption and no public network access.
+    - Defender for Cloud and policy compliance results are exported and dated, and findings are tracked to closure.
+    - Subscriptions sit under management groups, each with a recorded owner, purpose and BCP tier.
+  Logging: |
+    - The Activity Log for every subscription and Entra ID sign-in and audit logs are forwarded to Splunk.
+    - Diagnostic settings are enforced by policy, and an alert fires if a setting is removed.
+    - Defender for Cloud alerts reach a named contact.
+  Patching: |
+    - For virtual machines, the firm uses Update Manager or its scanning tool and patches within the timelines in the Recommended timelines by BCP tier guide.
+    - For platform services, record the maintenance windows and keep database engines supported.
+    - Virtual machines use approved images and encrypted disks. Azure Disk Encryption is being retired, so any machine still using it has a migration plan.
+  Recovery: |
+    - Azure Backup vaults use soft delete and immutability, with geo-redundant storage where the BCP tier requires.
+    - Restores are tested to a separate resource group and recorded.
+  Data: |
+    - Storage accounts and databases disable public network access.
+    - Key Vault access uses RBAC with purge protection and soft delete on. Shared key access is off on storage accounts, or the keys rotate.
+  Network: |
+    - Private endpoints and network security groups limit access to platform services. Connections to the data center are documented.
+    - Public IP addresses on production resources are by exception.
+  Vendor: |
+    - Microsoft is on the vendor risk team's list, and the system owner reviews its assurance reports (see the Reading a vendor's SOC report guide), including the controls the report expects the firm to run itself, such as identity and configuration.

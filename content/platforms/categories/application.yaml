@@ -1,0 +1,49 @@
+category: application
+intro: Business applications, including those built in-house and those bought from a vendor. The main
+  risk is that people can do things their job does not need, or that data and configuration change without
+  a record.
+practices:
+  Access: |
+    - Users sign in through single sign-on (SSO) tied to the firm's identity provider. Local passwords exist only for documented break-glass cases.
+    - Application roles are mapped to job duties, and the role-to-permission mapping is documented and reviewed on the schedule in your team's access review procedure.
+    - Access is requested and approved by someone other than the requester, and removed when a person moves or leaves. Evidence is the request record plus a dated user-and-role listing.
+    - Segregation of duties is built into the roles. No single role can both create and approve the same transaction.
+    - Administrator roles are held by named individuals, not shared accounts, and the list is reviewed on the same schedule.
+  Service accounts: |
+    - Every account used by an interface, job or integration is listed with an owner, a purpose and the permissions it holds.
+    - Service accounts cannot sign in interactively, and their credentials are held in a secret store, not in code or configuration files.
+    - Service accounts hold only the permissions the interface needs, and the list is reviewed on a schedule.
+  Change: |
+    - Code and configuration changes reach production through change control: a request, a review by someone other than the author, testing and an approval. See the CI/CD pipelines as change control guide.
+    - Configuration that affects controls, such as approval limits, workflow rules and role definitions, follows the same path as code.
+    - Developers do not have standing write access to production. Emergency access is time-limited, logged and reviewed afterward.
+    - The list of production changes for a period can be produced from a system, and each item matches an approval.
+  Configuration: |
+    - Security-relevant settings, such as password and session settings, SSO enforcement and audit options, are documented against a baseline.
+    - A dated export of those settings is kept, with the history of changes to them, and is refreshed after each change.
+    - The application has the documents listed in the What every system should have documented guide.
+  Logging: |
+    - Administrator actions are logged, including role and permission changes, user creation, configuration changes and failed sign-ins.
+    - Those logs are sent to Splunk, and an alert fires when the feed stops.
+    - Logs cannot be edited or deleted by the application's administrators.
+  Patching: |
+    - The application, its runtime and its components are in a vulnerability scan, and findings are fixed on the schedule in your team's written procedure.
+    - Vendor releases and security fixes are tracked, with the current version recorded.
+    - Versions that are out of vendor support are on a documented plan or an approved exception.
+  Recovery: |
+    - The application, its database and its configuration are covered by backups that match its BCP tier.
+    - A restore has been tested on a schedule, and the result is recorded with the date.
+    - A recovery runbook names the steps, the order of dependencies and the people who carry them out.
+  Data: |
+    - The data the application holds and moves is described and classified, including what flows to and from other systems.
+    - Interfaces and reports used in controls are shown to be complete and accurate: record counts or control totals reconcile between source and target, and failed records are reviewed.
+    - Edit or override of financial data is limited to defined roles and logged.
+    - Test environments do not hold production data unless it is masked or protected to the same level.
+  Network: |
+    - Users reach the application through approved paths only, such as the internal network, the VPN or an access gateway.
+    - Connections are encrypted in transit, and administrative interfaces are limited to administration networks.
+    - Firewall rules to the application servers are listed and reviewed on a schedule.
+  Vendor: |
+    - If a vendor builds, hosts or supports the application, it is on the vendor risk team's list, and the system owner reviews its assurance report each year (see the Reading a vendor's SOC report guide), including the controls the report expects the firm to run itself.
+    - The review checks that the report covers the service and the period in use, and that its test exceptions are assessed.
+    - Vendor access to the application or its data is approved, time-limited and logged.

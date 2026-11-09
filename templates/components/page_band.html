@@ -1,0 +1,19 @@
+{# The band content for a page: breadcrumbs, then optional title, summary, pill and lifecycle strip. Needs `band` (see apps/ui/bands.py). #}
+{% load trac_ui trac_labels %}
+{% if band.crumbs %}
+<div class="band-crumbs">
+  {% if band.icon and not band.title %}{% topic_icon band.icon %}{% endif %}
+  {% include "components/breadcrumbs.html" with crumbs=band.crumbs %}
+</div>
+{% endif %}
+{% if band.title %}
+<div class="band-text">
+  {% if band.section %}<div class="band-pill">{% section_pill band.section %}</div>{% endif %}
+  <div class="band-title-row">
+    <h1 class="band-title">{% if band.icon %}<span class="band-icon">{% topic_icon band.icon %}</span>{% endif %}{{ band.title }}</h1>
+    {% if band.action %}<a class="btn btn-sm btn-light" href="{{ band.action.1 }}">{{ band.action.0 }}</a>{% endif %}
+  </div>
+  {% if band.summary %}<div class="band-summary">{{ band.summary|linebreaks }}</div>{% endif %}
+</div>
+{% endif %}
+{% if band.stages %}{% lifecycle_strip band.stages band.active_stage %}{% endif %}

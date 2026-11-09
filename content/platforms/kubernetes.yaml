@@ -1,0 +1,43 @@
+platform: Kubernetes
+intro: Kubernetes clusters, whether run as a managed service by a cloud provider or on your own
+  servers. Read this with the Cloud category, the platform it runs on, and the Application category for
+  the workloads inside.
+considerations:
+  Access: |
+    - People sign in to the API server with SSO. Static tokens, shared kubeconfig files and client certificates for people are not used.
+    - Roles are granted with RBAC to groups from the identity provider, not individuals. Cluster-wide bindings are few and reviewed on the schedule in the common practices above.
+    - Nobody holds cluster-admin day to day. It is a time-limited, approved and logged elevation.
+    - Permissions that let someone raise their own access, such as `escalate`, `bind` and `impersonate`, are treated as administrator rights.
+    - Evidence is a dated export of role bindings with their subjects. For managed clusters, also the cloud role mapping to cluster access.
+  Service accounts: |
+    - Each workload has its own ServiceAccount with only the permissions it needs, and none are bound to cluster-admin.
+    - Workloads reach cloud services using workload identity, not stored keys.
+    - Secrets come from a secret store, not from manifests or Git. Where Kubernetes Secrets are used, they are encrypted at rest with a key held in a key management service.
+  Change: |
+    - Workloads and cluster configuration are deployed from Git through a pipeline or GitOps controller, and people do not run kubectl apply against production. See the CI/CD pipelines as change control guide.
+    - Drift is detected: live objects that differ from Git are reported or reverted.
+    - Cluster upgrades are planned changes, tested in a non-production cluster first.
+  Configuration: |
+    - Admission policies block privileged containers and require images from trusted registries.
+    - Production workloads do not share a namespace with other environments.
+    - A dated report of policy violations and cluster configuration against the baseline is kept. For managed clusters it includes the provider's own findings.
+  Logging: |
+    - API server audit logs, container logs and node logs go to Splunk. For managed clusters, enable the provider's control plane audit logs and forward them.
+    - Alerts exist for new cluster-wide bindings, use of cluster-admin, exec into production pods, and a stopped log feed.
+  Patching: |
+    - The cluster runs a supported Kubernetes version, and upgrades are planned before support ends. Managed clusters follow the provider's version schedule.
+    - Where the firm manages nodes, images are patched or replaced on the schedule in your team's written procedure. Where the provider manages nodes, record its upgrade settings.
+    - Images are rebuilt from updated base images and scanned again while running.
+  Recovery: |
+    - For self-managed control planes, etcd is backed up and access to the encryption key is part of the recovery plan. For managed clusters, record what the provider backs up and what the firm must back up, usually the objects in Git and the persistent data.
+    - Persistent volumes are backed up and restored in a test, and the cluster can be rebuilt from code.
+  Data: |
+    - Persistent volumes and etcd are encrypted.
+    - Workloads that hold sensitive data run in separate namespaces or nodes where classification calls for it.
+  Network: |
+    - Each namespace has a default-deny network policy, with allow rules for only the traffic the workload needs.
+    - The API server is not open to the internet. Access is private or limited to approved ranges.
+    - Workloads can't reach the node's cloud metadata service unless they need it.
+  Vendor: |
+    - For managed Kubernetes, the provider is on the vendor risk team's list and the system owner reviews its assurance report each year (see the Reading a vendor's SOC report guide). Record what the firm still owns: RBAC, workloads, images, add-ons and node settings where self-managed.
+    - For self-managed clusters, the distribution's vendor support and release cycle are tracked.

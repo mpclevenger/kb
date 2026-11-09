@@ -1,0 +1,37 @@
+{% extends "rcm/entity_form.html" %}
+{% block form_fields %}
+<section class="trac-form-section" aria-labelledby="sec-rule">
+  <h2 id="sec-rule">About this rule</h2>
+  <p class="section-help">An evidence rule is a checklist that appears on every control, such as how to capture screenshots.</p>
+  {% include "components/field_form.html" with field=form.name %}
+  {% include "components/field_form.html" with field=form.applies_to %}
+  {% include "components/field_form.html" with field=form.position %}
+</section>
+
+<section class="trac-form-section" aria-labelledby="sec-items">
+  <h2 id="sec-items">{{ form.items.label }}</h2>
+  <p class="section-help">One check per row.</p>
+  <div data-rows-editor>
+    {{ form.items }}
+    <div data-rows-wrap>
+      <ol class="trac-rows" data-list data-shape="strings" data-noun="item"></ol>
+      <template>
+        <li class="trac-row" data-row>
+          <span class="trac-row-num" aria-hidden="true"></span>
+          <div class="trac-row-body"><input class="form-control" data-field="value" aria-label="Checklist item" placeholder="For example: Screenshot shows the date and time"></div>
+          <div class="trac-row-tools" data-tools></div>
+        </li>
+      </template>
+      <button type="button" class="btn btn-sm btn-outline-primary" data-action="add">Add an item</button>
+    </div>
+  </div>
+  {% for error in form.items.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+</section>
+
+{% if form.change_summary %}
+<section class="trac-form-section" aria-labelledby="sec-change">
+  <h2 id="sec-change">Your change</h2>
+  {% include "components/field_form.html" with field=form.change_summary %}
+</section>
+{% endif %}
+{% endblock %}

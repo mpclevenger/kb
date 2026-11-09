@@ -1,0 +1,39 @@
+platform: AWS
+intro: Amazon Web Services accounts, including accounts that host SOX database servers. Read this with
+  the Cloud category, and with the Database and Operating system categories for anything running on servers
+  in the account.
+considerations:
+  Access: |
+    - People sign in through IAM Identity Center with permission sets assigned to groups from the corporate directory. IAM users with passwords are not created for people.
+    - Member accounts have no root credentials. The management account's root user has phishing-resistant multi-factor authentication, no access keys, and an alert on any sign-in.
+    - Service control policies prevent disabling logging, leaving the organization, and use of unapproved regions. They don't apply to the management account, so it is kept to organization tasks and very few people.
+  Service accounts: |
+    - Workloads use IAM roles instead of IAM users with access keys.
+    - Any remaining access keys have an owner and are reviewed from the IAM credential report.
+  Change: |
+    - The pipeline role is the only identity allowed to change production resources (see the Infrastructure as code guide).
+    - Console changes in production accounts are blocked or detected with AWS Config or CloudTrail, and each is followed up.
+  Configuration: |
+    - Accounts sit in an AWS Organizations structure with baseline guardrails applied by SCPs and AWS Config rules.
+    - AWS Config records resource configuration in every account and Region in use, and a dated conformance report shows compliance against the baseline.
+    - Production, non-production and log archive accounts are kept separate, and new accounts are created from a template.
+  Logging: |
+    - An organization CloudTrail trail covers all accounts and regions, is stored in a protected log archive account, and is forwarded to Splunk. An alert fires if a trail is stopped or changed.
+    - Database audit logs from SOX database servers hosted in AWS reach Splunk by the same method as on-premises servers.
+    - GuardDuty is on in every account and Region in use, and a named team reads the findings.
+  Patching: |
+    - For servers on EC2, the firm patches the operating system and database engine, and the scan covers instances in every region.
+    - For managed services, the review records the maintenance windows and that engine versions stay within support.
+    - AMIs are built from an approved base and rebuilt rather than patched by hand where possible.
+  Recovery: |
+    - Backups use AWS Backup or snapshots with a plan per BCP tier, protected from deletion, with copies in another account or region where the tier requires.
+    - Restores are tested to a separate environment and recorded.
+    - Recovery of a SOX database server hosted in AWS is part of the system's recovery plan.
+  Data: |
+    - S3 Block Public Access is on at the account level. Data is encrypted with KMS keys that have named owners.
+    - KMS key policies limit who can use and delete keys, and an alert fires when a key is scheduled for deletion or disabled.
+  Network: |
+    - Workloads sit in private subnets. Security groups name specific sources and ports, and none allow all traffic from the internet to administrative ports.
+    - Connections to the data center use Direct Connect or VPN, and the paths are documented.
+  Vendor: |
+    - AWS is on the vendor risk team's list, and the system owner reviews its assurance report (see the Reading a vendor's SOC report guide), including the controls the report expects the firm to run itself, such as identity, configuration and key management.

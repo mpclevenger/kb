@@ -1,0 +1,295 @@
+# Controls and risks for one topic. Plain text; edit with any text editor.
+# After editing: python manage.py check_controls, then
+# python manage.py sync_controls --user <you> --publish. See README.md in this folder.
+# A control or risk is matched to the site by its title. Renaming a title makes a NEW item.
+#
+# FILE
+#   topic          Name of the topic exactly as it appears on the site.
+#   risks          What could go wrong. Each risk lists the controls that cover it.
+#   controls       The controls themselves.
+#
+# RISK (each entry under "risks")
+#   title          Short name of the risk.
+#   statement      What could go wrong, why, and what it would lead to.
+#   owned_by       Role accountable for the risk (a role, not a name).
+#   stage          Lifecycle stage the risk belongs to. Use "theme" instead to
+#                  place it under a theme. Never both.
+#   in_sox_scope   yes or no. Is this a risk for SOX in-scope apps?
+#   covered_by     Controls that reduce this risk. Each has:
+#                    control   the short name ("ref") of a control in this file
+#                    coverage  full or partial
+#                    why       one line saying how the control helps
+#
+# CONTROL (each entry under "controls")
+#   ref            Short name used only inside this file, so risks can point to it.
+#                  The site gives the control its real ID (for example CM-01).
+#   title          Name of the control.
+#   why            Why the control exists, in two or three sentences.
+#   applies_when   Plain statements. The control applies if any one is true.
+#   nature         preventive (stops it happening) or detective (finds it afterward).
+#   method         manual, automated, or it_dependent (a person works from a system report).
+#   frequency      event (each time it happens), daily, weekly, monthly, quarterly,
+#                  semiannual or annual.
+#   level          key, non-key, compensating or supporting, most important first (see levels.yaml):
+#                    key           relied on to address the risk, tested by auditors
+#                    non-key       matters, but is not relied on alone
+#                    compensating  covers for a control that is missing or not working, usually for a limited time
+#                    supporting    helps other controls work (documentation, baselines, tuning)
+#   owned_by       Role accountable for the control.
+#   performed_by   Role that does the work day to day.
+#   reviewed_by    Role that checks the work (optional).
+#   stage / theme  Where it sits in the topic: one stage, or one theme.
+#   categories     Kinds of technology it applies to: application, database,
+#                  operating_system, jobs, network, identity, cloud,
+#                  engineering_tools or logging.
+#   platforms      Optional. Platform names exactly as on the site. A name the
+#                  site doesn't have is skipped with a warning.
+#   criteria       What good looks like, in groups. Each group has:
+#                    heading   what the group is about
+#                    part      optional: configuration (set up correctly) or
+#                              monitoring (checked on an ongoing basis)
+#                    items     plain sentences. Write "text:" and "sox_only: true"
+#                              for an item needed only for SOX in-scope apps.
+#   steps          How to run it, in order. Each has:
+
+# This topic covers IT disaster recovery only: getting systems and data back.
+# How the business keeps operating (business continuity) belongs to the BCP team.
+topic: IT disaster recovery
+
+risks:
+  - title: Data can't be recovered after loss or corruption
+    statement: >-
+      Data or configuration on a system is lost or damaged and there is no usable copy to restore. This
+      can happen when backups are missing, set up to the wrong need, or failing without anyone noticing.
+      The result could be permanent loss of financial or customer data, or long outages while the data is
+      rebuilt.
+    owned_by: Application owner
+    stage: Back up and restore
+    in_sox_scope: yes
+    covered_by:
+      - control: backups
+        coverage: full
+        why: Backups are set up to the system's needs, and failures are watched for and fixed.
+      - control: restore-tests
+        coverage: partial
+        why: Proves the copies can actually be restored, not just that a job ran.
+      - control: recovery-plan
+        coverage: partial
+        why: Describes how to use the copies to bring the system back.
+
+  - title: Backups exist but can't be restored
+    statement: >-
+      A backup is taken but turns out to be incomplete, corrupt or unusable when it is needed. This can
+      happen when restores are never tried or the backup does not include everything the system needs.
+      The result could be an outage that lasts far longer than planned, with data permanently lost.
+    owned_by: Application owner
+    stage: Back up and restore
+    in_sox_scope: yes
+    covered_by:
+      - control: restore-tests
+        coverage: full
+        why: A restore is tried on a schedule and gaps are fixed and recorded.
+      - control: backups
+        coverage: partial
+        why: Backup success is monitored, which catches many problems before a restore is needed.
+
+  - title: A serious outage has no tested way back
+    statement: >-
+      A critical system fails or its site is lost and the team does not know the order of steps, the people
+      or the targets for getting it back. This can happen when the recovery plan is missing, out of date or
+      never exercised. The result could be a long outage of tier 0 or tier 1 systems, missed financial
+      reporting and delayed decisions during the event.
+    owned_by: Head of Engineering
+    stage: Test recovery
+    in_sox_scope: yes
+    covered_by:
+      - control: recovery-plan
+        coverage: full
+        why: A written plan is kept current and exercised for the most critical systems.
+      - control: restore-tests
+        coverage: partial
+        why: Restore results show whether the plan's time and data-loss targets are realistic.
+
+  - title: Backups are read or changed by the wrong people
+    statement: >-
+      Backup copies are viewed, altered or deleted by people who do not need that access. This can happen
+      when backup storage is open to many administrators or shares permissions with the live system. The
+      result could be leaked data, or the only good copy being destroyed or tampered with.
+    owned_by: Head of Engineering
+    theme: Backup access
+    in_sox_scope: yes
+    covered_by:
+      - control: backup-access
+        coverage: full
+        why: Only named people and tools can reach backups, and what they do is logged and reviewed.
+
+controls:
+  - ref: backups
+    title: Backups match the system's needs and are monitored
+    why: >-
+      A backup that was never set up for the system's needs, or that quietly fails, is no protection.
+      Setting the schedule from the system's recovery needs and watching every result means a failure is
+      fixed in days, not discovered during an outage.
+    applies_when:
+      - The system holds data or configuration that would be hard or impossible to recreate.
+    nature: detective
+    method: it_dependent
+    frequency: daily
+    level: key
+    owned_by: Application owner
+    performed_by: Backup administrator
+    reviewed_by: Control owner
+    stage: Back up and restore
+    categories: [application, database, operating_system, cloud, jobs]
+    criteria:
+      - heading: What is backed up
+        part: configuration
+        items:
+          - "Everything needed to recover is listed: data, configuration, the means to rebuild the system, and any keys or certificates needed to read the backups."
+          - How often to back up and how long to keep copies come from the system's recovery needs and BCP tier. See [Recommended timelines by BCP tier](/guides/recommended-timelines-by-bcp-tier/).
+          - Copies are kept somewhere a failure of the live system would not also destroy, and changes to the schedule go through change control.
+      - heading: Watching the results
+        part: monitoring
+        items:
+          - Every backup run is checked for success, by an alert or a review of results.
+          - A failed or missed backup is fixed within the time set in your team's written procedure (our recommendation is in [Recommended timelines by BCP tier](/guides/recommended-timelines-by-bcp-tier/)), and the cause is recorded.
+          - On the schedule set in your procedure, someone checks that every in-scope system still has a backup job, so a system that was added or changed is not left out.
+          - text: A complete list of backup runs, with results and follow-up for each failure, is kept for the period in the firm's [records retention schedule](#todo-records-retention-schedule).
+            sox_only: true
+    steps:
+      - who: Backup administrator
+        do: List what the system needs to recover, set the backup schedule and retention from its BCP tier, and record them.
+        evidence: The written backup scope and schedule, with the date
+        part: configuration
+      - who: Backup administrator
+        do: Check every backup result, and raise a ticket for each failure or miss.
+        evidence: A dated record of each check showing who did it, or the alert rule and the tickets it raised, plus a monthly summary of runs and failures signed off by the control owner
+        part: monitoring
+      - who: Control owner
+        do: On the schedule set in your procedure, compare the list of in-scope systems to the backup jobs and review open failures.
+        evidence: The comparison with notes on each gap
+        part: monitoring
+
+  - ref: restore-tests
+    title: Restores are tested
+    why: >-
+      A backup is only proven when someone restores from it. Testing on a schedule finds missing
+      pieces, bad copies and unrealistic time estimates while there is still time to fix them.
+    applies_when:
+      - The system is backed up.
+    nature: detective
+    method: manual
+    frequency: annual
+    level: key
+    owned_by: Application owner
+    performed_by: Backup administrator
+    reviewed_by: Control owner
+    stage: Back up and restore
+    categories: [application, database, operating_system, cloud, jobs]
+    criteria:
+      - heading: The test
+        part: monitoring
+        items:
+          - A restore is tried from a real backup at least once a year, or more often if your team's written procedure sets it.
+          - The restore goes to a separate place, not over the live system.
+          - The restored data is checked for completeness and usability, for example by comparing counts or opening key records, and the time taken is compared with the system's recovery time target.
+      - heading: Following up
+        part: monitoring
+        items:
+          - Every problem found is fixed, with the cause and fix recorded, and a failed test is repeated after the fix.
+          - text: The test record for each restore, showing the date, what was restored and the result, is kept for the period in the firm's records retention schedule.
+            sox_only: true
+    steps:
+      - who: Backup administrator
+        do: Pick a recent backup, restore it to a separate place and check the result.
+        evidence: The restore log, the checks made and the time taken
+        part: monitoring
+      - who: Backup administrator
+        do: Record any problem and fix it, then repeat the test if it failed.
+        evidence: Tickets and the repeat test record
+        part: monitoring
+      - who: Control owner
+        do: Review the test record and sign off.
+        evidence: The sign-off with the date
+        part: monitoring
+
+  - ref: recovery-plan
+    title: A recovery plan exists and is tested for the most critical systems
+    why: >-
+      In a real outage people work from stress and memory. A written plan, practiced beforehand, turns
+      recovery into steps the team has already done once.
+    applies_when:
+      - The system is BCP tier 0 or tier 1.
+    nature: preventive
+    method: manual
+    frequency: annual
+    level: non-key
+    owned_by: Head of Engineering
+    performed_by: Recovery lead
+    reviewed_by: Control owner
+    stage: Plan
+    categories: [application, database, operating_system, cloud, jobs]
+    criteria:
+      - heading: The plan
+        items:
+          - A written plan names the recovery order, the people and their backups, and the time and data-loss targets that come with the BCP tier.
+          - It lists what the system depends on, including other systems, vendors and shared services, and where the system will run if its usual site is lost.
+          - It says who can decide to start recovery and how to reach the people involved if normal tools are down. It is kept where it can be read during an outage.
+          - It covers getting the IT systems back. How the business keeps working in the meantime sits with [the BCP team's continuity plans](#todo-bcp-continuity-plans).
+      - heading: Testing and upkeep
+        items:
+          - The plan is exercised at least once a year, including any failover set-up, or as your team's written procedure sets (see [Recommended timelines by BCP tier](/guides/recommended-timelines-by-bcp-tier/) for our recommendation).
+          - Results are recorded against the targets, including what did not work and who will fix it, and follow-up is tracked to completion.
+          - The plan is updated after any exercise, real outage or major change to the system.
+          - text: The plan versions, exercise records and follow-up are kept for the period in the firm's records retention schedule.
+            sox_only: true
+    steps:
+      - who: Recovery lead
+        do: Write or update the plan, including dependencies and contact details, and store it where it can be reached in an outage.
+        evidence: The plan with its date and version
+      - who: Recovery lead
+        do: Run the exercise with the people named in the plan and note what happened.
+        evidence: The exercise record, with times against the targets
+      - who: Control owner
+        do: Check that follow-up items are fixed and the plan was updated, then sign off.
+        evidence: The sign-off with the date
+
+  - ref: backup-access
+    title: Access to backups is restricted
+    why: >-
+      Backups hold a full copy of the data and are the last line of defense. Limiting who can read,
+      change or delete them protects both the confidentiality of the data and the ability to recover.
+    applies_when:
+      - The system is backed up, and the backups hold sensitive or financial data.
+    nature: preventive
+    method: it_dependent
+    frequency: quarterly
+    level: supporting
+    owned_by: Head of Engineering
+    performed_by: Backup administrator
+    reviewed_by: Control owner
+    theme: Backup access
+    categories: [application, database, operating_system, cloud, identity]
+    criteria:
+      - heading: Who can reach backups
+        part: configuration
+        items:
+          - Only named people and tools, whose jobs need it, can read, restore, change or delete backups.
+          - Backup storage permissions are separate from the live system's permissions.
+          - Deleting or changing backups needs more than one control, such as a delay, a second approver or a copy that cannot be changed.
+      - heading: Staying controlled
+        part: monitoring
+        items:
+          - The list of people and tools with backup access is reviewed on the schedule set in your team's written procedure, and access no longer needed is removed.
+          - Restores and deletions are logged and reviewed by someone who doesn't hold backup access, and unexpected ones are investigated.
+          - text: The access lists, reviews and log reviews are kept for the period in the firm's records retention schedule.
+            sox_only: true
+    steps:
+      - who: Backup administrator
+        do: Limit backup storage and the backup tool to the named group and remove broader access.
+        evidence: A dated export of the permissions, and the change history for them for the rest of the period
+        part: configuration
+      - who: Control owner
+        do: On the schedule set in your procedure, review who has access and the log of restores and deletions.
+        evidence: The reviewed list and log extract with notes
+        part: monitoring

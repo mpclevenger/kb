@@ -1,0 +1,10 @@
+{% load trac_labels %}<ul class="library-rows">
+  {% for page, v in rows %}
+  <li class="library-row">
+    <span class="library-row-type">{% section_pill v.section %}</span>
+    <a class="library-row-title" href="{{ page.get_absolute_url }}">{{ v.title }}</a>
+    <span>{% if v.platform %}{% platform_chip v.platform %}{% endif %}</span>
+    <span class="library-row-review">Review by {{ v.review_by|date:"M j, Y" }}</span>
+  </li>
+  {% endfor %}
+</ul>

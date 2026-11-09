@@ -1,0 +1,18 @@
+{% extends "manage/form_base.html" %}
+{% block header_actions %}
+{% if object %}
+<form method="post" action="{% url 'manage:aspect_delete' object.pk %}" data-confirm="Delete this question? This can't be undone.">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-outline-danger">Delete</button>
+</form>
+{% endif %}
+{% endblock %}
+{% block fields %}
+<div class="row">
+  <div class="col-md-6">{% include "components/field_form.html" with field=form.topic %}</div>
+  <div class="col-md-4">{% include "components/field_form.html" with field=form.label %}</div>
+  <div class="col-md-2">{% include "components/field_form.html" with field=form.position %}</div>
+</div>
+{% include "components/field_form.html" with field=form.text %}
+{% endblock %}
+{% block cancel_url %}{% url 'manage:aspect_list' %}{% endblock %}

@@ -1,0 +1,35 @@
+# SAMPLE — replace with the engine's real files
+# Copy of the risk engine's driver_mapping.yaml. Do not edit it here: change it in the engine, then copy it over.
+risk_drivers:
+  RD01:
+    trigger: "(get(RD01)==TRUE)"
+    questionnaire_fields: [RD01]
+    rationale: "The application keeps its own user accounts instead of using central sign-in, so access is granted and removed by hand."
+  RD02:
+    trigger: "(get(RD02)==TRUE)"
+    questionnaire_fields: [RD02]
+    rationale: "The application holds or processes client data, so a breach affects clients as well as the firm."
+  RD03:
+    trigger: "(get(RD03)==TRUE)"
+    questionnaire_fields: [RD03]
+    rationale: "The application can be reached from the internet, which widens the set of people who can attempt to break in."
+  RD16:
+    trigger: "(get(RD16)==TRUE)"
+    questionnaire_fields: [RD16]
+    rationale: "Staff or contractors with administrator rights can change data or settings directly, outside the normal screens."
+  RD36:
+    trigger: "(get(RD36)==TRUE)"
+    questionnaire_fields: [RD36, RD37]
+    rationale: "The application is changed often, so there are many chances for a change to go wrong or to bypass a check."
+  RD39:
+    trigger: "(get(RD39)==TRUE)"
+    questionnaire_fields: [RD39]
+    rationale: "The application relies on an outside vendor or service whose own controls the firm cannot see directly."
+  RD50:
+    trigger: "(get(RD50)==TRUE)"
+    questionnaire_fields: [RD50]
+    rationale: "The application feeds figures into the financial statements."
+  RD54:
+    trigger: "(get(RD54)==TRUE)"
+    questionnaire_fields: [RD54]
+    rationale: "The application supports a critical business service, so an outage or loss of data is felt quickly."

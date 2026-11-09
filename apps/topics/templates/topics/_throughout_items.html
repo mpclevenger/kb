@@ -1,0 +1,10 @@
+{% load trac_ui trac_labels %}{% if group.controls or group.risks %}
+<ul class="topic-theme-items">
+  {% for c in group.controls %}<li>{% control_pill c.ident c.title c.url %}</li>{% endfor %}
+  {% for r in group.risks %}<li class="topic-risk"><a href="{{ r.url }}"><span class="topic-risk-id">{{ r.ident }}</span> {{ r.title }}</a></li>{% endfor %}
+</ul>
+{% endif %}
+{% if group.more %}{% more_controls group.more %}{% for g in group.more %}<p class="more-controls-level">{{ g.label }}</p><ul class="topic-theme-items">
+  {% for c in g.items %}<li>{% control_pill c.ident c.title c.url %}</li>{% endfor %}
+</ul>{% endfor %}{% endmore_controls %}{% endif %}
+{% if show_gap and not group.controls and not group.more %}<p class="topic-none">No control yet</p>{% endif %}

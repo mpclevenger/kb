@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+{% load static trac_ui trac_labels platform_cards %}
+{% block title %}Component gallery - TRAC{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/gallery.css' %}">{% endblock %}
+
+{% block content %}
+<div class="trac-paper prose gallery-section">
+  <h1>Component gallery</h1>
+  <p>Style reference for the shared components. Every label below is placeholder text. Samples sit on Paper cards; the callouts, pills, and chips sections also appear directly on the Canvas background.</p>
+</div>
+
+<section class="gallery-section" id="page-header" aria-labelledby="h-page-header">
+  <h2 id="h-page-header">Page header</h2>
+  <div class="trac-paper">
+    {% page_header title="Example page title" ident="EXA-001" status="draft" pills="Type:Example,Frequency:Monthly" %}
+      <a class="btn btn-outline-primary" href="#">Secondary action</a>
+      <a class="btn btn-primary" href="#">Primary action</a>
+    {% endpage_header %}
+    {% page_header title="Header without extras" %}{% endpage_header %}
+  </div>
+</section>
+
+<section class="gallery-section" id="page-band" aria-labelledby="h-page-band">
+  <h2 id="h-page-band">Page band</h2>
+  <p>The strip under the top bar. This page's own band (above) shows breadcrumbs, an icon and a lifecycle strip. A band with a title, summary and button looks like this:</p>
+  <div class="trac-band"><div class="trac-band-inner">
+    {% include "components/page_band.html" with band=titled_band %}
+  </div></div>
+</section>
+
+<section class="gallery-section" id="callouts" aria-labelledby="h-callouts">
+  <h2 id="h-callouts">Callouts</h2>
+  {% callout "auditor_tip" %}<p>Example text for an auditor tip.</p>{% endcallout %}
+  {% callout "common_deficiency" %}<p>Example text for a common deficiency.</p>{% endcallout %}
+  {% callout "key_control" %}<p>Example text for a key control.</p>{% endcallout %}
+  {% callout "note" %}<p>Example text for a note.</p>{% endcallout %}
+  {% callout "warning" %}<p>Example text for a warning.</p>{% endcallout %}
+  {% callout "note" title="Custom title" %}<p>Example note with a custom title.</p>{% endcallout %}
+</section>
+
+<section class="gallery-section" id="criteria" aria-labelledby="h-criteria">
+  <h2 id="h-criteria">What good looks like</h2>
+  <div class="trac-paper">
+    {% criteria_list criteria_groups %}
+  </div>
+</section>
+
+<section class="gallery-section" id="control-pills" aria-labelledby="h-control-pills">
+  <h2 id="h-control-pills">Control pills</h2>
+  <p class="gallery-label">On paper</p>
+  <div class="gallery-sample gallery-row">
+    {% control_pill "CTL-000" "Example control title" "#" %}
+    {% control_pill "CTL-001" "Example without a link" %}
+    {% control_pill "CTL-002" %}
+  </div>
+  <p class="gallery-label">On canvas</p>
+  <div class="gallery-row gallery-canvas">
+    {% control_pill "CTL-000" "Example control title" "#" %}
+    {% control_pill "CTL-002" %}
+  </div>
+  <p class="gallery-label">Folded "More controls" box (non-key levels, grouped by level)</p>
+  <div class="gallery-sample">
+    {% more_controls more_groups %}{% for group in more_groups %}<p class="more-controls-level">{{ group.label }}</p>
+    {% for ident in group.items %}{% control_pill ident %} {% endfor %}{% endfor %}{% endmore_controls %}
+  </div>
+</section>
+
+<section class="gallery-section" id="bullet-text" aria-labelledby="h-bullets">
+  <h2 id="h-bullets">Bullet text</h2>
+  <p class="gallery-label">Lines that start with "- " become a list (the bullets filter)</p>
+  <div class="gallery-sample">
+    {{ sample_bullets|bullets }}
+  </div>
+</section>
+
+<section class="gallery-section" id="lifecycle-strips" aria-labelledby="h-lifecycle">
+  <h2 id="h-lifecycle">Lifecycle strip</h2>
+  <p class="gallery-label">Seven stages, no active stage</p>
+  <div class="trac-band"><div class="trac-band-inner">{% lifecycle_strip seven_stages None %}</div></div>
+  <p class="gallery-label">Three stages, linked, second active</p>
+  <div class="trac-band"><div class="trac-band-inner">{% lifecycle_strip three_stages "Review" %}</div></div>
+</section>
+
+<section class="gallery-section" id="lifecycle-arrows" aria-labelledby="h-lifecycle-arrows">
+  <h2 id="h-lifecycle-arrows">Lifecycle arrows</h2>
+  <p>Used on topic pages. Each arrow loads its stage in place (not wired up here); the second is selected.</p>
+  {% lifecycle_arrows arrow_stages 2 "#gallery-nothing" %}
+</section>
+
+<section class="gallery-section" id="topic-icons" aria-labelledby="h-icons">
+  <h2 id="h-icons">Topic icons</h2>
+  <div class="gallery-sample gallery-row">
+    {% for name in icon_names %}<span class="attr-pill">{% topic_icon name %}<span class="attr-pill-value">{{ name }}</span></span>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="gallery-section" id="section-cards" aria-labelledby="h-section-cards">
+  <h2 id="h-section-cards">Section cards</h2>
+  <p>Collapsible cards, one tone per meaning. Open by default; the toggle appears on pages with three or more cards.</p>
+  {% section_toolbar %}
+  {% section_card "Why: why this exists" tone="why" id="gal-why" %}<p>Example text for the why tone, used for purpose and context.</p>{% endsection_card %}
+  {% section_card "Need: do I need this?" tone="need" id="gal-need" %}<p>Example text for the need tone, used for applicability.</p>{% endsection_card %}
+  {% section_card "Good: what good looks like" tone="good" id="gal-good" %}
+    <p>Example text for the good tone, used for testable criteria.</p>
+    {% criteria_list criteria_groups %}
+  {% endsection_card %}
+  {% section_card "How: how to run it" tone="how" id="gal-how" %}
+    {% step_list %}{% step role="Example role" %}<p>Example step.</p>{% endstep %}{% step %}<p>Example second step.</p>{% endstep %}{% endstep_list %}
+  {% endsection_card %}
+  {% section_card "Neutral: links and other content" tone="neutral" id="gal-neutral" %}<p>Example text for the neutral tone.</p>{% endsection_card %}
+  <p class="gallery-label">Collapsed</p>
+  {% section_card "Why, collapsed" tone="why" open=False id="gal-why-c" %}<p>Hidden until opened.</p>{% endsection_card %}
+  {% section_card "Need, collapsed" tone="need" open=False id="gal-need-c" %}<p>Hidden until opened.</p>{% endsection_card %}
+  {% section_card "Good, collapsed" tone="good" open=False id="gal-good-c" %}<p>Hidden until opened.</p>{% endsection_card %}
+  {% section_card "How, collapsed" tone="how" open=False id="gal-how-c" %}<p>Hidden until opened.</p>{% endsection_card %}
+  {% section_card "Neutral, collapsed" tone="neutral" open=False id="gal-neutral-c" %}<p>Hidden until opened.</p>{% endsection_card %}
+</section>
+
+<section class="gallery-section" id="attribute-pills" aria-labelledby="h-pills">
+  <h2 id="h-pills">Attribute pills</h2>
+  <div class="gallery-sample">
+    <p class="gallery-label">Nature</p>
+    <div class="gallery-row">
+      {% attribute_pill "Nature" "Preventive" tone="preventive" %}
+      {% attribute_pill "Nature" "Detective" tone="detective" %}
+    </div>
+    <p class="gallery-label">Method</p>
+    <div class="gallery-row">
+      {% attribute_pill "Method" "Manual" tone="manual" %}
+      {% attribute_pill "Method" "Automated" tone="automated" %}
+      {% attribute_pill "Method" "IT-dependent manual" tone="it_dependent" %}
+    </div>
+    <p class="gallery-label">Frequency, designation, scope, owner</p>
+    <div class="gallery-row">
+      {% attribute_pill "Frequency" "Quarterly" tone="frequency" %}
+      {% attribute_pill "" "Key control" tone="key" %}
+      {% attribute_pill "" "SOX scope" tone="sox" %}
+      {% attribute_pill "Owner" "Example owner" tone="owner" %}
+    </div>
+    <p class="gallery-label">Untoned</p>
+    <div class="gallery-row">
+      {% attribute_pill "Designation" "Example" %}
+      {% attribute_pill "" "Value only" %}
+    </div>
+  </div>
+  <p class="gallery-label">On canvas</p>
+  <div class="gallery-row gallery-canvas">
+    {% attribute_pill "Nature" "Preventive" tone="preventive" %}
+    {% attribute_pill "Method" "Automated" tone="automated" %}
+    {% attribute_pill "" "Key control" tone="key" %}
+    {% attribute_pill "" "Value only" %}
+  </div>
+</section>
+
+<section class="gallery-section" id="badges" aria-labelledby="h-badges">
+  <h2 id="h-badges">Badges</h2>
+  <p class="gallery-label">Coverage</p>
+  <div class="gallery-sample gallery-row">
+    {% badge "coverage" "covered" %}
+    {% badge "coverage" "partial" %}
+    {% badge "coverage" "unmapped" %}
+  </div>
+  <p class="gallery-label">Status</p>
+  <div class="gallery-sample gallery-row">
+    {% badge "status" "draft" %}
+    {% badge "status" "in_review" %}
+    {% badge "status" "approved" %}
+    {% badge "status" "published" %}
+    {% badge "status" "retired" %}
+  </div>
+  <p class="gallery-label">On canvas</p>
+  <div class="gallery-row gallery-canvas">
+    {% badge "status" "draft" %}
+    {% badge "status" "in_review" %}
+    {% badge "status" "approved" %}
+    {% badge "status" "published" %}
+    {% badge "status" "retired" %}
+  </div>
+</section>
+
+<section class="gallery-section" id="link-chips" aria-labelledby="h-chips">
+  <h2 id="h-chips">Chips</h2>
+  <p class="gallery-label">Link chips</p>
+  <div class="gallery-sample gallery-row">
+    {% link_chip "risk" "RSK-000" "Example risk title" %}
+    {% link_chip "control" "CTL-000" "Example control title" %}
+    {% link_chip "driver" "DRV-000" "Example driver title" %}
+  </div>
+  <p class="gallery-label">Driver pills (id only; the title shows on hover)</p>
+  <div class="gallery-sample gallery-row">
+    {% driver_pill "RD01" "#" "Example driver title" %}
+    {% driver_pill "RD02" "#" %}
+  </div>
+  <p class="gallery-label">Link chips on canvas</p>
+  <div class="gallery-row gallery-canvas">
+    {% link_chip "risk" "RSK-000" "Example risk title" %}
+    {% link_chip "control" "CTL-000" "Example control title" %}
+  </div>
+  <p class="gallery-label">Platform chips, plain and in a category color</p>
+  <div class="gallery-sample gallery-row">
+    {% platform_chip sample_platform %}
+    {% platform_chip sample_platform "database" %}
+    {% platform_chip sample_platform "identity" %}
+    {% platform_chip sample_platform "cloud" %}
+  </div>
+</section>
+
+<section class="gallery-section" id="type-pills" aria-labelledby="h-type-pills">
+  <h2 id="h-type-pills">Type, section and category pills</h2>
+  <div class="gallery-sample">
+    <p class="gallery-label">Content types</p>
+    <div class="gallery-row">
+      {% type_pill "Control" %} {% type_pill "Risk" %} {% type_pill "Driver" %}
+    </div>
+    <p class="gallery-label">Guide sections</p>
+    <div class="gallery-row">
+      {% for key in section_keys %}{% section_pill key %}{% endfor %}
+    </div>
+    <p class="gallery-label">Categories (each links to its category page)</p>
+    <div class="gallery-row">
+      {% for key in category_keys %}{% category_pill key %}{% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="gallery-section" id="count-tiles" aria-labelledby="h-count-tiles">
+  <h2 id="h-count-tiles">Count tiles</h2>
+  <dl class="count-tiles">
+    {% count_tile "Controls" 12 "control" %}
+    {% count_tile "Risks" 8 "risk" %}
+    {% count_tile "Unmapped risks" 2 "alert" %}
+    {% count_tile "Unmapped risks (none)" 0 "alert" %}
+    {% count_tile "Neutral" 5 %}
+  </dl>
+</section>
+
+<section class="gallery-section" id="library-pieces" aria-labelledby="h-library">
+  <h2 id="h-library">Library tabs, category cards and references</h2>
+  {% include "components/library_tabs.html" with active="technology" %}
+  {% category_cards %}
+  {% include "components/references.html" with references=sample_references %}
+</section>
+
+<section class="gallery-section" id="step-lists" aria-labelledby="h-steps">
+  <h2 id="h-steps">Step list</h2>
+  <div class="trac-paper">
+    {% step_list %}
+      {% step role="Example role A" %}<p>Example first step with a role label.</p>{% endstep %}
+      {% step role="Example role B" %}<p>Example second step with a role label.</p>{% endstep %}
+      {% step %}<p>Example third step without a role label.</p>{% endstep %}
+    {% endstep_list %}
+  </div>
+</section>
+
+<section class="gallery-section" id="governance-footers" aria-labelledby="h-gov">
+  <h2 id="h-gov">Governance footer</h2>
+  <p class="gallery-label">Current</p>
+  {% governance_footer version="1.0" effective_date="2030-01-15" approver="Example approver" owner="Example owner" next_review="2031-01-15" %}
+  <p class="gallery-label">Overdue</p>
+  {% governance_footer version="2.1" effective_date="2020-01-15" approver="Example approver" owner="Example owner" next_review="2021-01-15" %}
+</section>
+
+<section class="gallery-section" id="empty-states" aria-labelledby="h-empty">
+  <h2 id="h-empty">Empty state</h2>
+  <p class="gallery-label">With action</p>
+  {% empty_state "Nothing here yet" "Example sentence explaining what would appear here." action_label="Example action" %}
+  <p class="gallery-label">Without action</p>
+  {% empty_state "No results" "Example sentence explaining the empty result." %}
+</section>
+
+<section class="gallery-section" id="data-tables" aria-labelledby="h-table">
+  <h2 id="h-table">Data table</h2>
+  <table class="trac-table">
+    <caption>Example dense list</caption>
+    <thead><tr><th scope="col">ID</th><th scope="col">Title</th><th scope="col">Status</th><th scope="col">Owner</th></tr></thead>
+    <tbody>
+      <tr><td class="col-id">EXA-001</td><td>Example row one</td><td>{% badge "status" "published" %}</td><td>Example owner</td></tr>
+      <tr><td class="col-id">EXA-002</td><td>Example row two</td><td>{% badge "status" "in_review" %}</td><td>Example owner</td></tr>
+      <tr><td class="col-id">EXA-003</td><td>Example row three</td><td>{% badge "status" "draft" %}</td><td>Example owner</td></tr>
+    </tbody>
+  </table>
+</section>
+{% endblock %}
+
+{% block rail %}
+<aside class="page-rail" aria-labelledby="rail-title">
+  <p class="page-rail-title" id="rail-title">On this page</p>
+  <ul>
+    <li><a href="#page-header">Page header</a></li>
+    <li><a href="#page-band">Page band</a></li>
+    <li><a href="#callouts">Callouts</a></li>
+    <li><a href="#criteria">What good looks like</a></li>
+    <li><a href="#control-pills">Control pills</a></li>
+    <li><a href="#lifecycle-strips">Lifecycle strip</a></li>
+    <li><a href="#lifecycle-arrows">Lifecycle arrows</a></li>
+    <li><a href="#topic-icons">Topic icons</a></li>
+    <li><a href="#section-cards">Section cards</a></li>
+    <li><a href="#attribute-pills">Attribute pills</a></li>
+    <li><a href="#badges">Badges</a></li>
+    <li><a href="#link-chips">Chips</a></li>
+    <li><a href="#type-pills">Type, section and category pills</a></li>
+    <li><a href="#count-tiles">Count tiles</a></li>
+    <li><a href="#library-pieces">Tabs, category cards, references</a></li>
+    <li><a href="#step-lists">Step list</a></li>
+    <li><a href="#governance-footers">Governance footer</a></li>
+    <li><a href="#empty-states">Empty state</a></li>
+    <li><a href="#data-tables">Data table</a></li>
+  </ul>
+</aside>
+{% endblock %}

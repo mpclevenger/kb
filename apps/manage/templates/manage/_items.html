@@ -1,0 +1,32 @@
+<section class="trac-form-section" aria-labelledby="sec-{{ section.kind }}">
+  <h2 id="sec-{{ section.kind }}">{{ section.title }}</h2>
+  <p class="section-help">
+    {% if section.kind == "stages" %}The steps of this topic's lifecycle, in order. A stage can only be removed while nothing uses it.
+    {% else %}Things that apply throughout the topic instead of at one stage. A theme can only be removed while nothing uses it.{% endif %}
+  </p>
+  {% url "manage:"|add:section.kind object.pk as action %}
+  <ol class="trac-rows">
+    {% for item in section.items %}
+    <li class="trac-row">
+      <span class="trac-row-num"></span>
+      <form method="post" action="{{ action }}" class="d-flex flex-wrap gap-2 flex-grow-1">
+        {% csrf_token %}
+        <input type="hidden" name="item" value="{{ item.pk }}">
+        <input class="form-control w-auto flex-grow-1" type="text" name="name" value="{{ item.name }}" maxlength="{{ section.max_length }}" aria-label="Name of {{ section.noun }} {{ forloop.counter }}">
+        {% if section.kind == "stages" %}<input class="form-control w-100" type="text" name="summary" value="{{ item.summary }}" maxlength="{{ section.summary_max_length }}" placeholder="What happens at this stage (optional)" aria-label="Summary of {{ section.noun }} {{ forloop.counter }}">{% endif %}
+        <button class="btn btn-outline-primary" type="submit" name="action" value="save">Save</button>
+        <button class="btn btn-outline-secondary" type="submit" name="action" value="up"{% if forloop.first %} disabled{% endif %}>Move up</button>
+        <button class="btn btn-outline-secondary" type="submit" name="action" value="down"{% if forloop.last %} disabled{% endif %}>Move down</button>
+        <button class="btn btn-outline-danger" type="submit" name="action" value="remove">Remove</button>
+      </form>
+    </li>
+    {% empty %}
+    <li class="text-secondary">No {{ section.kind }} yet.</li>
+    {% endfor %}
+  </ol>
+  <form method="post" action="{{ action }}" class="d-flex flex-wrap gap-2">
+    {% csrf_token %}
+    <input class="form-control w-auto flex-grow-1" type="text" name="name" maxlength="{{ section.max_length }}" aria-label="Name of the new {{ section.noun }}">
+    <button class="btn btn-primary" type="submit" name="action" value="add">Add {{ section.noun }}</button>
+  </form>
+</section>

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load trac_ui %}
+{% block title %}Review queue | TRAC{% endblock %}
+{% block content %}
+{% page_header "Review queue" %}{% endpage_header %}
+
+<section class="mb-5" aria-labelledby="waiting">
+  <h2 class="h4 mb-3" id="waiting">Waiting for approval</h2>
+  {% if versions %}
+  <table class="trac-table">
+    <caption>{{ versions|length }} change{{ versions|length|pluralize }} in review, oldest first.</caption>
+    <thead><tr><th scope="col">Item</th><th scope="col">Type</th><th scope="col">Proposed by</th><th scope="col">Submitted</th><th scope="col">Note</th></tr></thead>
+    <tbody>
+    {% for row in versions %}
+      <tr>
+        <td>{% if row.url %}<a href="{{ row.url }}">{% if row.version.entity.ident %}{{ row.version.entity.ident }} {% endif %}{{ row.name }} v{{ row.version.number }}</a>{% else %}{{ row.name }} v{{ row.version.number }}{% endif %}</td>
+        <td>{{ row.type }}</td>
+        <td>{{ row.version.proposed_by.get_full_name|default:row.version.proposed_by.get_username }}</td>
+        <td class="text-nowrap">{{ row.version.submitted_at|date:"M j, Y" }}</td>
+        <td>{% if row.version.proposed_by_id == request.user.pk %}Yours — another Tech Risk member must approve{% endif %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  {% empty_state "Nothing is waiting for approval" %}
+  {% endif %}
+</section>
+
+<section class="mb-5" aria-labelledby="comments">
+  <h2 class="h4 mb-3" id="comments">Comments</h2>
+  <ul class="status-tabs mb-3">
+    {% for value, label, count in statuses %}
+    <li><a class="status-tab{% if value == status %} active{% endif %}" href="?status={{ value }}"{% if value == status %} aria-current="page"{% endif %}>{{ label }} ({{ count }})</a></li>
+    {% endfor %}
+  </ul>
+  {% for comment in comments %}
+  <article class="trac-paper mb-3">
+    <p class="mb-1"><a href="{{ comment.about_url }}">{{ comment.about_label }}</a> · {{ comment.section }}</p>
+    <p class="mb-1">{{ comment.comment|linebreaksbr }}</p>
+    <p class="text-secondary small">{{ comment.submitted_by.get_full_name|default:comment.submitted_by.get_username }}, {{ comment.submitted_at|date:"M j, Y g:i A" }}</p>
+    <form class="row g-2 align-items-start" method="post" action="{% url 'review:respond' comment.pk %}">
+      {% csrf_token %}
+      <input type="hidden" name="view" value="{{ status }}">
+      <div class="col-sm-3">
+        <label class="form-label" for="status-{{ comment.pk }}">Status</label>
+        <select class="form-select" id="status-{{ comment.pk }}" name="status">
+          {% for value, label in status_choices %}<option value="{{ value }}"{% if value == comment.status %} selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-sm-7">
+        <label class="form-label" for="response-{{ comment.pk }}">Reply <span class="text-secondary fw-normal">(required to decline)</span></label>
+        <textarea class="form-control" id="response-{{ comment.pk }}" name="response" rows="2">{{ comment.response }}</textarea>
+      </div>
+      <div class="col-sm-2 align-self-end"><button type="submit" class="btn btn-primary">Save</button></div>
+    </form>
+  </article>
+  {% empty %}
+  {% empty_state "No comments here" %}
+  {% endfor %}
+</section>
+{% endblock %}

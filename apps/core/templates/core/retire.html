@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load trac_ui %}
+{% block title %}Retire {{ entity }} - TRAC{% endblock %}
+
+{% block content %}
+{% page_header heading %}{% endpage_header %}
+<p>Retiring takes <strong>{{ entity }}</strong> out of use. It drops out of lists and searches, but its page and history stay, with a Retired notice.</p>
+<p>Another member of Tech Risk needs to approve it first. Until then, nothing changes.</p>
+<form method="post" class="trac-paper p-4" novalidate>
+  {% csrf_token %}
+  <div class="mb-3">
+    <label class="form-label" for="retire-reason">Why is it being retired?</label>
+    <textarea class="form-control{% if error %} is-invalid{% endif %}" id="retire-reason" name="reason" rows="3" required
+      {% if error %}aria-invalid="true" aria-describedby="retire-error"{% endif %}>{{ reason }}</textarea>
+    {% if error %}<div class="invalid-feedback" id="retire-error">{{ error }}</div>{% endif %}
+    <div class="form-text">This shows on the item's page once it's retired.</div>
+  </div>
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Send for approval</button>
+    <a class="btn btn-outline-secondary" href="{{ cancel_url }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

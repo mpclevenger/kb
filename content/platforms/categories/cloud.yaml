@@ -1,0 +1,42 @@
+category: cloud
+intro: Cloud accounts, subscriptions, container platforms and managed data platforms where the firm runs
+  workloads. The main risk is that one misconfigured permission or setting exposes many systems at once.
+practices:
+  Access: |
+    - Administrator access is granted to named individuals through the central identity provider with multi-factor sign-in, not through local users created in the cloud account.
+    - Day-to-day work uses least-privilege roles. Administrator roles are time-limited or approved on request, and are reviewed on the schedule in your team's written procedure.
+    - Root or owner credentials are locked away, protected by multi-factor authentication and monitored for any use.
+    - Access is removed when a person moves or leaves. Vendor and partner access has an end date.
+  Service accounts: |
+    - Workloads use roles or managed identities with temporary credentials, rather than long-lived keys.
+    - Where long-lived keys exist, each has an owner, is rotated, and is stored in a secret store.
+    - A list of workload identities and their permissions is kept and reviewed on the schedule in your team's written procedure.
+  Change: |
+    - Infrastructure is defined as code, reviewed by someone other than the author and applied through a pipeline. See the Infrastructure as code guide.
+    - Changes made in the console are blocked for production or detected, and each is followed up.
+    - The deployment identity makes production changes; people have read access by default.
+  Configuration: |
+    - Accounts and subscriptions sit under one organization structure, each with a recorded owner, purpose and BCP tier.
+    - They follow a baseline, and guardrails prevent unsafe settings such as public storage.
+    - A dated report of resources against the baseline is kept, and findings are tracked to closure.
+  Logging: |
+    - Administrative activity logs are on in every account and subscription, and sent to Splunk.
+    - Log storage is protected from deletion by the account's own administrators.
+    - An alert fires when logging is turned off or the feed stops, and new accounts are added to logging when created.
+  Patching: |
+    - Hosts and images that the firm manages are scanned and patched within the timelines in the Recommended timelines by BCP tier guide.
+    - The review separates what the provider patches from what the firm patches, and the firm's part is covered.
+  Recovery: |
+    - Data and configuration are backed up to meet the BCP tier, with copies in another region or account where the tier requires.
+    - Infrastructure can be rebuilt from code, and a restore is tested and recorded.
+  Data: |
+    - Data stored in the cloud is classified, encrypted, and kept in approved regions.
+    - Storage that holds sensitive data is not public, and this is checked.
+    - Encryption keys have named owners, and who can use or delete them is limited.
+  Network: |
+    - Workloads sit in private networks, and exposure to the internet is by exception and approved.
+    - Security groups and network rules are limited to the ports and sources needed, and are reviewed on the schedule in your team's written procedure.
+    - Connections to the firm's on-premises network use approved, encrypted links.
+  Vendor: |
+    - The cloud provider is on the vendor risk team's list, and the system owner reviews its assurance report (see the Reading a vendor's SOC report guide), including the controls the report expects the firm to run itself.
+    - The review lists what the provider covers and what the firm must do itself, under the shared responsibility model, and shows the firm does its part.

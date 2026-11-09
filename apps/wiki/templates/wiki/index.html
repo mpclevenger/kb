@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Best practices and guides - TRAC{% endblock %}
+
+{% block content %}
+<div class="library-head">
+  <ul class="library-feature-list">
+    <li>
+      <a class="library-feature" href="{% url 'wiki:faq' %}">
+        <span class="library-feature-title">Frequently asked questions</span>
+        <span class="library-feature-text">Short answers to common questions, with links to the full guidance.</span>
+      </a>
+    </li>
+  </ul>
+  {% if new_button %}<div class="page-header-actions"><a class="btn btn-secondary" href="{{ new_button.1 }}">{{ new_button.0 }}</a></div>{% endif %}
+</div>
+{% include "wiki/_library.html" %}
+{% endblock %}

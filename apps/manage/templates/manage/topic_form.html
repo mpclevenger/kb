@@ -1,0 +1,19 @@
+{% extends "manage/form_base.html" %}
+{% block header_actions %}{% if object %}{% url 'manage:topic_active' object.pk as action %}{% include "manage/_active_button.html" %}{% endif %}{% endblock %}
+{% block fields %}
+{% include "components/field_form.html" with field=form.name %}
+<div class="row">
+  <div class="col-md-4">{% include "components/field_form.html" with field=form.id_prefix %}</div>
+  <div class="col-md-5">{% include "components/field_form.html" with field=form.icon %}</div>
+  <div class="col-md-3">{% include "components/field_form.html" with field=form.position %}</div>
+</div>
+{% include "components/field_form.html" with field=form.summary %}
+{% include "components/field_form.html" with field=form.is_active %}
+{% endblock %}
+{% block after_form %}
+{% if object %}
+{% for section in item_lists %}{% include "manage/_items.html" %}{% endfor %}
+{% else %}
+<p class="text-secondary mb-5">Save the topic first, then add its stages and themes.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,20 @@
+{# Pass field (the references or links field); help replaces the default introduction. #}
+<p class="section-help">{% firstof help "Optional. Link to the guidance this is based on, such as an internal guide or a public framework. Add up to 10." %}</p>
+<div data-rows-editor>
+  {{ field }}
+  <div data-rows-wrap>
+    <ol class="trac-rows" data-list data-shape="objects" data-noun="reference"></ol>
+    <template>
+      <li class="trac-row" data-row>
+        <span class="trac-row-num" aria-hidden="true"></span>
+        <div class="trac-row-body trac-link-grid">
+          <label class="wide">Label<input class="form-control" data-field="label" maxlength="160" placeholder="For example: Access management best practices"></label>
+          <label class="wide">Link<input class="form-control" data-field="url" type="url" placeholder="https://"></label>
+        </div>
+        <div class="trac-row-tools" data-tools></div>
+      </li>
+    </template>
+    <button type="button" class="btn btn-sm btn-outline-primary" data-action="add">Add a reference</button>
+  </div>
+</div>
+{% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}

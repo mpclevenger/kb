@@ -1,0 +1,16 @@
+{% load trac_labels %}{% for group in groups %}
+<section class="category-group" data-filter-group aria-labelledby="{{ group.id }}">
+  <h2 class="category-group-heading" id="{{ group.id }}">{{ group.title }}</h2>
+  <ul class="category-cards">
+    {% for card in group.cards %}
+    <li class="category-card category-{{ card.category.value }}" data-filter-card>
+      <a class="category-card-name" href="{% url 'platforms:category' card.category.value %}">{{ card.category.label }}</a>
+      <ul class="category-card-chips">
+        {% for platform in card.platforms %}<li data-filter-item>{% platform_chip platform %}</li>
+        {% endfor %}
+      </ul>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endfor %}

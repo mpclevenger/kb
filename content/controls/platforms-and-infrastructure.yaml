@@ -1,0 +1,426 @@
+# Controls and risks for one topic. Plain text; edit with any text editor.
+# After editing: python manage.py check_controls, then
+# python manage.py sync_controls --user <you> --publish. See README.md in this folder.
+# A control or risk is matched to the site by its title. Renaming a title makes a NEW item.
+#
+# FILE
+#   topic          Name of the topic exactly as it appears on the site.
+#   risks          What could go wrong. Each risk lists the controls that cover it.
+#   controls       The controls themselves.
+#
+# RISK (each entry under "risks")
+#   title          Short name of the risk.
+#   statement      What could go wrong, why, and what it would lead to.
+#   owned_by       Role accountable for the risk (a role, not a name).
+#   stage          Lifecycle stage the risk belongs to. Use "theme" instead to
+#                  place it under a theme. Never both.
+#   in_sox_scope   yes or no. Is this a risk for SOX in-scope apps?
+#   covered_by     Controls that reduce this risk. Each has:
+#                    control   the short name ("ref") of a control in this file
+#                    coverage  full or partial
+#                    why       one line saying how the control helps
+#
+# CONTROL (each entry under "controls")
+#   ref            Short name used only inside this file, so risks can point to it.
+#                  The site gives the control its real ID (for example CM-01).
+#   title          Name of the control.
+#   why            Why the control exists, in two or three sentences.
+#   applies_when   Plain statements. The control applies if any one is true.
+#   nature         preventive (stops it happening) or detective (finds it afterward).
+#   method         manual, automated, or it_dependent (a person works from a system report).
+#   frequency      event (each time it happens), daily, weekly, monthly, quarterly,
+#                  semiannual or annual.
+#   level          key, non-key, compensating or supporting, most important first (see levels.yaml):
+#                    key           relied on to address the risk, tested by auditors
+#                    non-key       matters, but is not relied on alone
+#                    compensating  covers for a control that is missing or not working, usually for a limited time
+#                    supporting    helps other controls work (documentation, baselines, tuning)
+#   owned_by       Role accountable for the control.
+#   performed_by   Role that does the work day to day.
+#   reviewed_by    Role that checks the work (optional).
+#   stage / theme  Where it sits in the topic: one stage, or one theme.
+#   categories     Kinds of technology it applies to: application, database,
+#                  operating_system, jobs, network, identity, cloud,
+#                  engineering_tools or logging.
+#   platforms      Optional. Platform names exactly as on the site. A name the
+#                  site doesn't have is skipped with a warning.
+#   criteria       What good looks like, in groups. Each group has:
+#                    heading   what the group is about
+#                    part      optional: configuration (set up correctly) or
+#                              monitoring (checked on an ongoing basis)
+#                    items     plain sentences. Write "text:" and "sox_only: true"
+#                              for an item needed only for SOX in-scope apps.
+#   steps          How to run it, in order. Each has:
+
+# Jobs run in many places: SQL Server Agent, Windows scheduled tasks, the in-house scheduling
+# app and others. The job controls apply to all of them. Baseline controls cover Windows Server
+# and SQL Server; Kubernetes is an example where a platform differs.
+topic: Platforms and infrastructure
+
+risks:
+  - title: Scheduled jobs are changed without approval
+    statement: >-
+      A job, its schedule or its settings are changed so that financial data is processed differently,
+      late or not at all. This can happen when job definitions are edited directly on the scheduler
+      without a request or review. The result could be wrong or missing data in reports, found only when
+      someone downstream notices.
+    owned_by: Application owner
+    theme: Job scheduling and monitoring
+    in_sox_scope: yes
+    covered_by:
+      - control: job-changes
+        coverage: full
+        why: Every change to a job definition or schedule is requested, reviewed and approved before it takes effect.
+      - control: scheduler-access
+        coverage: partial
+        why: Fewer people can edit jobs, so fewer unapproved changes are possible.
+
+  - title: Job failures go unnoticed or unresolved
+    statement: >-
+      A scheduled job fails, stops early or runs late and nobody acts on it. This can happen when failures
+      send no alert, alerts go to a mailbox nobody reads, or there is no record of the follow-up. The result
+      could be incomplete or stale data feeding reports and downstream systems.
+    owned_by: Application owner
+    theme: Job scheduling and monitoring
+    in_sox_scope: yes
+    covered_by:
+      - control: job-monitoring
+        coverage: full
+        why: Failures are alerted, investigated and resolved, with a record of each.
+      - control: job-changes
+        coverage: partial
+        why: Controlled changes reduce failures caused by edits nobody reviewed.
+
+  - title: Scheduler access is too broad
+    statement: >-
+      Too many people or accounts can create, edit, run or stop jobs on a scheduler or on SQL Server Agent.
+      This can happen when access is granted with the server rather than for the job, or the scheduler runs
+      jobs as a highly privileged account. The result could be data changed or jobs stopped by people who
+      should not be able to do so, with unclear records of who did it.
+    owned_by: Head of Engineering
+    theme: Job scheduling and monitoring
+    in_sox_scope: yes
+    covered_by:
+      - control: scheduler-access
+        coverage: full
+        why: Access to define and run jobs is limited to named roles and reviewed.
+      - control: job-changes
+        coverage: partial
+        why: Changes by people with access still need an approved request.
+
+  - title: Servers are set up inconsistently or insecurely
+    statement: >-
+      A server, database instance or cluster is built or configured in a way that is weaker than intended.
+      This can happen when there is no agreed baseline, or each build is done by hand. The result could be
+      exposure to attack or unreliable behavior across the systems that run on it.
+    owned_by: Head of Engineering
+    stage: Configure and evidence
+    in_sox_scope: yes
+    covered_by:
+      - control: config-baseline
+        coverage: full
+        why: A documented baseline defines the intended settings, and new servers are built to it.
+      - control: drift-monitoring
+        coverage: partial
+        why: Finds servers that no longer match the baseline.
+
+  - title: Configuration drifts away from the approved setup
+    statement: >-
+      Settings on a server, database instance or cluster change over time without an approved request.
+      This can happen when administrators make direct changes and nothing compares the live settings to
+      the baseline. The result could be weakened security or changed behavior, with no record of who changed
+      what or why.
+    owned_by: Head of Engineering
+    stage: Monitor drift
+    in_sox_scope: yes
+    covered_by:
+      - control: drift-monitoring
+        coverage: full
+        why: Live settings are compared to the baseline on a schedule, and each difference is approved or fixed.
+      - control: config-baseline
+        coverage: partial
+        why: The baseline gives a clear definition of what should be set.
+
+  - title: Data transfers into financial systems are incomplete or inaccurate
+    statement: >-
+      Data sent between systems, such as a feed into a financial system, arrives incomplete, duplicated
+      or not at all. This can happen when a transfer fails part way, records are rejected and nobody
+      works them, or the receiving side is never compared with the sending side. The result could be
+      financial reports built on missing or doubled data.
+    owned_by: Application owner
+    theme: Interfaces and data transfers
+    in_sox_scope: yes
+    covered_by:
+      - control: interface-completeness
+        coverage: full
+        why: Counts and totals are reconciled between source and target, rejected records are worked, and failures raise alerts.
+      - control: job-monitoring
+        coverage: partial
+        why: A failed job that carries the transfer is alerted and resolved.
+
+controls:
+  - ref: job-changes
+    title: Changes to scheduled jobs go through change control
+    why: >-
+      A job is a piece of production processing. Changing its steps, schedule or settings changes what
+      data the firm ends up with, so it needs the same request, review and approval as any other change.
+    applies_when:
+      - Jobs run on a scheduler, SQL Server Agent, a task scheduler or the in-house scheduling app.
+    nature: preventive
+    method: it_dependent
+    frequency: event
+    level: key
+    owned_by: Application owner
+    performed_by: Job owner
+    reviewed_by: Peer reviewer
+    theme: Job scheduling and monitoring
+    categories: [application, database, operating_system, jobs, cloud]
+    criteria:
+      - heading: Changing a job
+        items:
+          - A new job, a changed step, a changed schedule or a changed dependency starts with a recorded request.
+          - Someone other than the person who made the change reviews and approves it before it takes effect.
+          - The job is tested outside production first, where the job's risk calls for it.
+          - Jobs defined in code are changed through the pull request process, as in "CI/CD pipelines as change control".
+      - heading: Seeing every change
+        part: monitoring
+        items:
+          - A system-generated list of job definition changes for the period can be produced. If the scheduler doesn't keep a change history, job definitions are exported on a schedule and compared version to version, or changes to the job tables are audited.
+          - Someone compares the list to the approved requests on the schedule set in your team's written procedure, and investigates any change with no request.
+          - text: The list, the matching and the follow-up are kept for the period in the firm's [records retention schedule](#todo-records-retention-schedule).
+            sox_only: true
+    steps:
+      - who: Job owner
+        do: Raise a request describing the change to the job or schedule and why.
+        evidence: The request
+      - who: Peer reviewer
+        do: Review the change and approve it before it is applied.
+        evidence: The recorded approval
+      - who: Control owner
+        do: On the schedule set in your procedure, compare the list of job definition changes to approved requests.
+        evidence: The comparison with notes on each unmatched change
+        part: monitoring
+
+  - ref: job-monitoring
+    title: Job failures are monitored, investigated and resolved
+    why: >-
+      A missed or failed job can leave reports short of data without any visible error. Alerting on
+      failure and keeping a record of what was done turns a silent gap into a fixed problem.
+    applies_when:
+      - Jobs process, move or load data that feeds financial reporting or other controls.
+    nature: detective
+    method: it_dependent
+    frequency: daily
+    level: key
+    owned_by: Application owner
+    performed_by: Job operator
+    reviewed_by: Control owner
+    theme: Job scheduling and monitoring
+    categories: [application, database, operating_system, jobs, cloud, logging]
+    criteria:
+      - heading: Knowing a job failed
+        part: configuration
+        items:
+          - Every in-scope job reports its result, and a failure, a missed start or a long run sends an alert to a team that watches it.
+          - A new job is added to monitoring when it is created, and on the schedule set in your team's written procedure the list of monitored jobs is compared with the jobs defined in the scheduler, so a new job that feeds financial data isn't missed.
+      - heading: Acting on it
+        part: monitoring
+        items:
+          - Each failure becomes a ticket or record with the cause, the fix and the date it was resolved.
+          - A failed job is rerun or its data is corrected within the time set in your procedure (our recommendation is in [Recommended timelines by BCP tier](/guides/recommended-timelines-by-bcp-tier/)), and downstream users are told if data was late.
+          - Repeated failures are looked at for the underlying cause.
+          - text: A list of job runs with every failure and its follow-up is kept for the period in the firm's records retention schedule.
+            sox_only: true
+    steps:
+      - who: Job owner
+        do: Set up alerting for failure, missed start and long runs on each in-scope job, and list the jobs covered.
+        evidence: The alert settings and the job list, with the date
+        part: configuration
+      - who: Job operator
+        do: Act on each alert, record the cause and fix, and rerun the job if needed.
+        evidence: The ticket linked to the failed run
+        part: monitoring
+      - who: Control owner
+        do: On the schedule set in your procedure, compare the failed runs for the period to the records and check each was resolved, and compare the monitored jobs with the jobs defined in the scheduler.
+        evidence: The comparisons with notes on any gap
+        part: monitoring
+
+  - ref: scheduler-access
+    title: Access to the scheduler is limited
+    why: >-
+      Whoever can edit or run jobs can change what data is processed and when. Keeping that to a small
+      set of named roles, with jobs running as limited accounts, narrows what a mistake or misuse can do.
+    applies_when:
+      - People or tools can create, edit, run or stop jobs on a scheduler, SQL Server Agent or a task scheduler.
+    nature: preventive
+    method: it_dependent
+    frequency: quarterly
+    level: non-key
+    owned_by: Head of Engineering
+    performed_by: Platform engineer
+    reviewed_by: Control owner
+    theme: Job scheduling and monitoring
+    categories: [application, database, operating_system, jobs, identity]
+    criteria:
+      - heading: Who can do what
+        part: configuration
+        items:
+          - Defining, editing and running jobs are limited to named roles whose jobs need it, requested through the access request control.
+          - The people who build a job do not also have rights to change it in production, unless the change goes through change control.
+          - Jobs run as service accounts that hold only the permissions the job needs, following the service accounts control.
+          - On SQL Server Agent, membership of its roles and ownership of jobs are limited and listed.
+      - heading: Staying limited
+        part: monitoring
+        items:
+          - The list of people and accounts with scheduler access is reviewed on the schedule set in your team's written procedure, and access no longer needed is removed.
+          - Job owners that no longer work in the role are reassigned.
+          - text: The access lists, reviews and removals are kept for the period in the firm's records retention schedule.
+            sox_only: true
+    steps:
+      - who: Platform engineer
+        do: List who can create, edit, run or stop jobs, including SQL Server Agent roles and job owners, and remove what is not needed.
+        evidence: The list with the date, and tickets for removals
+        part: configuration
+      - who: Control owner
+        do: On the schedule set in your procedure, review the list with the job owners and record decisions.
+        evidence: The reviewed list with sign-off
+        part: monitoring
+
+  - ref: config-baseline
+    title: Servers are built to a documented baseline
+    why: >-
+      A written baseline says what a correctly set up server, database instance or cluster looks like.
+      Without one, every build is a judgment call and nothing can be checked against it later.
+    applies_when:
+      - The team builds or manages Windows servers, SQL Server instances or similar platforms.
+      - The team runs a directory, an engineering tool or a logging platform whose settings protect in-scope systems.
+    nature: preventive
+    method: manual
+    frequency: annual
+    level: supporting
+    owned_by: Head of Engineering
+    performed_by: Platform engineer
+    reviewed_by: Control owner
+    stage: Configure and evidence
+    categories: [operating_system, database, cloud, network, identity, engineering_tools, logging]
+    criteria:
+      - heading: The baseline
+        part: configuration
+        items:
+          - A written baseline exists for each kind of server or platform, covering security settings, services, accounts, logging and patch level.
+          - It is based on vendor guidance and adjusted to the firm's needs, and the reasons for any difference are recorded.
+          - Kubernetes clusters, directories, engineering tools and logging platforms have a baseline in the same way, covering the settings that protect the systems that rely on them.
+          - The baseline is reviewed at least once a year and when the platform changes.
+      - heading: Building to it
+        part: configuration
+        items:
+          - New servers are built from the baseline using a template or automation, not by hand from memory.
+          - Any difference from the baseline at build time is approved and recorded.
+          - text: The baseline versions and the evidence that each in-scope server was built to it are kept for the period in the firm's records retention schedule.
+            sox_only: true
+    steps:
+      - who: Platform engineer
+        do: Write down the intended settings for each kind of server or platform, and the reasons for any departure from vendor guidance.
+        evidence: The baseline document with its date and version
+        part: configuration
+      - who: Platform engineer
+        do: Build servers from the template, and record any approved difference.
+        evidence: The build record or template version used
+        part: configuration
+      - who: Control owner
+        do: Review the baseline each year and sign off.
+        evidence: The sign-off with the date
+
+  - ref: drift-monitoring
+    title: Configuration drift is monitored
+    why: >-
+      Servers change after they are built. Comparing live settings to the baseline on a schedule finds
+      unapproved changes and weakened settings before they cause harm or hide a different problem.
+    applies_when:
+      - The team runs servers, database instances or clusters whose settings could affect security or data.
+      - The team runs a directory, an engineering tool or a logging platform whose settings protect in-scope systems.
+    nature: detective
+    method: it_dependent
+    frequency: monthly
+    level: non-key
+    owned_by: Head of Engineering
+    performed_by: Platform engineer
+    reviewed_by: Control owner
+    stage: Monitor drift
+    categories: [operating_system, database, cloud, network, identity, engineering_tools, logging]
+    criteria:
+      - heading: Checking against the baseline
+        part: monitoring
+        items:
+          - Live settings are compared to the baseline on the schedule set in your team's written procedure, by a tool where possible.
+          - The comparison covers every in-scope server, instance, cluster and platform, and the list of what is covered is kept complete.
+          - Changes to important settings, such as administrator group membership, can raise an alert between checks.
+      - heading: Dealing with differences
+        part: monitoring
+        items:
+          - Each difference is either matched to an approved change and the baseline updated, or fixed.
+          - Unexplained differences are investigated and the outcome recorded.
+          - text: The comparison results and the follow-up are kept for the period in the firm's records retention schedule.
+            sox_only: true
+    steps:
+      - who: Platform engineer
+        do: Run the comparison against the baseline for every in-scope server, instance, cluster and platform.
+        evidence: The comparison output with the date and what it covered
+        part: monitoring
+      - who: Platform engineer
+        do: Match each difference to an approved change or fix it, and record which.
+        evidence: Tickets or notes for each difference
+        part: monitoring
+      - who: Control owner
+        do: Review the results and follow-up, and sign off.
+        evidence: The sign-off with the date
+        part: monitoring
+
+  - ref: interface-completeness
+    title: Interface and data transfer completeness
+    why: >-
+      A feed can run without errors and still deliver the wrong amount of data. Comparing what was sent
+      with what arrived, and working every rejected record, shows that the receiving system holds all of
+      the data it should, once.
+    applies_when:
+      - Data is sent by file, message, API or database link from one system into a financial system or into a report used in a control.
+    nature: detective
+    method: it_dependent
+    frequency: daily
+    level: key
+    owned_by: Application owner
+    performed_by: Interface owner
+    reviewed_by: Control owner
+    theme: Interfaces and data transfers
+    categories: [application, database, jobs, cloud]
+    criteria:
+      - heading: Knowing the transfer is complete
+        items:
+          - Every interface that feeds a financial system is on a list with its source, target, owner and schedule, and a new interface is added when it is created.
+          - For each run, record counts and control totals, such as the sum of amounts, at the source are compared with those at the target. Differences are explained before the data is used.
+          - The same file or batch can't be loaded twice, or a second load is detected.
+      - heading: Rejected records and failures
+        part: monitoring
+        items:
+          - Records the target rejects are listed, then corrected and resent or closed with a reason. Rejects open past the time set in your team's written procedure are escalated.
+          - A failed, partial or missing transfer raises an alert to a team that watches it. The record shows the cause, the fix and that the missing data was reloaded.
+          - Changes to the mapping or logic of an interface go through change control, as in "Changes start from an approved request".
+          - text: The reconciliations, reject lists and alert follow-up are kept for the period in the firm's records retention schedule.
+            sox_only: true
+    steps:
+      - who: Interface owner
+        do: List each interface into a financial system with its source, target and schedule, and define the counts and totals to compare.
+        evidence: The interface list and the comparison definition, with the date
+        part: configuration
+      - who: Interface owner
+        do: After each run, compare source and target counts and totals and explain any difference.
+        evidence: The comparison for each run, with notes on differences
+        part: monitoring
+      - who: Interface owner
+        do: Work each rejected record until it is corrected and resent, or closed with a reason.
+        evidence: The reject list with the outcome of each record
+        part: monitoring
+      - who: Control owner
+        do: On the schedule set in your procedure, check that every run has a comparison, every reject is closed and every failure was resolved, and sign off.
+        evidence: The sign-off with the date
+        part: monitoring

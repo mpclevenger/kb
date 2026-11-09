@@ -1,0 +1,40 @@
+category: operating_system
+intro: Server operating systems, which at the firm means Windows Server. The main risk is that local administrators,
+  unpatched hosts or unmonitored changes give someone control over everything running on the server.
+practices:
+  Access: |
+    - Membership of the local Administrators group is controlled by policy or a managed group and limited to named administrators or approved groups.
+    - Administrators sign in with separate privileged accounts. Shared and built-in administrator accounts are disabled or have managed, rotated passwords.
+    - Remote desktop access is limited to a defined group and logged.
+    - The administrator list is reviewed on the schedule in your team's written procedure, and access is removed when a person moves or leaves.
+  Service accounts: |
+    - Accounts that run services and scheduled tasks are listed with an owner and purpose. Group managed service accounts are used where the software supports them.
+    - Service accounts aren't local or domain administrators unless there is a documented reason.
+  Change: |
+    - Operating system changes, such as role installs and upgrades, go through change control with a record and an approval.
+    - Configuration is applied through policy, desired state configuration or a build image, so a change is a reviewed change to code or policy.
+    - Changes made locally on the server are found by comparing it with its approved build.
+  Configuration: |
+    - Each server is built from an approved baseline covering services, firewall, audit policy, local accounts and security settings.
+    - A dated report of settings against the baseline is kept, and servers that drift are corrected.
+    - Unneeded roles, features, shares and software are removed.
+  Logging: |
+    - Security event logs are collected into Splunk, including logons, privilege use, account and group changes, and audit policy changes.
+    - An alert fires when a server stops sending logs or someone clears the event log.
+  Patching: |
+    - Servers are scanned and patched on the schedule in your team's written procedure.
+    - The patch report lists every in-scope server, so servers missing from the scanner are found.
+    - Administration servers and jump workstations are patched on the same schedule.
+    - Versions past vendor support have an approved plan or exception.
+  Recovery: |
+    - Server state and data are backed up to meet the recovery objectives of the BCP tier, or the server can be rebuilt from its approved build and its data restored.
+    - A restore or rebuild is tested on a schedule, with the date and result recorded.
+  Data: |
+    - Servers that hold sensitive data have disk encryption or equivalent protection, and file shares are limited to the groups that need them.
+    - Temporary files, exports and logs left on the server are cleaned up on a schedule.
+  Network: |
+    - Host firewalls allow only the ports the server needs.
+    - Remote administration is reachable only from administration networks, and legacy protocols that aren't needed are turned off.
+  Vendor: |
+    - Operating system vendor support is current for every version in use.
+    - If a hosting provider runs the server, it is on the vendor risk team's list, and the system owner reviews its assurance report each year (see the Reading a vendor's SOC report guide), including the controls the report expects the firm to run itself.

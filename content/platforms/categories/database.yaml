@@ -1,0 +1,45 @@
+category: database
+intro: Database engines and the data stores inside them. The main risk is that people or accounts change
+  data or structure directly, bypassing the application and its controls, without anyone noticing.
+practices:
+  Access: |
+    - Administrative rights are held by a short list of named individuals, never shared accounts, using a separate privileged account. The list is reviewed on the schedule in your team's written procedure.
+    - Developers and support staff have no standing write access to production data. Emergency (break-glass) access is time-limited, requested with a reason, logged and reviewed afterward.
+    - Application users don't connect to the database directly with personal logins.
+    - Unused accounts are disabled after the period set in your team's procedure.
+  Service accounts: |
+    - Each application, job and integration has its own database account, with an owner and a listed purpose.
+    - Service accounts have only the permissions they need, not broad roles such as `db_owner`.
+    - Credentials are kept in a secret store and rotated.
+    - Any exclusion of service accounts from a review population has a written reason.
+  Change: |
+    - Schema changes are written as scripts, reviewed by someone other than the author and deployed through a pipeline or change record. See the CI/CD pipelines as change control guide.
+    - Direct data changes in production are treated as changes: requested, approved and logged.
+    - Changes made outside the approved path are found by comparing audit records with the approved change list.
+  Configuration: |
+    - Settings are documented against a baseline, covering authentication mode, encryption, auditing and enabled features.
+    - A dated export of those settings is kept, and drift is checked on a schedule.
+    - Default accounts and features that aren't needed are removed or turned off.
+  Logging: |
+    - Auditing records logins, failed logins, permission and role changes, schema changes, and data changes on in-scope tables by people and administrator accounts.
+    - Audit records are written somewhere administrators can't change and collected into Splunk, using Splunk DB Connect where the audit data is in a database table.
+    - An alert fires when expected audit records don't arrive in Splunk.
+    - Someone who isn't one of the administrators in the log reviews privileged activity on a schedule and follows up anything unexpected.
+  Patching: |
+    - Database engines and their hosts are patched on the schedule in your team's written procedure.
+    - The version in use is within vendor support, and unsupported versions have an approved plan or exception.
+  Recovery: |
+    - Backups run on a schedule that supports the recovery point set by the system's BCP tier.
+    - Backups are encrypted, stored away from the server they protect and protected from deletion by database administrators.
+    - A restore is tested on a schedule, with the date and result recorded.
+    - Failed backup jobs raise an alert that someone reads.
+  Data: |
+    - Data in each database is classified, and sensitive columns are known and protected at rest.
+    - Keys and certificates have named owners and are backed up separately so data can still be read after a rebuild.
+    - Production data copied to test environments is masked or protected to the production level.
+  Network: |
+    - Database ports are reachable only from application servers, administration networks and approved tools.
+    - Connections use encryption in transit.
+  Vendor: |
+    - If the database is a managed service, the provider is on the vendor risk team's list, and the system owner reviews its assurance report each year (see the Reading a vendor's SOC report guide), including the controls the report expects the firm to run itself.
+    - The review confirms which parts the provider runs and which the firm still owns, such as access, configuration and data.

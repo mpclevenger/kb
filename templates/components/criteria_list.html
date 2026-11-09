@@ -1,0 +1,10 @@
+{% load trac_ui %}<div class="criteria">
+  {% for group in groups %}<section class="criteria-group"{% if group.name %} aria-label="{{ group.name }}"{% endif %}>
+    {% if group.name %}<h3 class="criteria-group-name">{{ group.name }}</h3>{% endif %}
+    <ul class="criteria-items">
+      {% for item in group.items %}<li class="criteria-item">{{ item.text|links }}{% if item.sox_only %} <span class="sox-only-pill">For SOX apps</span>{% endif %}</li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endfor %}
+</div>

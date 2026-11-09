@@ -1,0 +1,3 @@
+{% if propose_url or retire_url or edit_draft_url %}
+<div class="page-header-actions">{% if propose_url %}<a class="btn btn-secondary" href="{{ propose_url }}">Propose a change</a>{% endif %}{% if retire_url %}<a class="btn btn-secondary" href="{{ retire_url }}">Retire</a>{% endif %}{% if edit_draft_url %}<a class="btn btn-secondary" href="{{ edit_draft_url }}">Edit draft</a>{% endif %}</div>
+{% endif %}

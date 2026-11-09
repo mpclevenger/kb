@@ -1,0 +1,15 @@
+{% load trac_labels %}<header class="page-header">
+  <div class="page-header-top">
+    <div>
+      {% if ident %}<div class="page-header-id">{{ ident }}</div>{% endif %}
+      <h1 class="page-header-title">{{ title }}</h1>
+    </div>
+    {% if actions %}<div class="page-header-actions">{{ actions }}</div>{% endif %}
+  </div>
+  {% if pills or status %}
+  <div class="page-header-meta">
+    {% if status %}{% badge "status" status %}{% endif %}
+    {% for pill in pills %}{% include "components/attribute_pill.html" with label=pill.label value=pill.value %}{% endfor %}
+  </div>
+  {% endif %}
+</header>

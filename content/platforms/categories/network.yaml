@@ -1,0 +1,39 @@
+category: network
+intro: How people and systems reach the firm's systems, including remote access and network scanning.
+  The main risk is that an unapproved path to a system exists, or that nobody would see someone using
+  it.
+practices:
+  Access: |
+    - Network administration rights are held by named individuals with separate privileged accounts, and are reviewed on the schedule in your team's written procedure.
+    - Remote access is granted to named users through approved groups, requires multi-factor authentication, and is removed when a person moves or leaves.
+  Service accounts: |
+    - Accounts used by network devices and tools, such as scanning accounts, have an owner and purpose, the least access they need, and credentials held in a secret store.
+  Change: |
+    - Firewall rules, routing and device configuration changes go through change control with a record, a reason and an approval.
+    - Firewall rules each have an owner and a business reason, and are reviewed on the schedule in your team's written procedure.
+    - Changes made outside change control are detected by comparing device configuration with the approved copy.
+  Configuration: |
+    - Network devices and remote access gateways are set up to a baseline.
+    - A dated export of device configuration is kept, and drift is checked.
+    - Network diagrams show the paths into in-scope systems and are updated after changes.
+  Logging: |
+    - Connection logs from remote access, firewalls and device administration are sent to Splunk.
+    - Alerts fire for sign-in anomalies, and when a device stops sending logs.
+    - Scan results are kept, with the date and the systems covered.
+  Patching: |
+    - Network devices and remote access software are patched within the timelines in the Recommended timelines by BCP tier guide.
+    - Vulnerability scanning covers all in-scope networks, compared against the asset inventory so systems are not missed.
+    - Unsupported firmware and software have an approved plan or exception.
+  Recovery: |
+    - Device configurations are backed up, and a device can be replaced and restored from the backup.
+    - Remote access has a recovery plan that matches the BCP tier of the systems that depend on it, and a restore or failover test is recorded.
+  Data: |
+    - Traffic that carries sensitive data is encrypted in transit.
+    - Logs and scan results hold sensitive detail and are limited to the people who need them.
+  Network: |
+    - Segmentation separates user, server, administration and internet-facing networks, and rules between them are limited to what is needed.
+    - Administrative interfaces of network devices are reachable only from administration networks.
+    - Direct internet exposure of in-scope systems is documented and approved.
+  Vendor: |
+    - Providers of connectivity, remote access or managed network services are on the vendor risk team's list, and the system owner reviews their assurance reports (see the Reading a vendor's SOC report guide), including the controls the report expects the firm to run itself.
+    - Vendor access to network devices is approved, time-limited and logged.

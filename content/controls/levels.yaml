@@ -1,0 +1,33 @@
+# Control levels: how important a control is.
+#
+# Every control has one level. Pages sort controls by the order below (most important first).
+# Levels marked "open: true" are shown on pages. Levels marked "open: false" are folded
+# under a "More controls" box that readers can expand.
+#
+# To add a level: add a new entry in the place you want it to rank.
+# To rename what readers see: change its "label" (leave "key" alone, controls point at it).
+# To show a level by default: set "open: true".
+# After editing, run:  .\trac.ps1 check
+#
+# The first level is also the one listed on the "Key controls for SOX in-scope apps" page.
+
+levels:
+  # Relied on to address the risk, and tested by auditors.
+  - key: key
+    label: Key
+    open: true
+
+  # Matters, but is not relied on alone.
+  - key: non-key
+    label: Non-key
+    open: false
+
+  # Covers for a control that is missing or not working, usually for a limited time.
+  - key: compensating
+    label: Compensating
+    open: false
+
+  # Helps other controls work (documentation, baselines, tuning).
+  - key: supporting
+    label: Supporting
+    open: false

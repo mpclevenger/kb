@@ -1,0 +1,56 @@
+{% load workflow_tags %}{% workflow_state version request.user as wf %}
+{% if wf.any %}
+<section class="workflow-actions trac-paper mb-4" aria-label="Review actions">
+  {% if wf.can_submit %}
+  <p class="mb-3"><strong>This is a draft.</strong> Only you and Tech Risk can see it. Nothing is official until Tech Risk approves and publishes it.</p>
+  <div class="d-flex flex-wrap gap-2">
+    <form method="post" action="{% url 'workflow:submit' wf.ctype_id version.pk %}">
+      {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button type="submit" class="btn btn-primary">Submit for review</button>
+    </form>
+    <form method="post" action="{% url 'workflow:discard' wf.ctype_id version.pk %}" data-confirm="Discard this draft? This can&#39;t be undone.">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline-secondary">Discard draft</button>
+    </form>
+  </div>
+  {% endif %}
+
+  {% if wf.can_withdraw %}
+  <p class="mb-3"><strong>In review.</strong>
+    {% if wf.self_approval_on %}Single-approver mode is on, so you can approve your own changes.{% elif wf.needs_other_approver %}You proposed this, so another member of Tech Risk needs to approve it.{% else %}Waiting for Tech Risk to review it.{% endif %}
+    Withdraw it if you want to change it first.</p>
+  <form method="post" action="{% url 'workflow:withdraw' wf.ctype_id version.pk %}">
+    {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <button type="submit" class="btn btn-outline-primary">Withdraw</button>
+  </form>
+  {% endif %}
+
+  {% if wf.can_decide %}
+  <p class="mb-3"><strong>Waiting for your decision.</strong> Approving publishes the change, so it becomes official.</p>
+  <div class="row g-4">
+    <form class="col-md-6" method="post" action="{% url 'workflow:approve' wf.ctype_id version.pk %}">
+      {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <div class="mb-2">
+        <label class="form-label" for="wf-date-{{ version.pk }}">Start date <span class="text-secondary fw-normal">(optional)</span></label>
+        <input class="form-control" type="date" id="wf-date-{{ version.pk }}" name="effective_date" min="{{ wf.today }}" aria-describedby="wf-date-help-{{ version.pk }}">
+        <div class="form-text" id="wf-date-help-{{ version.pk }}">Leave blank to make it official now.</div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="wf-note-{{ version.pk }}">Note <span class="text-secondary fw-normal">(optional)</span></label>
+        <textarea class="form-control" id="wf-note-{{ version.pk }}" name="comment" rows="2"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Approve and publish</button>
+    </form>
+    <form class="col-md-6" method="post" action="{% url 'workflow:reject' wf.ctype_id version.pk %}">
+      {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <div class="mb-3">
+        <label class="form-label" for="wf-reason-{{ version.pk }}">Why are you sending it back?</label>
+        <textarea class="form-control" id="wf-reason-{{ version.pk }}" name="comment" rows="3" required aria-describedby="wf-reason-help-{{ version.pk }}"></textarea>
+        <div class="form-text" id="wf-reason-help-{{ version.pk }}">The person who proposed it will see this.</div>
+      </div>
+      <button type="submit" class="btn btn-outline-danger">Reject</button>
+    </form>
+  </div>
+  {% endif %}
+</section>
+{% endif %}

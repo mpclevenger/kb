@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static trac_ui %}
+{% block title %}Edit guidance: {{ name }} | TRAC{% endblock %}
+{% block content %}
+{% page_header "Edit guidance" ident=name %}{% endpage_header %}
+{% if version %}{% include "core/workflow_actions.html" %}{% endif %}
+<div class="trac-form">
+{% if blocked %}
+  <div class="trac-form-section">
+    <p class="mb-3">{{ blocked }}</p>
+    {% if version.intro %}<p>{{ version.intro|linebreaksbr }}</p>{% endif %}
+    {% for question, text in proposed %}<div class="mb-3"><strong>{{ question.label }}.</strong>{{ text|bullets }}</div>{% endfor %}
+    <a class="btn btn-outline-secondary" href="{{ cancel_url }}">Back</a>
+  </div>
+{% else %}
+  <p class="text-secondary">Saving keeps this as a draft. Nothing is official until another member of Tech Risk approves and publishes it.</p>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.errors %}
+    <div class="alert alert-danger" role="alert" tabindex="-1" id="form-errors">
+      <strong>This isn't saved yet.</strong> Fix the problems marked below.
+      {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+    </div>
+    {% endif %}
+    <section class="trac-form-section" aria-labelledby="sec-intro">
+      <h2 id="sec-intro">Introduction</h2>
+      {% include "components/field_form.html" with field=form.intro %}
+    </section>
+    <section class="trac-form-section" aria-labelledby="sec-lines">
+      <h2 id="sec-lines">Guidance by risk area</h2>
+      <p class="section-help">One entry for each risk area. Start a line with "- " (dash and space) to make a bullet list. Leave it empty to show "Guidance coming soon".</p>
+      {% for field in form.line_fields %}
+      <div class="mb-3">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        <div class="form-text" id="id_{{ field.name }}_help">{{ field.help_text }}</div>
+        {{ field }}
+      </div>
+      {% endfor %}
+    </section>
+    <section class="trac-form-section" aria-labelledby="sec-references">
+      <h2 id="sec-references">References</h2>
+      {% include "components/references_editor.html" with field=form.references %}
+    </section>
+    {% if form.change_summary %}
+    <section class="trac-form-section" aria-labelledby="sec-change">
+      <h2 id="sec-change">Your change</h2>
+      {% include "components/field_form.html" with field=form.change_summary %}
+    </section>
+    {% endif %}
+    <div class="trac-actions mb-5">
+      <button type="submit" class="btn btn-primary">Save draft</button>
+      <a class="btn btn-outline-secondary" href="{{ cancel_url }}">Cancel</a>
+    </div>
+  </form>
+{% endif %}
+</div>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'js/trac-rows.js' %}"></script>{% endblock %}

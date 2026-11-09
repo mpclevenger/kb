@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load trac_ui trac_labels %}
+{% block title %}Manage topics and platforms | TRAC{% endblock %}
+{% block content %}
+{% page_header "Manage topics and platforms" %}<a class="btn btn-outline-secondary" href="{% url 'manage:aspect_list' %}">Aspect questions</a>{% endpage_header %}
+
+<section class="mb-5" aria-labelledby="topics">
+  <div class="page-header-top mb-3">
+    <h2 class="h4 mb-0" id="topics">Topics</h2>
+    <a class="btn btn-primary" href="{% url 'manage:topic_new' %}">New topic</a>
+  </div>
+  <table class="trac-table">
+    <caption>{{ topics|length }} topic{{ topics|length|pluralize }}</caption>
+    <thead><tr><th scope="col">Position</th><th scope="col">Name</th><th scope="col">ID prefix</th><th scope="col">Stages</th><th scope="col">Active</th></tr></thead>
+    <tbody>
+    {% for topic in topics %}
+      <tr>
+        <td>{{ topic.position }}</td>
+        <td>{% topic_icon topic.icon %} <a href="{% url 'manage:topic_edit' topic.pk %}">{{ topic.name }}</a></td>
+        <td class="col-id">{{ topic.id_prefix }}</td>
+        <td>{{ topic.stage_count }}</td>
+        <td>{{ topic.is_active|yesno:"Yes,No" }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="mb-5" aria-labelledby="platforms">
+  <div class="page-header-top mb-3">
+    <h2 class="h4 mb-0" id="platforms">Platforms</h2>
+    <a class="btn btn-primary" href="{% url 'manage:platform_new' %}">New platform</a>
+  </div>
+  <table class="trac-table">
+    <caption>{{ platforms|length }} platform{{ platforms|length|pluralize }}</caption>
+    <thead><tr><th scope="col">Name</th><th scope="col">Categories</th><th scope="col">Hosting</th><th scope="col">Runs on</th><th scope="col">Owner</th><th scope="col">Active</th></tr></thead>
+    <tbody>
+    {% for platform in platforms %}
+      <tr>
+        <td><a href="{% url 'manage:platform_edit' platform.pk %}"><strong>{{ platform.name }}</strong></a></td>
+        <td>{% for key in platform.categories %}{% category_pill key %} {% endfor %}</td>
+        <td>{{ platform.get_hosting_display }}</td>
+        <td>{{ platform.runs_on.name }}</td>
+        <td>{{ platform.owner }}</td>
+        <td>{{ platform.is_active|yesno:"Yes,No" }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="mb-5" aria-labelledby="recent">
+  <h2 class="h4 mb-3" id="recent">Recent changes</h2>
+  {% include "manage/_changes.html" with caption="The latest changes made on these pages" show_object=True %}
+</section>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load trac_ui %}
+{% block title %}Add your name | TRAC{% endblock %}
+{% block content %}
+{% page_header "Add your name" %}{% endpage_header %}
+<p class="mb-4">Your name is optional. It shows next to the comments you leave, so the Tech Risk team knows who to ask. Leave it blank to stay anonymous. Everyone who visits can read the site and leave comments; only Tech Risk can change it.</p>
+<form method="post" class="trac-paper mb-3">
+  {% csrf_token %}
+  {% for field in form %}{% include "components/field_form.html" %}{% endfor %}
+  <button type="submit" class="btn btn-primary">Save</button>
+</form>
+{% endblock %}

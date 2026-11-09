@@ -1,0 +1,50 @@
+{% load trac_ui trac_labels %}{% if is_partial %}{% include "rcm/_stage_select.html" with oob=True %}{% endif %}
+<ul class="nav nav-tabs mb-3" role="tablist">
+  <li class="nav-item"><a class="nav-link{% if f.view == 'risks' %} active{% endif %}" href="?{% include 'rcm/_query.html' with view='risks' %}" hx-get="{% url 'rcm:explorer' %}?{% include 'rcm/_query.html' with view='risks' %}" hx-target="#results" hx-push-url="true"{% if f.view == 'risks' %} aria-current="page"{% endif %}>By risk</a></li>
+  <li class="nav-item"><a class="nav-link{% if f.view == 'controls' %} active{% endif %}" href="?{% include 'rcm/_query.html' with view='controls' %}" hx-get="{% url 'rcm:explorer' %}?{% include 'rcm/_query.html' with view='controls' %}" hx-target="#results" hx-push-url="true"{% if f.view == 'controls' %} aria-current="page"{% endif %}>By control</a></li>
+</ul>
+
+{% if not rows %}
+  {% empty_state "No matches" "Nothing fits these filters. Try removing one." action_label="Clear filters" action_url="/rcm/" %}
+{% elif f.view == 'risks' %}
+<table class="trac-table">
+  <caption>{{ rows|length }} risk{{ rows|length|pluralize }}</caption>
+  <thead><tr><th scope="col">Risk</th><th scope="col">Topic / stage</th><th scope="col">Coverage</th><th scope="col">Controls</th><th scope="col">Drivers</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr>
+      <td><a class="col-id" href="{{ r.row.risk.get_absolute_url }}">{{ r.row.risk.ident }}</a><div>{{ r.row.version.title }}</div></td>
+      <td>{{ r.scope }}</td>
+      <td>{% include "rcm/_coverage.html" with coverage=r.row.coverage label=r.row.coverage|capfirst %}</td>
+      <td>{% for c in r.controls %}<div class="mb-1 d-flex align-items-center gap-2">{% control_pill c.control.ident c.version.title c.control.get_absolute_url %}{% if c.coverage == "partial" %}{% badge "coverage" "partial" %}{% endif %}</div>{% empty %}<span class="text-secondary">None</span>{% endfor %}</td>
+      <td>{% for d in r.row.drivers %}<div class="mb-1">{% link_chip "driver" d.driver.ident d.version.title d.driver.get_absolute_url %}</div>{% empty %}<span class="text-secondary">None</span>{% endfor %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h2 class="h5 mt-4">Controls not linked to any risk</h2>
+{% if unlinked %}
+<ul class="list-unstyled d-flex flex-column gap-1">
+  {% for u in unlinked %}<li>{% control_pill u.control.ident u.version.title u.control.get_absolute_url %}</li>{% endfor %}
+</ul>
+{% else %}
+<p class="text-secondary">Every control here is linked to a risk.</p>
+{% endif %}
+{% else %}
+<table class="trac-table">
+  <caption>{{ rows|length }} control{{ rows|length|pluralize }}</caption>
+  <thead><tr><th scope="col">Control</th><th scope="col">Topic / stage</th><th scope="col">Level</th><th scope="col">Type and timing</th><th scope="col">Risks addressed</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr>
+      <td>{% control_pill r.control.ident r.version.title r.control.get_absolute_url %}</td>
+      <td>{{ r.scope }}</td>
+      <td>{{ r.level_label }}</td>
+      <td><div class="attr-pill-row">{% attribute_pill "" r.version.get_nature_display tone=r.version.nature|pill_tone:"nature" %}{% attribute_pill "" r.version.get_method_display tone=r.version.method|pill_tone:"method" %}{% attribute_pill "" r.version.get_frequency_display tone=r.version.frequency|pill_tone:"frequency" %}</div></td>
+      <td>{% for risk, cov in r.risks %}<div class="mb-1 d-flex align-items-center gap-2">{% link_chip "risk" risk.risk.ident risk.version.title risk.risk.get_absolute_url %}{% if cov == "partial" %}{% badge "coverage" "partial" %}{% endif %}</div>{% empty %}<span class="text-secondary">Not linked to any risk</span>{% endfor %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}

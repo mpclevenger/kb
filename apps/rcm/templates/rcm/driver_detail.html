@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load trac_ui trac_labels %}
+{% block title %}{{ ident }} {{ v.title }} - TRAC{% endblock %}
+
+{% block content %}
+{% include "components/version_notices.html" %}
+{% include "components/version_workflow.html" %}
+<header class="page-header">
+  <div class="page-header-top">
+    <div>
+      <div class="page-header-id">{{ ident }}</div>
+      <h1 class="page-header-title">{{ v.title }}</h1>
+    </div>
+    {% include "components/page_actions.html" %}
+  </div>
+  <div class="page-header-meta">
+    {% if v.category %}{% attribute_pill "Category" v.category %}{% endif %}
+    {% attribute_pill "Owner role" v.owner_role tone="owner" %}
+  </div>
+</header>
+
+{% section_toolbar %}
+
+{% if v.description %}
+{% section_card "What this is" tone="why" id="description" %}
+  <div class="prose">{{ v.description|linebreaks }}</div>
+{% endsection_card %}
+{% endif %}
+
+{% if show_engine and v.trigger or show_engine and v.questionnaire_fields %}
+{% section_card "From the risk engine" tone="neutral" id="engine" %}
+  <p class="text-secondary">Copied from the engine. To change it, change the engine and refresh the files.</p>
+  <dl class="mb-0">
+    {% if v.trigger %}<dt>Trigger</dt><dd><code>{{ v.trigger }}</code></dd>{% endif %}
+    {% if v.questionnaire_fields %}<dt>Questionnaire fields</dt><dd><code>{{ v.questionnaire_fields|join:", " }}</code></dd>{% endif %}
+  </dl>
+{% endsection_card %}
+{% endif %}
+
+{% if v.indicators %}
+{% section_card "How you'd know" tone="need" id="indicators" %}
+  <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
+    {% for indicator in v.indicators %}
+    <li>{% attribute_pill "" indicator.type|capfirst %} {{ indicator.text }}</li>
+    {% endfor %}
+  </ul>
+{% endsection_card %}
+{% endif %}
+
+{% if show_engine %}
+{% section_card "Engine risks this driver feeds" tone="neutral" id="engine-risks" %}
+  {% if engine_risks %}
+  <table class="trac-table">
+    <thead><tr><th scope="col">Engine risk</th><th scope="col">Feeds</th></tr></thead>
+    <tbody>
+    {% for r in engine_risks %}
+      <tr>
+        <td><a href="{% url 'rcm:engine_risks' %}#{{ r.risk.key }}">{{ r.risk.name }}</a> <span class="text-secondary">({{ r.risk.domain }}, {{ r.risk.category }})</span></td>
+        <td>{{ r.feeds|capfirst }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="mb-0 text-secondary">No engine risk names this driver.</p>
+  {% endif %}
+{% endsection_card %}
+{% endif %}
+
+{% section_card "TRAC risks" tone="neutral" id="risks" %}
+  {% if risks %}
+  <table class="trac-table">
+    <thead><tr><th scope="col">Risk</th><th scope="col">Coverage</th></tr></thead>
+    <tbody>
+    {% for r in risks %}
+      <tr>
+        <td>{% link_chip "risk" r.risk.ident r.version.title r.risk.get_absolute_url %}</td>
+        <td>{% badge "coverage" r.coverage %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="mb-0 text-secondary">No published TRAC risk is linked to this driver yet.</p>
+  {% endif %}
+{% endsection_card %}
+
+{% include "components/references.html" with references=v.references %}
+{% include "components/version_footer.html" %}
+{% endblock %}

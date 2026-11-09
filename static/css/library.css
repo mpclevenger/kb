@@ -1,0 +1,80 @@
+/* Best practices and guides (section tiles, rows, page body and contents) and the FAQ. */
+
+/* Section colors: each text color has at least 4.5:1 contrast on its own light tint. */
+.type-pill-section-build, .library-section-build { --pill-bg: #dce7f3; --pill-ink: #1f4e7a; }
+.type-pill-section-run, .library-section-run { --pill-bg: #dcede4; --pill-ink: #1b5e40; }
+.type-pill-section-best_practice, .library-section-best_practice { --pill-bg: #d7ecf0; --pill-ink: #135563; }
+.type-pill-section-audit_prep, .library-section-audit_prep { --pill-bg: #f3e8d6; --pill-ink: #6b4a12; }
+
+.library-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--trac-space-3); flex-wrap: wrap; margin-bottom: var(--trac-space-4); }
+.library-feature-list { display: flex; flex-wrap: wrap; gap: var(--trac-space-3); list-style: none; margin: 0; padding: 0; flex: 1 1 auto; }
+.library-feature-list li { flex: 1 1 18rem; max-width: 30rem; }
+.library-feature {
+  display: flex; flex-direction: column; gap: var(--trac-space-1); height: 100%; padding: var(--trac-space-3) var(--trac-space-4);
+  background: var(--trac-paper); border: 1px solid var(--trac-border); border-left: 5px solid var(--trac-blue);
+  border-radius: var(--trac-radius); text-decoration: none; color: var(--trac-ink);
+}
+.library-feature:hover { border-color: var(--trac-blue); }
+.library-feature-title { font-weight: 600; color: var(--trac-blue-strong); }
+.library-feature-text { font-size: 0.9375rem; color: var(--trac-pill-ink); }
+
+.library-sections { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: var(--trac-space-3); list-style: none; margin: 0 0 var(--trac-space-4); padding: 0; }
+.library-section {
+  display: grid; grid-template-columns: auto 1fr; column-gap: var(--trac-space-2); align-items: baseline; height: 100%;
+  padding: var(--trac-space-3); background: var(--pill-bg); color: var(--pill-ink);
+  border: 2px solid transparent; border-radius: var(--trac-radius); text-decoration: none;
+}
+.library-section:hover { border-color: var(--pill-ink); color: var(--pill-ink); }
+.library-section-active { border-color: var(--pill-ink); }
+.library-section-title { font-weight: 600; }
+.library-section-hint { grid-column: 1 / -1; font-size: 0.875rem; margin-top: var(--trac-space-1); }
+
+.library-rows { list-style: none; margin: 0; padding: 0; background: var(--trac-paper); border: 1px solid var(--trac-border); border-radius: var(--trac-radius); }
+.library-row {
+  display: grid; grid-template-columns: 11rem minmax(0, 1fr) auto 9.5rem; gap: var(--trac-space-3); align-items: baseline;
+  padding: 0.75rem var(--trac-space-3); border-top: 1px solid var(--trac-divider);
+}
+.library-row:first-child { border-top: 0; }
+.library-row-title { font-weight: 600; }
+.library-row .platform-chip { white-space: nowrap; }
+.library-row-review { font-size: 0.8125rem; color: var(--trac-ink-secondary); }
+@media (max-width: 767.98px) {
+  .library-row { grid-template-columns: 1fr; gap: var(--trac-space-1); }
+}
+.library-none { color: var(--trac-pill-ink); }
+
+.library-meta { display: flex; justify-content: space-between; align-items: center; gap: var(--trac-space-3); flex-wrap: wrap; margin-bottom: var(--trac-space-3); }
+.library-meta .applies-to { margin: 0; }
+
+.library-body > p, .library-body > ul, .library-body > ol, .library-body > blockquote { max-width: var(--trac-prose-width); }
+.library-intro { margin-bottom: var(--trac-space-3); }
+/* Guide sections shown as cards (wiki/page.html): the card supplies the frame, so tables sit flush. */
+.section-card-body.library-body table { margin-bottom: var(--trac-space-3); }
+.library-body td > ul { margin: 0; padding-left: 1.1rem; }
+.library-body h2 { font-size: 1.375rem; margin: var(--trac-space-4) 0 var(--trac-space-2); scroll-margin-top: var(--trac-space-3); }
+.library-body h3 { font-size: 1.125rem; margin: var(--trac-space-3) 0 var(--trac-space-2); scroll-margin-top: var(--trac-space-3); }
+.library-body h4 { font-size: 1rem; font-weight: 600; margin: var(--trac-space-3) 0 var(--trac-space-1); scroll-margin-top: var(--trac-space-3); }
+.library-body > :first-child { margin-top: 0; }
+.library-body > :last-child { margin-bottom: 0; }
+.library-body table { width: 100%; table-layout: fixed; border-collapse: collapse; background: #fff; border: 1px solid var(--trac-border); margin: var(--trac-space-2) 0 var(--trac-space-3); font-size: 0.9375rem; }
+.library-body th, .library-body td { padding: 0.5rem 0.75rem; border: 1px solid var(--trac-divider); vertical-align: top; text-align: left; }
+.library-body th { background: var(--trac-pill-bg); font-weight: 600; font-size: 0.8125rem; border-bottom: 2px solid var(--trac-border); }
+.library-body blockquote { margin: var(--trac-space-3) 0; padding: var(--trac-space-2) var(--trac-space-3); background: var(--trac-mist-soft); border-left: 4px solid var(--trac-blue); border-radius: 0 var(--trac-radius) var(--trac-radius) 0; color: var(--trac-ink); }
+.library-body blockquote > :last-child { margin-bottom: 0; }
+.library-body code, .library-body pre { font-family: var(--trac-mono); font-size: 0.875em; }
+.library-body pre { padding: var(--trac-space-2) var(--trac-space-3); background: #fff; border: 1px solid var(--trac-border); border-radius: var(--trac-radius); overflow-x: auto; }
+.library-toc-3 { padding-left: var(--trac-space-3); }
+
+.library-faq-group { margin-bottom: var(--trac-space-4); }
+.library-faq-heading { font-size: 1.125rem; margin-bottom: var(--trac-space-2); }
+.library-faq { background: var(--trac-paper); border: 1px solid var(--trac-border); border-radius: var(--trac-radius); margin-bottom: var(--trac-space-2); }
+.library-faq summary { cursor: pointer; font-weight: 500; padding: 0.75rem var(--trac-space-3); }
+.library-faq-answer { padding: 0 var(--trac-space-3) var(--trac-space-3); max-width: var(--trac-prose-width); }
+.library-faq-answer > p { margin-bottom: var(--trac-space-2); }
+.library-faq-related { font-size: 0.9375rem; color: var(--trac-pill-ink); }
+
+/* Diagrams: the text is drawn as an SVG by trac-ui.js; until then (or without JavaScript) it shows as plain text */
+pre.mermaid { margin: var(--trac-space-3) 0; text-align: center; background: transparent; border: 0; padding: 0; font-family: inherit; overflow-x: auto; }
+pre.mermaid:not([data-processed]) { text-align: left; white-space: pre; font-family: var(--trac-mono); color: var(--trac-ink-secondary); }
+pre.mermaid svg { max-width: 100%; height: auto; }
+@media print { pre.mermaid { break-inside: avoid; } }

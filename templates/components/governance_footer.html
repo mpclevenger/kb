@@ -1,0 +1,9 @@
+<footer class="governance-footer{% if overdue %} governance-footer-overdue{% endif %}" aria-label="Governance">
+  <dl class="governance-footer-list">
+    <div><dt>Version</dt><dd>{{ version }}</dd></div>
+    <div><dt>Effective date</dt><dd>{{ effective_date|date:"M j, Y" }}</dd></div>
+    <div><dt>Approver</dt><dd>{{ approver }}</dd></div>
+    <div><dt>Owner role</dt><dd>{{ owner }}</dd></div>
+    {% if next_review %}<div><dt>Review by</dt><dd>{{ next_review|date:"M j, Y" }}{% if overdue %} <span class="governance-footer-flag">Overdue</span>{% endif %}</dd></div>{% endif %}
+  </dl>
+</footer>

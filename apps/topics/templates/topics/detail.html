@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load trac_ui trac_labels %}
+{% block title %}{{ topic.name }} - TRAC{% endblock %}
+
+{% block content %}
+{% if applies_to %}
+<p class="applies-to"><span class="applies-to-label">Applies to:</span>
+  {% for platform, category in applies_to %}{% platform_chip platform category %}
+  {% endfor %}
+</p>
+{% endif %}
+<dl class="count-tiles" aria-label="Coverage summary">
+  {% count_tile "Controls" counts.controls "control" %}
+  {% count_tile "Risks" counts.risks "risk" %}
+  {% count_tile "Unmapped risks" counts.unmapped "alert" %}
+</dl>
+
+{% if stages %}
+{% section_card "The lifecycle" tone="neutral" id="lifecycle" %}
+{% include "topics/_lifecycle.html" %}
+{% endsection_card %}
+{% else %}
+<p class="topic-note">The stages for this topic are being defined. Everything published so far is listed below.</p>
+{% endif %}
+
+{% if theme_boxes or whole_topic %}
+{% section_card "Applies throughout" tone="neutral" id="throughout" %}
+<p class="topic-throughout-lead">These apply at every stage of the lifecycle, not just one.</p>
+{% if theme_boxes %}
+<div class="topic-theme-grid">
+  {% for box in theme_boxes %}
+  <section class="topic-theme-box" aria-labelledby="theme-{{ box.theme.pk }}">
+    <h3 class="topic-theme-name" id="theme-{{ box.theme.pk }}">{{ box.theme.name }}</h3>
+    {% include "topics/_throughout_items.html" with group=box show_gap=True %}
+  </section>
+  {% endfor %}
+</div>
+{% endif %}
+{% if whole_topic %}
+<section class="topic-theme-box" aria-labelledby="whole-topic">
+  <h3 class="topic-theme-name" id="whole-topic">Across the whole topic</h3>
+  {% include "topics/_throughout_items.html" with group=whole_topic %}
+</section>
+{% endif %}
+{% endsection_card %}
+{% endif %}
+
+{% if faqs %}
+{% section_card "Common questions" tone="neutral" id="questions" %}
+<div class="topic-faqs">
+  {% for faq in faqs %}
+  <details class="topic-faq">
+    <summary>{{ faq.question }}</summary>
+    <div class="topic-faq-answer">{{ faq.answer|linebreaks }}</div>
+  </details>
+  {% endfor %}
+</div>
+{% endsection_card %}
+{% endif %}
+
+{% include "topics/_everything.html" %}
+{% endblock %}

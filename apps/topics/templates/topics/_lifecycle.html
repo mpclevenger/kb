@@ -1,0 +1,32 @@
+{% load trac_ui trac_labels %}<div id="lifecycle-view">
+  {% lifecycle_arrows stages stage.pk "#lifecycle-view" %}
+  {% stage_step selected_index stages|length as step %}
+  <section class="stage-panel lifecycle-step-{{ step }}" aria-labelledby="stage-panel-name">
+    <h3 class="stage-panel-name" id="stage-panel-name">{{ stage.name }}</h3>
+    {% if stage.summary %}<p class="stage-panel-summary">{{ stage.summary }}</p>{% endif %}
+    <div class="stage-panel-columns">
+      <div>
+        <h4 class="stage-panel-label">What can go wrong</h4>
+        {% if panel.risks %}
+        <ul>
+          {% for r in panel.risks %}<li class="topic-risk"><a href="{{ r.url }}"><span class="topic-risk-id">{{ r.ident }}</span> {{ r.title }}</a></li>
+          {% endfor %}
+        </ul>
+        {% else %}<p class="topic-none">None yet</p>{% endif %}
+      </div>
+      <div>
+        <h4 class="stage-panel-label">How we control it</h4>
+        {% if panel.controls or panel.more %}
+        {% if panel.controls %}<ul>
+          {% for c in panel.controls %}<li>{% control_pill c.ident c.title c.url %}</li>
+          {% endfor %}
+        </ul>{% endif %}
+        {% if panel.more %}{% more_controls panel.more %}{% for group in panel.more %}<p class="more-controls-level">{{ group.label }}</p><ul>
+          {% for c in group.items %}<li>{% control_pill c.ident c.title c.url %}</li>
+          {% endfor %}
+        </ul>{% endfor %}{% endmore_controls %}{% endif %}
+        {% else %}<p class="topic-none">None yet</p>{% endif %}
+      </div>
+    </div>
+  </section>
+</div>

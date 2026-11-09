@@ -1,0 +1,4 @@
+<ol class="lifecycle-strip" aria-label="Lifecycle">
+  {% for stage in stages %}<li class="lifecycle-stage">{% if stage.url %}<a class="lifecycle-stage-label" href="{{ stage.url }}"{% if stage.active %} aria-current="step"{% endif %}>{{ stage.name }}</a>{% else %}<span class="lifecycle-stage-label"{% if stage.active %} aria-current="step"{% endif %}>{{ stage.name }}</span>{% endif %}</li>
+  {% endfor %}
+</ol>

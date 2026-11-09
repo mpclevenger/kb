@@ -1,0 +1,10 @@
+<form method="post" action="{{ action }}">
+  {% csrf_token %}
+  {% if object.is_active %}
+  <input type="hidden" name="active" value="false">
+  <button type="submit" class="btn btn-outline-secondary">Deactivate</button>
+  {% else %}
+  <input type="hidden" name="active" value="true">
+  <button type="submit" class="btn btn-outline-primary">Reactivate</button>
+  {% endif %}
+</form>

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load trac_ui %}
+{% block title %}{% if object %}{{ object }}{% else %}New {{ noun }}{% endif %} | TRAC{% endblock %}
+{% block breadcrumbs %}{% include "manage/_crumbs.html" with current=heading %}{% endblock %}
+{% block content %}
+{% page_header heading %}{% block header_actions %}{% endblock %}{% endpage_header %}
+<div class="trac-form">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.errors %}
+    <div class="alert alert-danger" role="alert">
+      <strong>This isn't saved yet.</strong> Fix the problems marked below.
+      {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+    </div>
+    {% endif %}
+    <section class="trac-form-section">
+      {% block fields %}{% endblock %}
+    </section>
+    <div class="trac-actions mb-4">
+      <button type="submit" class="btn btn-primary">Save</button>
+      <a class="btn btn-outline-secondary" href="{% block cancel_url %}{% url 'manage:index' %}{% endblock %}">Cancel</a>
+    </div>
+  </form>
+  {% block after_form %}{% endblock %}
+  {% if object %}
+  <section class="mb-5" aria-labelledby="history">
+    <h2 class="h5" id="history">History</h2>
+    {% include "manage/_changes.html" with changes=history caption="Every change saved on this page" %}
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

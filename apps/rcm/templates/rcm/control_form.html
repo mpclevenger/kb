@@ -1,0 +1,162 @@
+{% extends "rcm/entity_form.html" %}
+{% block form_fields %}
+<section class="trac-form-section" aria-labelledby="sec-about">
+  <h2 id="sec-about">About this control</h2>
+  {% include "components/field_form.html" with field=form.title %}
+  <div class="row">
+    <div class="col-md-6">
+      {% include "components/field_form.html" with field=form.topic %}
+    </div>
+    <div class="col-md-6">{% include "components/field_form.html" with field=form.stage %}</div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">{% include "components/field_form.html" with field=form.theme %}</div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">{% include "components/field_form.html" with field=form.owner_role %}</div>
+    <div class="col-md-6">{% include "components/field_form.html" with field=form.performer_role %}</div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">{% include "components/field_form.html" with field=form.reviewer_role %}</div>
+  </div>
+</section>
+
+<section class="trac-form-section" aria-labelledby="sec-how">
+  <h2 id="sec-how">What kind of control it is</h2>
+  <div class="row">
+    <div class="col-md-4">{% include "components/field_form.html" with field=form.nature %}</div>
+    <div class="col-md-4">{% include "components/field_form.html" with field=form.method %}</div>
+    <div class="col-md-4">{% include "components/field_form.html" with field=form.frequency %}</div>
+  </div>
+  {% include "components/field_form.html" with field=form.level %}
+</section>
+
+<section class="trac-form-section" aria-labelledby="sec-where">
+  <h2 id="sec-where">Where it applies</h2>
+  <fieldset class="mb-3">
+    <legend class="form-label fs-6">{{ form.categories.label }} <span class="text-secondary fw-normal">(optional)</span></legend>
+    <div class="trac-category-checks">
+      {% for choice in form.categories %}
+      <div class="form-check">
+        {{ choice.tag }}
+        <label class="form-check-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="form-text" id="id_categories_help">{{ form.categories.help_text }}</div>
+    {% for error in form.categories.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+  </fieldset>
+  {% include "components/field_form.html" with field=form.platforms %}
+</section>
+
+<section class="trac-form-section" aria-labelledby="sec-why">
+  <h2 id="sec-why">Why it exists</h2>
+  {% include "components/field_form.html" with field=form.why %}
+</section>
+
+<section class="trac-form-section" aria-labelledby="sec-need">
+  <h2 id="sec-need">Do I need this?</h2>
+  <p class="section-help">Write one statement per row. Someone needs this control if any one of them is true.</p>
+  <div data-rows-editor>
+    {{ form.applies_when }}
+    <div data-rows-wrap>
+      <ol class="trac-rows" data-list data-shape="strings" data-noun="statement"></ol>
+      <template>
+        <li class="trac-row" data-row>
+          <span class="trac-row-num" aria-hidden="true"></span>
+          <div class="trac-row-body"><input class="form-control" data-field="value" aria-label="Statement" placeholder="For example: You approve access to financial systems"></div>
+          <div class="trac-row-tools" data-tools></div>
+        </li>
+      </template>
+      <button type="button" class="btn btn-sm btn-outline-primary" data-action="add">Add a statement</button>
+    </div>
+  </div>
+  {% for error in form.applies_when.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+</section>
+
+<section class="trac-form-section" aria-labelledby="sec-good">
+  <h2 id="sec-good">What good looks like</h2>
+  <p class="section-help">Group the checks by part of the control, such as "The review" or "The follow-up". Each item should be specific enough to test. Set a group's part to Configuration (checked at setup, on any change, and yearly) or Monitoring (checked on the control's schedule) when the control has both. Tick For SOX apps on items that apply only when the system is on the firm's SOX in-scope list.</p>
+  <div data-rows-editor>
+    {{ form.criteria }}
+    <div data-rows-wrap>
+      <ol class="trac-rows" data-list data-shape="objects" data-noun="group"></ol>
+      <template>
+        <li class="trac-row trac-group" data-row>
+          <div class="trac-group-head">
+            <span class="trac-row-num" aria-hidden="true"></span>
+            <div class="trac-row-body trac-group-fields">
+              <label>Group name<input class="form-control" data-field="name" placeholder="For example: The review"></label>
+              <label>Part<select class="form-select" data-field="part">
+                <option value="">None</option>
+                <option value="configuration">Configuration</option>
+                <option value="monitoring">Monitoring</option>
+              </select></label>
+            </div>
+            <div class="trac-row-tools" data-tools></div>
+          </div>
+          <div class="trac-group-items" data-rows-wrap>
+            <div class="section-label">Items in this group</div>
+            <ol class="trac-rows" data-list data-shape="strings" data-name="items" data-noun="item"></ol>
+            <template>
+              <li class="trac-row" data-row>
+                <span class="trac-row-num" aria-hidden="true"></span>
+                <div class="trac-row-body trac-item-fields">
+                  <input class="form-control" data-field="value" aria-label="Item" placeholder="For example: Every user on the list has a keep or remove decision">
+                  <label class="form-check trac-sox-only"><input type="checkbox" class="form-check-input" data-field="sox_only"> <span class="form-check-label">For SOX apps</span></label>
+                </div>
+                <div class="trac-row-tools" data-tools></div>
+              </li>
+            </template>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-action="add">Add an item</button>
+          </div>
+        </li>
+      </template>
+      <button type="button" class="btn btn-sm btn-outline-primary" data-action="add">Add a group</button>
+    </div>
+  </div>
+  {% for error in form.criteria.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+</section>
+
+<section class="trac-form-section" aria-labelledby="sec-run">
+  <h2 id="sec-run">How to run it</h2>
+  <p class="section-help">List the steps in order. Say who does each one, what they do, and what proof to keep.</p>
+  <div data-rows-editor>
+    {{ form.steps }}
+    <div data-rows-wrap>
+      <ol class="trac-rows trac-steps" data-list data-shape="objects" data-noun="step"></ol>
+      <template>
+        <li class="trac-row" data-row>
+          <span class="trac-row-num" aria-hidden="true"></span>
+          <div class="trac-row-body">
+            <label>Who<input class="form-control" data-field="role" placeholder="For example: Control owner"></label>
+            <label>What to do<textarea class="form-control" data-field="text" rows="2"></textarea></label>
+            <label>Evidence to keep<input class="form-control" data-field="evidence" placeholder="For example: Signed review with dates"></label>
+            <label>Part<select class="form-select" data-field="part">
+              <option value="">None</option>
+              <option value="configuration">Configuration</option>
+              <option value="monitoring">Monitoring</option>
+            </select></label>
+          </div>
+          <div class="trac-row-tools" data-tools></div>
+        </li>
+      </template>
+      <button type="button" class="btn btn-sm btn-outline-primary" data-action="add">Add a step</button>
+    </div>
+  </div>
+  {% for error in form.steps.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+</section>
+
+<section class="trac-form-section" aria-labelledby="sec-refs">
+  <h2 id="sec-refs">References</h2>
+  {% include "components/references_editor.html" with field=form.references %}
+</section>
+
+{% if form.change_summary %}
+<section class="trac-form-section" aria-labelledby="sec-change">
+  <h2 id="sec-change">Your change</h2>
+  {% include "components/field_form.html" with field=form.change_summary %}
+</section>
+{% endif %}
+<noscript><p class="text-danger">This form needs JavaScript to add and edit the lists above.</p></noscript>
+{% endblock %}

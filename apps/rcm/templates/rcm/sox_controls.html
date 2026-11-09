@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load trac_ui trac_labels %}
+{% block title %}Key controls for SOX in-scope apps - TRAC{% endblock %}
+
+{% block content %}
+<p class="sox-intro">These are the controls that matter most for systems on the firm's SOX in-scope list. They will be mapped to the firm's formal SOX risk and control matrix later. Lines marked For SOX apps on a control page apply only to those systems.</p>
+<div class="topic-filters mb-3" role="group" aria-label="Filter by category">
+  <a class="topic-chip{% if not category %} topic-chip-active{% endif %}" href="{% url 'rcm:sox' %}"{% if not category %} aria-current="true"{% endif %}>All</a>
+  {% for key, label in category_choices %}
+  <a class="topic-chip{% if key == category %} topic-chip-active{% endif %}" href="{% url 'rcm:sox' %}?category={{ key }}"{% if key == category %} aria-current="true"{% endif %}>{{ label }}</a>
+  {% endfor %}
+</div>
+{% for group in groups %}
+{% section_card group.topic.name tone="neutral" %}
+  <ul class="topic-rows">
+    {% for row in group.controls %}
+    <li class="sox-row">
+      <span>{% control_pill row.ident %}</span>
+      <span>
+        <a href="{% url 'rcm:control' row.ident %}">{{ row.version.title }}</a>
+        {% if row.version.applies_when %}<span class="sox-row-note">Applies when: {{ row.version.applies_when.0|truncatechars:120 }}</span>{% endif %}
+      </span>
+      {% if row.sox_only %}<span class="sox-row-note">Checks for SOX apps: {{ row.sox_only }}</span>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+{% endsection_card %}
+{% empty %}
+{% empty_state "No key controls to show" "There are no key controls in this category yet." %}
+{% endfor %}
+{% endblock %}

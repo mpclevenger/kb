@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load trac_labels %}
+{% block title %}History: {{ entity }}{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4">History: {{ entity }}</h1>
+
+<h2 class="h5">Versions</h2>
+<table class="table trac-table mb-5">
+  <thead><tr><th>Version</th><th>Kind</th><th>Status</th><th>Proposed by</th><th>Decided by</th><th>Effective from</th><th>Summary</th></tr></thead>
+  <tbody>
+  {% for version in versions %}
+    <tr>
+      <td>v{{ version.number }}</td>
+      <td>{{ version.get_kind_display }}</td>
+      <td>{% badge "status" version.status %}</td>
+      <td>{{ version.proposed_by }}</td>
+      <td>{{ version.decided_by|default:"" }}</td>
+      <td>{{ version.effective_from|date:"M j, Y g:i A"|default:"" }}</td>
+      <td>{{ version.change_summary }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h2 class="h5">Audit log</h2>
+<table class="table trac-table">
+  <thead><tr><th>When (ET)</th><th>Who</th><th>Version</th><th>Change</th><th>Comment</th></tr></thead>
+  <tbody>
+  {% for event in events %}
+    <tr>
+      <td>{{ event.occurred_at|date:"M j, Y g:i A" }}</td>
+      <td>{{ event.actor|default:"System" }}</td>
+      <td>v{{ event.version_number }}</td>
+      <td>{{ event.from_status|default:"new" }} &rarr; {{ event.to_status }}</td>
+      <td>{{ event.comment }}</td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="5">No recorded changes.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

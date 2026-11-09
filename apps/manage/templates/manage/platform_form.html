@@ -1,0 +1,34 @@
+{% extends "manage/form_base.html" %}
+{% load static %}
+{% block header_actions %}{% if object %}{% url 'manage:platform_active' object.pk as action %}{% include "manage/_active_button.html" %}{% endif %}{% endblock %}
+{% block fields %}
+<div class="row">
+  <div class="col-md-6">{% include "components/field_form.html" with field=form.name %}</div>
+  <div class="col-md-6">{% include "components/field_form.html" with field=form.runs_on %}</div>
+</div>
+<fieldset class="mb-3">
+  <legend class="form-label fs-6">{{ form.categories.label }}</legend>
+  <div class="trac-category-checks">
+    {% for choice in form.categories %}
+    <div class="form-check">
+      {{ choice.tag }}
+      <label class="form-check-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="form-text" id="id_categories_help">{{ form.categories.help_text }}</div>
+  {% for error in form.categories.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+</fieldset>
+<div class="row">
+  <div class="col-md-4">{% include "components/field_form.html" with field=form.hosting %}</div>
+  <div class="col-md-5">{% include "components/field_form.html" with field=form.owner %}</div>
+  <div class="col-md-3">{% include "components/field_form.html" with field=form.position %}</div>
+</div>
+{% include "components/field_form.html" with field=form.summary %}
+<div class="mb-3">
+  <div class="form-label">{{ form.doc_links.label }}</div>
+  {% include "components/references_editor.html" with field=form.doc_links help="Shown in the platform page header as Documentation. Add up to 10." %}
+</div>
+{% include "components/field_form.html" with field=form.is_active %}
+{% endblock %}
+{% block extra_js %}<script src="{% static 'js/trac-rows.js' %}"></script>{% endblock %}

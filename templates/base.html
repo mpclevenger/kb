@@ -1,0 +1,71 @@
+{% load static trac_ui %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}TRAC{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/trac.css' %}">
+  <link rel="stylesheet" href="{% static 'css/guidance.css' %}">
+  <link rel="stylesheet" href="{% static 'css/library.css' %}">
+  <link rel="stylesheet" href="{% static 'css/topics.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body data-mermaid-src="{% static 'vendor/mermaid/mermaid.min.js' %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="trac-topbar">
+    <div class="trac-topbar-inner">
+      <a class="trac-wordmark" href="/">TRAC</a>
+      {% primary_nav %}
+      <div class="trac-topbar-tools">
+        {% if suite_links %}
+        <div class="dropdown trac-switcher">
+          <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Apps</button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            {% for name, url in suite_links.items %}<li><a class="dropdown-item" href="{{ url }}">{{ name }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+        {% if user.is_authenticated %}<span class="trac-user">
+          {% if is_visitor %}
+            {% if user.first_name %}{{ user.first_name }} &middot; {% endif %}{{ role_label }}
+            <a class="trac-user-link" href="{% url 'accounts:login' %}">{% if user.first_name %}Change name{% else %}Add your name{% endif %}</a>
+          {% else %}
+            {{ user.get_full_name|default:user.get_username }}{% if auth_mode == "open" %} &middot; {{ role_label }}
+            <form method="post" action="{% url 'accounts:logout' %}" class="d-inline">{% csrf_token %}<button type="submit" class="btn btn-link p-0 align-baseline trac-user-link">Sign out</button></form>{% endif %}
+          {% endif %}
+        </span>{% endif %}
+      </div>
+    </div>
+  </header>
+  {% band %}{% block band %}{% if band %}{% include "components/page_band.html" %}{% endif %}{% endblock %}{% endband %}
+  <div class="trac-shell">
+    {% if messages %}
+    <div class="trac-messages">
+      {% for message in messages %}
+      <div class="trac-alert trac-alert-{{ message.level_tag|default:'info' }} alert alert-dismissible fade show" role="{% if message.level_tag == 'error' %}alert{% else %}status{% endif %}">
+        <div class="trac-alert-body">{{ message }}</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Dismiss"></button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% block breadcrumbs %}{% endblock %}
+    <div class="page-layout">
+      <main id="main" class="page-main" tabindex="-1">
+        {% block content %}{% endblock %}
+        {% if show_comment_box %}{% include "review/comment_box.html" %}{% endif %}
+      </main>
+      {% block rail %}{% endblock %}
+    </div>
+  </div>
+  <footer class="trac-footer">
+    <div class="trac-footer-inner">TRAC, Tech Risk and Controls{% if is_visitor %} &middot; <a href="{% url 'accounts:staff_login' %}">Tech Risk sign-in</a>{% endif %}</div>
+  </footer>
+  <script src="{% static 'vendor/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'vendor/htmx.min.js' %}"></script>
+  <script src="{% static 'js/trac-ui.js' %}" defer></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

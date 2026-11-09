@@ -1,0 +1,22 @@
+{% load trac_ui trac_labels %}<div id="everything" class="topic-everything">
+  {% section_card "Everything in this topic" tone="neutral" id="everything-heading" %}
+  <div class="topic-filters" role="group" aria-label="Filter by type">
+    {% for f in filters %}
+    <a class="topic-chip{% if f.active %} topic-chip-active{% endif %}"
+       href="{{ base_url }}?{{ query }}type={{ f.key }}#everything"
+       hx-get="{{ base_url }}?{{ query }}type={{ f.key }}" hx-target="#everything" hx-swap="outerHTML" hx-push-url="true"
+       {% if f.active %}aria-current="true"{% endif %}>{{ f.label }} <span class="topic-chip-count">{{ f.count }}</span></a>
+    {% endfor %}
+  </div>
+  {% if items or more %}
+  {% if items %}<ul class="topic-rows">
+    {% for item in items %}{% include "topics/_everything_row.html" %}{% endfor %}
+  </ul>{% endif %}
+  {% if more %}{% more_controls more %}{% for group in more %}<p class="more-controls-level">{{ group.label }}</p><ul class="topic-rows">
+    {% for item in group.items %}{% include "topics/_everything_row.html" %}{% endfor %}
+  </ul>{% endfor %}{% endmore_controls %}{% endif %}
+  {% else %}
+  <p class="topic-none">Nothing published here yet.</p>
+  {% endif %}
+  {% endsection_card %}
+</div>

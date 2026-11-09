@@ -1,0 +1,43 @@
+category: engineering_tools
+intro: Tools engineers use to store, build and release code, such as source control and pipelines. The
+  main risk is that someone can change code or the pipeline itself without review, and so change production
+  without detection.
+practices:
+  Access: |
+    - Platform and organization administrators are few, named individuals, reviewed on the schedule in your team's written procedure.
+    - Repository access is given through teams, not individuals, and the default organization permission is none or read.
+    - Access is removed when a person moves or leaves, and outside collaborators and external accounts are reviewed.
+    - Permission to approve changes and permission to deploy are held by different people where the control depends on it.
+  Service accounts: |
+    - Automation uses machine accounts or app identities with an owner and a purpose, not a person's credentials.
+    - Tokens and keys are short-lived or scoped to one repository, rotated on a schedule and stored in a secret store.
+    - The list of machine accounts and tokens is reviewed on the same schedule.
+  Change: |
+    - Changes to code reach production only through a reviewed pull request and an automated deployment. See [CI/CD pipelines as change control](/guides/cicd-pipelines/).
+    - Pipeline definitions have named owners who must review changes to them.
+    - Changes to organization settings, runners and protection rules are logged and reviewed.
+  Configuration: |
+    - Branch rules for in-scope repositories follow the [Repository management](/guides/repository-management/) guide.
+    - A dated export of those settings is kept, along with the history of changes to them.
+    - Secret scanning and dependency alerts are turned on, and findings are acted on.
+  Logging: |
+    - The platform audit log is streamed to Splunk, including settings changes, permission changes and token use.
+    - An alert fires if the stream stops.
+    - Deployment history to production is kept and can be listed for any period.
+  Patching: |
+    - The platform and its build hosts and runners are scanned and patched within the timelines in the Recommended timelines by BCP tier guide.
+    - Platform upgrades stay within the vendor's supported versions.
+    - Third-party actions and build dependencies are pinned and updated through review (see [GitHub Actions runners](/guides/github-actions-runners/)).
+  Recovery: |
+    - Repositories, settings and pipeline definitions are backed up, and a restore is tested on a schedule.
+    - Pipeline definitions live in repositories, so the pipeline can be recreated.
+    - The recovery plan states how deployments continue, or pause safely, if the tool is unavailable.
+  Data: |
+    - Repositories do not hold secrets, personal data or data extracts, and scanning checks for them.
+    - Build logs and artifacts are kept only as long as needed, and access to them is limited.
+  Network: |
+    - The tool is reachable from the internal network and approved remote access only.
+    - Runners and build hosts have network access limited to what builds and deployments need.
+  Vendor: |
+    - Vendor support for the product is current.
+    - Where a hosted service or third-party integration touches code, it is approved, it is on the vendor risk team's list, and the system owner reviews its assurance report each year (see the Reading a vendor's SOC report guide), including the controls the report expects the firm to run itself.

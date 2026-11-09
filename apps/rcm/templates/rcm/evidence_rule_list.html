@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load trac_ui trac_labels %}
+{% block title %}Evidence rules - TRAC{% endblock %}
+
+{% block content %}
+{% page_header "Evidence rules" %}<a class="btn btn-secondary" href="{{ new_url }}">New evidence rule</a>{% endpage_header %}
+<p class="text-secondary">Each rule is a checklist shown on every control it applies to, such as how to capture screenshots.</p>
+{% if rules %}
+<table class="trac-table">
+  <caption>{{ rules|length }} evidence rule{{ rules|length|pluralize }}</caption>
+  <thead><tr><th scope="col">Order</th><th scope="col">Name</th><th scope="col">Applies to</th><th scope="col">Items</th><th scope="col">Status</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
+  <tbody>
+  {% for rule in rules %}
+    <tr>
+      <td>{{ rule.position }}</td>
+      <td><a href="{% url 'rcm:evidence_rule_edit' rule.entity_id %}">{{ rule.name }}</a></td>
+      <td>{{ rule.get_applies_to_display }}</td>
+      <td>{{ rule.items|length }}</td>
+      <td>{% badge "status" rule.status %}</td>
+      <td>{% if rule.retire_url %}<a href="{{ rule.retire_url }}">Retire<span class="visually-hidden"> {{ rule.name }}</span></a>{% endif %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+  {% empty_state "No evidence rules yet" "Add a rule to put a checklist on every control." action_label="New evidence rule" action_url=new_url %}
+{% endif %}
+{% endblock %}

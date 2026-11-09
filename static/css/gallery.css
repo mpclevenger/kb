@@ -1,0 +1,8 @@
+/* Component gallery page only (/ui/gallery/): the frames the samples sit in. */
+
+.gallery-section { margin-bottom: var(--trac-space-5); }
+.gallery-sample { background: var(--trac-paper); border: 1px solid var(--trac-border); border-radius: var(--trac-radius); padding: var(--trac-space-4); }
+.gallery-canvas { padding: var(--trac-space-3) 0; }
+.gallery-row { display: flex; flex-wrap: wrap; gap: var(--trac-space-2); align-items: center; }
+.gallery-label { font-size: 0.8125rem; font-weight: 600; color: var(--trac-pill-ink); margin: var(--trac-space-3) 0 var(--trac-space-1); }
+.gallery-label + .governance-footer { margin-top: 0; }

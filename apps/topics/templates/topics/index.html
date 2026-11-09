@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load trac_ui %}
+{% block title %}Library - TRAC{% endblock %}
+
+{% block content %}
+{% include "components/library_tabs.html" with active="topic" %}
+{% if not tiles %}
+  {% empty_state "No topics yet" "Topics appear here once Tech Risk sets them up." %}
+{% else %}
+<ul class="topic-grid">
+  {% for tile in tiles %}
+  <li>
+    <a class="topic-tile" href="{% url 'topics:detail' tile.topic.slug %}">
+      <span class="topic-tile-icon">{% topic_icon tile.topic.icon %}</span>
+      <span class="topic-tile-name">{{ tile.topic.name }}</span>
+      <span class="topic-tile-summary">{{ tile.topic.summary }}</span>
+      <span class="topic-tile-counts">
+        <span><strong>{{ tile.controls }}</strong> control{{ tile.controls|pluralize }}</span>
+        <span><strong>{{ tile.risks }}</strong> risk{{ tile.risks|pluralize }}</span>
+        <span><strong>{{ tile.stages }}</strong> stage{{ tile.stages|pluralize }}</span>
+      </span>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

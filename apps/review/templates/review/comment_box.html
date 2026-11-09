@@ -1,0 +1,17 @@
+<section class="trac-paper mt-5" data-comment-box aria-labelledby="comment-box-title">
+  <h2 class="h4" id="comment-box-title">Comment on this page</h2>
+  <form method="post" action="{% url 'review:comment' %}">
+    {% csrf_token %}
+    <input type="hidden" name="path" value="{{ request.get_full_path }}">
+    <input type="hidden" name="label" value="">
+    <div class="mb-3">
+      <label class="form-label" for="comment-section">Section</label>
+      <select class="form-select" id="comment-section" name="section"><option>General</option></select>
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="comment-text">Comment</label>
+      <textarea class="form-control" id="comment-text" name="comment" rows="4" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Send comment</button>
+  </form>
+</section>

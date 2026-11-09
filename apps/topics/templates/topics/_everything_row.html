@@ -1,0 +1,6 @@
+{% load trac_labels %}<li class="topic-row">
+  <span class="topic-row-id">{{ item.ident }}</span>
+  <span class="topic-row-title">{% if item.url %}<a href="{{ item.url }}">{{ item.title }}</a>{% else %}{{ item.title }}{% endif %}</span>
+  {% type_pill item.type_label %}
+  <span class="topic-row-stage">{{ item.stage_name|default:"" }}</span>
+</li>

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load trac_ui trac_labels %}
+{% block title %}My comments | TRAC{% endblock %}
+{% block content %}
+{% page_header "My comments" %}{% endpage_header %}
+{% if comments %}
+<table class="trac-table">
+  <caption>Comments you sent to Tech Risk, newest first.</caption>
+  <thead><tr><th scope="col">Page</th><th scope="col">Section</th><th scope="col">Your comment</th><th scope="col">Sent</th><th scope="col">Status</th><th scope="col">Tech Risk reply</th></tr></thead>
+  <tbody>
+  {% for comment in comments %}
+    <tr>
+      <td><a href="{{ comment.about_url }}">{{ comment.about_label }}</a></td>
+      <td>{{ comment.section }}</td>
+      <td>{{ comment.comment|linebreaksbr }}</td>
+      <td class="text-nowrap">{{ comment.submitted_at|date:"M j, Y" }}</td>
+      <td>{% attribute_pill None comment.get_status_display %}</td>
+      <td>{{ comment.response|linebreaksbr }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+{% empty_state "No comments yet" "Use the comment box at the bottom of any page to tell Tech Risk what is missing or unclear." %}
+{% endif %}
+{% endblock %}

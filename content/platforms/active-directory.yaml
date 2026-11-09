@@ -1,0 +1,33 @@
+platform: Active Directory
+intro: On-premises Active Directory, including domain controllers, which synchronizes to Entra ID. Read
+  this with the Identity category and, for the domain controller hosts, the Operating system category.
+considerations:
+  Access: |
+    - Enterprise Admins and Schema Admins are empty day to day. Domain Admins and similar powerful groups have a few named members.
+    - Administrative accounts are separate from user accounts and kept out of everyday machines.
+    - Rights delegated on organizational units, such as resetting passwords, are listed and reviewed.
+    - A dated export of privileged group membership, with a record of changes, makes good evidence.
+  Service accounts: |
+    - Service accounts are found in the directory and compared against the owner list.
+    - Service accounts have long passwords or are group managed service accounts, because weak passwords can be cracked offline.
+  Change: |
+    - Group Policy changes go through change control, with a backup and a record of who edited each one. Edit rights on policies that reach domain controllers are limited.
+    - Schema changes and trust changes are approved and tested.
+  Configuration: |
+    - Password and lockout policy, signed LDAP and signed SMB on domain controllers are set to the baseline and exported.
+    - Domain controller policy is separate from member server policy.
+    - Settings for the sync to Entra ID are documented, including what syncs and what is filtered out. The sync tool is kept on a supported version.
+  Logging: |
+    - Domain controller Security logs are collected into Splunk, with alerts for changes to privileged groups, lockout spikes and Group Policy changes.
+    - Every domain controller sends logs, since a missing one hides activity.
+  Patching: |
+    - Domain controllers run a supported Windows Server version and are patched in an order that keeps the directory available.
+  Recovery: |
+    - Domain controller backups are taken on a schedule and the restore is tested.
+    - A forest recovery procedure exists, including how the `krbtgt` account (the key behind sign-in tickets) is reset after a compromise.
+  Data: |
+    - Password hashes in the directory and its backups are sensitive. Backups are encrypted and access is limited.
+  Network: |
+    - Domain controllers accept administrative connections only from administration networks.
+  Vendor: |
+    - Directory support follows Windows Server support, so the support dates for domain controller versions are tracked.

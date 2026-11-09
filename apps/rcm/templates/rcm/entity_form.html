@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static trac_ui %}
+{% block title %}{{ heading }}{% if ident %}: {{ ident }}{% endif %} | TRAC{% endblock %}
+{% block content %}
+{% page_header heading ident=ident %}{% endpage_header %}
+{% include "core/workflow_actions.html" %}
+<div class="trac-form">
+{% if blocked %}
+  <div class="trac-form-section">
+    <p class="mb-3">{{ blocked }}</p>
+    <div class="trac-actions">
+      {% if view_link %}<a class="btn btn-primary" href="{{ view_link }}">See the change in progress</a>{% endif %}
+      <a class="btn btn-outline-secondary" href="{{ cancel_url }}">Back</a>
+    </div>
+  </div>
+{% else %}
+  <p class="text-secondary">Saving keeps this as a draft. Nothing is official until Tech Risk approves and publishes it.</p>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.errors %}
+    <div class="alert alert-danger" role="alert" tabindex="-1" id="form-errors">
+      <strong>This isn't saved yet.</strong> Fix the problems marked below.
+      {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+    </div>
+    {% endif %}
+    {% block form_fields %}{% endblock %}
+    <div class="trac-actions mb-5">
+      <button type="submit" class="btn btn-primary">Save draft</button>
+      <a class="btn btn-outline-secondary" href="{{ cancel_url }}">Cancel</a>
+    </div>
+  </form>
+{% endif %}
+</div>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'js/trac-rows.js' %}"></script>{% endblock %}

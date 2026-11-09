@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load trac_ui %}
+{% block title %}Frequently asked questions - TRAC{% endblock %}
+
+{% block content %}
+{% if new_button %}<div class="library-head"><div class="page-header-actions"><a class="btn btn-secondary" href="{{ new_button.1 }}">{{ new_button.0 }}</a></div></div>{% endif %}
+{% for topic, questions in groups %}
+<section class="library-faq-group" aria-labelledby="faq-group-{{ forloop.counter }}">
+  <h2 class="library-faq-heading" id="faq-group-{{ forloop.counter }}">{{ topic.name|default:"General" }}</h2>
+  {% for faq, v, related in questions %}
+  <details class="library-faq">
+    <summary>{{ v.question }}</summary>
+    <div class="library-faq-answer">
+      {{ v.answer|linebreaks }}
+      {% if related %}<p class="library-faq-related">Read more: {% for page, pv in related %}<a href="{{ page.get_absolute_url }}">{{ pv.title }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+      {% if can_propose %}<p class="library-faq-related"><a href="{% url 'wiki:faq_edit' faq.pk %}">Edit this question</a></p>{% endif %}
+    </div>
+  </details>
+  {% endfor %}
+</section>
+{% empty %}
+  {% empty_state "No questions yet" "Questions show up here once Tech Risk approves and publishes them." %}
+{% endfor %}
+{% endblock %}

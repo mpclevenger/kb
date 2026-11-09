@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load trac_labels %}
+{% block title %}{{ v.question }} - TRAC{% endblock %}
+
+{% block content %}
+{% include "components/version_notices.html" %}
+{% include "components/version_workflow.html" %}
+<div class="library-meta">
+  <p class="applies-to">
+    <span class="applies-to-label">Topic:</span>
+    {% if v.topic %}{% platform_chip v.topic %}{% else %}<span class="platform-chip">General</span>{% endif %}
+  </p>
+  {% include "components/page_actions.html" %}
+</div>
+<article class="trac-paper library-body">
+  {{ v.answer|linebreaks }}
+  {% if related %}<p class="mb-0">Read more: {% for page, pv in related %}<a href="{{ page.get_absolute_url }}">{{ pv.title }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+</article>
+{% if history_url %}<p class="mt-3"><a href="{{ history_url }}">View history</a></p>{% endif %}
+{% endblock %}

@@ -1,0 +1,88 @@
+/* Library (Home), category and platform pages: the category-colored band, category cards, aspect rows.
+   Colors and spacing come from the tokens in trac.css; each category color is set by its .category-<key> class. */
+
+/* Band in the category color: white text on every category color is at least 4.5:1.
+   Links inside are white; chips and pills keep their own colors because they set their own text color. */
+.guidance-band {
+  --bs-link-color-rgb: 255, 255, 255;
+  background: var(--category); color: #fff;
+  margin: calc(-1 * var(--trac-space-3)) calc(-1 * var(--trac-space-4));
+  padding: var(--trac-space-4);
+  box-shadow: 0 0 0 100vmax var(--category); clip-path: inset(0 -100vmax);
+  display: flex; flex-direction: column; gap: var(--trac-space-3);
+}
+.guidance-band .band-text { max-width: none; gap: var(--trac-space-3); }
+.guidance-band .band-summary { color: #fff; }
+.guidance-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--trac-space-2); align-items: center; }
+.guidance-chips-label { font-size: 0.875rem; font-weight: 600; }
+.guidance-facts { display: flex; flex-wrap: wrap; gap: var(--trac-space-2); align-items: center; font-size: 0.875rem; }
+.guidance-docs { margin: 0; font-size: 0.9375rem; }
+
+/* Rows of guidance and controls */
+.place-list { list-style: none; margin: 0 0 var(--trac-space-4); padding: 0; display: grid; gap: var(--trac-space-2); }
+.place-row {
+  display: grid; grid-template-columns: 14rem minmax(0, 1fr) minmax(0, 18rem); gap: var(--trac-space-4); align-items: start;
+  background: var(--trac-paper); border: 1px solid var(--trac-border); border-left: 5px solid var(--category);
+  border-radius: var(--trac-radius); padding: var(--trac-space-3);
+}
+.place-label { display: block; font-weight: 600; color: var(--category-ink); }
+.place-question { display: block; font-size: 0.875rem; color: var(--trac-ink-secondary); }
+.place-guidance p { margin: 0 0 var(--trac-space-1); }
+.place-guidance ul { margin: 0 0 var(--trac-space-1); padding-left: 1.25rem; }
+.place-guidance > :last-child { margin-bottom: 0; }
+.place-controls { display: flex; flex-wrap: wrap; gap: var(--trac-space-1); align-items: flex-start; }
+.gap-badge {
+  display: inline-block; padding: 0.1rem 0.6rem; border-radius: 999px; font-size: 0.8125rem; font-weight: 600;
+  background: #f6dcdc; color: #8a2b2b; border: 1px solid #e3b7b7;
+}
+@media (max-width: 62rem) { .place-row { grid-template-columns: 1fr; gap: var(--trac-space-2); } }
+
+.practice { margin-bottom: var(--trac-space-2); }
+.practice > summary {
+  cursor: pointer; padding: var(--trac-space-2) var(--trac-space-3); font-weight: 600; color: var(--category-ink);
+  background: var(--category-tint); border-left: 5px solid var(--category); border-radius: var(--trac-radius);
+}
+.practice[open] > summary { margin-bottom: var(--trac-space-2); }
+.runs-on { margin-top: var(--trac-space-4); }
+.guide-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--trac-space-2); }
+
+/* Library tabs */
+.library-tabs { margin-bottom: var(--trac-space-4); border-bottom: 1px solid var(--trac-border); }
+.library-tabs ul { list-style: none; margin: 0; padding: 0; display: flex; gap: var(--trac-space-4); }
+.library-tabs a {
+  display: block; padding: 0.5rem 0.1rem calc(0.5rem - 3px); color: var(--trac-pill-ink); text-decoration: none;
+  border-bottom: 3px solid transparent;
+}
+.library-tabs a:hover { color: var(--trac-ink); }
+.library-tabs a[aria-current="page"] { color: var(--trac-ink); font-weight: 600; border-bottom-color: var(--trac-blue); }
+
+/* Category cards on the Library */
+.category-group-heading { font-size: 1.375rem; margin: var(--trac-space-4) 0 var(--trac-space-3); }
+.category-group:first-of-type .category-group-heading { margin-top: 0; }
+.category-cards { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--trac-space-3); grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.category-card {
+  background: var(--trac-paper); border: 1px solid var(--trac-border); border-top: 5px solid var(--category);
+  border-radius: var(--trac-radius); padding: var(--trac-space-3);
+}
+.category-card:hover { border-color: var(--category); background: #fff; }
+.category-card-name { font-size: 1.0625rem; font-weight: 700; color: var(--category-ink); text-decoration: none; }
+.category-card-name:hover { color: var(--category-ink); text-decoration: underline; }
+.category-card-chips { list-style: none; margin: var(--trac-space-2) 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--trac-space-1); }
+@media (max-width: 62rem) { .category-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 40rem) { .category-cards { grid-template-columns: 1fr; } }
+
+/* Library search */
+.filter-box { max-width: 28rem; margin-bottom: var(--trac-space-4); }
+
+/* SOX controls page */
+.sox-intro { max-width: 60rem; }
+.sox-row { display: grid; grid-template-columns: 7rem minmax(0, 1fr) auto; gap: var(--trac-space-3); align-items: baseline; padding: 0.5rem 0; border-top: 1px solid var(--trac-divider); }
+.sox-row:first-child { border-top: 0; }
+.sox-row-note { display: block; font-size: 0.8125rem; color: var(--trac-ink-secondary); }
+
+/* "More controls (N)": the folded list of non-key controls on reader pages */
+.more-controls { margin-top: var(--trac-space-2); }
+.more-controls-summary { cursor: pointer; font-size: 0.875rem; color: var(--trac-ink-secondary); }
+.more-controls[open] > .more-controls-summary { margin-bottom: var(--trac-space-2); }
+.more-controls-body { padding-left: var(--trac-space-3); }
+.more-controls-level { margin: var(--trac-space-2) 0 0.25rem; font-size: 0.8125rem; font-weight: 600; color: var(--trac-ink-secondary); }

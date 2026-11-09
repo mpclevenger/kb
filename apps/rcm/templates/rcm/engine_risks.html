@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load trac_ui trac_labels %}
+{% block title %}Engine risks - TRAC{% endblock %}
+
+{% block content %}
+{% page_header "Engine risks" %}{% endpage_header %}
+<p class="text-secondary">These risks come from the risk engine, which owns them. TRAC shows a read-only copy and links each one to the drivers that feed it. To change one, change it in the engine and refresh the files in <code>content/engine</code>.</p>
+
+<pre class="mermaid">
+flowchart LR
+  accTitle: How the engine rates a risk
+  accDescr: A questionnaire answer switches on a driver. Drivers feed a risk as likelihood drivers or impact drivers. The risk's scoring rules read those drivers to give the risk rating.
+  A[Questionnaire answer] --> B[Driver switched on, RD01 and so on]
+  B --> C[Likelihood drivers]
+  B --> D[Impact drivers]
+  C --> E[Scoring rules]
+  D --> E
+  E --> F[Risk rating]
+</pre>
+
+{% for domain, categories in groups %}
+<h2 class="h4 mt-4">{{ domain }}</h2>
+{% for category, risks in categories %}
+{% section_card category tone="neutral" id=category|slugify %}
+  {% for risk in risks %}
+  <article class="mb-4" id="{{ risk.key }}">
+    <h3 class="h5">{{ risk.name }}</h3>
+    {% if risk.description %}<p>{{ risk.description }}</p>{% endif %}
+    {% if risk.example %}<p class="text-secondary"><strong>Example:</strong> {{ risk.example }}</p>{% endif %}
+    <p class="mb-1"><strong>Likelihood drivers:</strong>
+      {% for d in risk.likelihood_drivers %}{% driver_pill d.driver.ident d.driver.get_absolute_url d.title %} {% empty %}<span class="text-secondary">None</span>{% endfor %}
+    </p>
+    <p class="mb-2"><strong>Impact drivers:</strong>
+      {% for d in risk.impact_drivers %}{% driver_pill d.driver.ident d.driver.get_absolute_url d.title %} {% empty %}<span class="text-secondary">None</span>{% endfor %}
+    </p>
+    {% if risk.scoring %}
+    <details class="topic-faq">
+      <summary>Scoring rules</summary>
+      {% for table in risk.scoring %}
+      <table class="trac-table mt-2">
+        <caption>{{ table.heading }}</caption>
+        <thead><tr><th scope="col">Level</th><th scope="col">Rule</th></tr></thead>
+        <tbody>{% for level, rule in table.rows %}<tr><td>{{ level }}</td><td><code>{{ rule }}</code></td></tr>{% endfor %}</tbody>
+      </table>
+      {% endfor %}
+    </details>
+    {% endif %}
+  </article>
+  {% endfor %}
+{% endsection_card %}
+{% endfor %}
+{% empty %}
+  {% empty_state "No engine risks yet" "Copy the engine's files into content/engine, then run the sync. See content/engine/README.md." %}
+{% endfor %}
+
+{% section_card "All risk drivers" tone="neutral" id="drivers" open=False %}
+  <p class="text-secondary">Drivers come from the risk engine (RD01, RD02 ...), so they cannot be added in the site. TRAC's own details for a driver are in <code>content/drivers/drivers.json</code>. Drivers show here once they are approved.</p>
+  <ul class="list-unstyled d-flex flex-column gap-1 mb-0">
+    {% for driver, version in drivers %}<li>{% link_chip "driver" driver.ident version.title driver.get_absolute_url %}</li>{% endfor %}
+  </ul>
+{% endsection_card %}
+{% endblock %}

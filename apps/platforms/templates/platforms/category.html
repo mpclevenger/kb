@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ category.label }} - Library - TRAC{% endblock %}
+{% block band %}
+{% include "platforms/_band.html" %}
+{% endblock %}
+
+{% block content %}
+<section class="category-{{ category.value }}" aria-labelledby="well-controlled-heading">
+  <h2 id="well-controlled-heading">{{ category.heading }}</h2>
+  {% include "platforms/_aspect_rows.html" with show_gaps=True %}
+</section>
+{% include "components/references.html" %}
+{% endblock %}

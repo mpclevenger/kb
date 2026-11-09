@@ -1,0 +1,37 @@
+# SAMPLE — replace with the engine's real files
+domain: Technology
+category: Change failure
+name: Production change causes an outage or wrong results
+likelihood_scoring:
+  critical: ">.80 and (RD36 in ad and RD16 in ad)"
+  high: ">.60 and RD36 in ad"
+  medium: ">.30"
+  low: "dc >= 0"
+likelihood_drivers: [RD16, RD36, RD39]
+impact_drivers: [RD50, RD54]
+impact_scoring:
+  financial_impact:
+    critical: "RD50 in ad and RD54 in ad"
+    high: "RD50 in ad"
+    medium: "RD54 in ad"
+    low: "dc >= 1"
+  client_impact:
+    critical: null
+    high: "RD54 in ad"
+    medium: null
+    low: "dc >= 1"
+  regulatory_impact:
+    critical: null
+    high: "RD50 in ad"
+    medium: null
+    low: "dc >= 1"
+description: >
+  A change to the application, its data or its settings is released without enough testing or approval,
+  and the application stops working or produces wrong results.
+example: >
+  A late fix is pushed straight to production, a report starts rounding figures differently, and the
+  error is not noticed until month end.
+framework mappings:
+  iso_25010:
+    - characteristic: Reliability
+      sub_caractersitics: Maturity

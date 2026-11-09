@@ -1,0 +1,36 @@
+platform: Databricks
+intro: 'Databricks workspaces, which span cloud, database and jobs: the workspace is the platform, tables
+  hold data, and jobs run work. Examples use AWS terms (for example, AWS S3 for storage);
+  the same points apply on Azure. Deployments run through the GHES environment pipelines.'
+considerations:
+  Access: |
+    - Account admins and workspace admins are few, named people, and are reviewed on the schedule in the common practices above.
+    - Users and groups come from the corporate identity provider through SCIM provisioning and SSO. Local users are not created for people.
+    - In production workspaces, people have read access only. Edit or manage rights go to a deployment identity.
+    - Unity Catalog grants go to groups, and the ability to grant is limited to data owners.
+  Service accounts: |
+    - Production jobs run as service principals, not people. Each has an owner and a purpose.
+    - Service principals sign in with OAuth. Personal access tokens are restricted or turned off, and existing long-lived tokens are found and revoked.
+  Change: |
+    - Notebooks, jobs, pipelines and cluster policies are kept in Git and deployed with Declarative Automation Bundles (formerly Databricks Asset Bundles) or similar from the GHES environment pipeline. See the CI/CD pipelines as change control guide.
+    - Edits made directly in production are blocked by permissions, or detected by comparing deployed jobs with the repository.
+  Configuration: |
+    - Cluster policies enforce approved runtimes, auto-termination and an access mode that enforces Unity Catalog permissions.
+    - Workspace settings, such as IP access lists and token controls, are exported and dated.
+    - Secrets are kept out of notebooks and job parameters.
+  Logging: |
+    - Audit events from `system.access.audit` are forwarded to Splunk, and a stopped feed raises an alert. The copy in Splunk covers the period in the firm's [records retention schedule](#todo-records-retention-schedule).
+    - Logs cover grants, permission changes, job and cluster changes and token creation.
+  Patching: |
+    - Cluster runtimes stay on supported versions, and long-lived clusters are restarted to pick up fixes.
+    - Libraries installed on clusters are tracked and scanned.
+  Recovery: |
+    - Code and job definitions are recoverable from Git. Delta tables are backed up to match the BCP tier of the data, and table history and time travel are not treated as a backup.
+    - A table restore and a redeploy of workspace content are tested and recorded.
+  Data: |
+    - Sensitive columns use masking or row filters where classification calls for it.
+    - Production data is not copied to development workspaces unless it is masked.
+  Network: |
+    - Workspaces use private connectivity and IP access lists where available. Clusters sit in the firm's private network, and serverless compute uses network policies.
+  Vendor: |
+    - Databricks and AWS are on the vendor risk team's list, and the system owner reviews both assurance reports each year (see the Reading a vendor's SOC report guide), including the controls the report expects the firm to run itself.

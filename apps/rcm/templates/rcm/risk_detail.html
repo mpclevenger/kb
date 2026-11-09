@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load trac_ui trac_labels %}
+{% block title %}{{ ident }} {{ v.title }} - TRAC{% endblock %}
+
+{% block content %}
+{% include "components/version_notices.html" %}
+{% include "components/version_workflow.html" %}
+<header class="page-header">
+  <div class="page-header-top">
+    <div>
+      <div class="page-header-id">{{ ident }}</div>
+      <h1 class="page-header-title">{{ v.title }}</h1>
+    </div>
+    {% include "components/page_actions.html" %}
+  </div>
+  <div class="page-header-meta">
+    {% include "rcm/_coverage.html" with coverage=coverage label=coverage_label %}
+    {% if v.in_sox_scope %}{% attribute_pill "" "SOX scope" tone="sox" %}{% endif %}
+    {% attribute_pill "Owner role" v.owner_role tone="owner" %}
+  </div>
+</header>
+
+{% section_toolbar %}
+
+{% section_card "What could go wrong" tone="why" id="statement" %}
+  <div class="prose">{{ v.statement|linebreaks }}</div>
+{% endsection_card %}
+
+{% section_card "Controls that address it" tone="neutral" id="controls" %}
+  {% if links %}
+  <table class="trac-table">
+    <thead><tr><th scope="col">Control</th><th scope="col">Coverage</th><th scope="col">Why it helps</th></tr></thead>
+    <tbody>
+    {% for l in links %}
+      <tr>
+        <td>{% control_pill l.control.ident l.version.title l.control.get_absolute_url %}</td>
+        <td>{% badge "coverage" l.coverage %}</td>
+        <td>{{ l.rationale }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="mb-0 text-secondary">No control addresses this risk yet.</p>
+  {% endif %}
+{% endsection_card %}
+
+{% if drivers %}
+{% section_card "What raises it" tone="neutral" id="drivers" %}
+  <ul class="list-unstyled d-flex flex-column gap-1 mb-0">
+    {% for d in drivers %}<li>{% link_chip "driver" d.driver.ident d.version.title d.driver.get_absolute_url %}</li>{% endfor %}
+  </ul>
+{% endsection_card %}
+{% endif %}
+
+{% include "components/references.html" with references=v.references %}
+{% include "components/version_footer.html" %}
+{% endblock %}

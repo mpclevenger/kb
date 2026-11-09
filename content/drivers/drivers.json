@@ -1,0 +1,112 @@
+{
+  "RD01": {
+    "title": "Systems with their own user accounts",
+    "category": "Technology",
+    "owner_role": "Head of Infrastructure",
+    "indicators": [
+      {
+        "type": "leading",
+        "text": "Number of systems that keep their own user lists."
+      },
+      {
+        "type": "lagging",
+        "text": "Leavers whose access was removed late."
+      }
+    ],
+    "trac_risks": [
+      "R-AC-03"
+    ]
+  },
+  "RD02": {
+    "title": "Client data held",
+    "category": "Data",
+    "owner_role": "Head of Data Governance",
+    "indicators": [
+      {
+        "type": "leading",
+        "text": "Number of systems that hold client data."
+      },
+      {
+        "type": "lagging",
+        "text": "Client data incidents per year."
+      }
+    ],
+    "trac_risks": []
+  },
+  "RD03": {
+    "title": "Reachable from the internet",
+    "category": "Technology",
+    "owner_role": "Head of Infrastructure",
+    "indicators": [
+      {
+        "type": "leading",
+        "text": "Number of systems exposed to the internet."
+      },
+      {
+        "type": "lagging",
+        "text": "Blocked attack attempts per month."
+      }
+    ],
+    "trac_risks": []
+  },
+  "RD16": {
+    "title": "Administrator rights in use",
+    "category": "People",
+    "owner_role": "Head of Infrastructure",
+    "indicators": [
+      {
+        "type": "leading",
+        "text": "People holding administrator rights."
+      },
+      {
+        "type": "lagging",
+        "text": "Administrator changes made outside the normal process."
+      }
+    ],
+    "trac_risks": [
+      "R-AC-02"
+    ]
+  },
+  "RD36": {
+    "title": "Frequent changes",
+    "category": "Process",
+    "owner_role": "Head of Engineering",
+    "indicators": [
+      {
+        "type": "leading",
+        "text": "Releases per month."
+      },
+      {
+        "type": "lagging",
+        "text": "Releases that needed a fix within a week."
+      }
+    ],
+    "trac_risks": []
+  },
+  "RD39": {
+    "title": "Reliance on an outside vendor",
+    "category": "Third parties",
+    "owner_role": "",
+    "indicators": [],
+    "trac_risks": []
+  },
+  "RD50": {
+    "title": "Feeds the financial statements",
+    "category": "",
+    "owner_role": "",
+    "indicators": [],
+    "trac_risks": []
+  },
+  "RD54": {
+    "title": "Supports a critical business service",
+    "category": "",
+    "owner_role": "",
+    "indicators": [
+      {
+        "type": "lagging",
+        "text": "Outages of the service per year."
+      }
+    ],
+    "trac_risks": []
+  }
+}

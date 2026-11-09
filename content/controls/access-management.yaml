@@ -1,0 +1,606 @@
+# Controls and risks for one topic. Plain text; edit with any text editor.
+# After editing: python manage.py check_controls, then
+# python manage.py sync_controls --user <you> --publish. See README.md in this folder.
+# A control or risk is matched to the site by its title. Renaming a title makes a NEW item.
+#
+# FILE
+#   topic          Name of the topic exactly as it appears on the site.
+#   risks          What could go wrong. Each risk lists the controls that cover it.
+#   controls       The controls themselves.
+#
+# RISK (each entry under "risks")
+#   title          Short name of the risk.
+#   statement      What could go wrong, why, and what it would lead to.
+#   owned_by       Role accountable for the risk (a role, not a name).
+#   stage          Lifecycle stage the risk belongs to. Use "theme" instead to
+#                  place it under a theme. Never both.
+#   in_sox_scope   yes or no. Is this a risk for SOX in-scope apps?
+#   covered_by     Controls that reduce this risk. Each has:
+#                    control   the short name ("ref") of a control in this file
+#                    coverage  full or partial
+#                    why       one line saying how the control helps
+#
+# CONTROL (each entry under "controls")
+#   ref            Short name used only inside this file, so risks can point to it.
+#                  The site gives the control its real ID (for example CM-01).
+#   title          Name of the control.
+#   why            Why the control exists, in two or three sentences.
+#   applies_when   Plain statements. The control applies if any one is true.
+#   nature         preventive (stops it happening) or detective (finds it afterward).
+#   method         manual, automated, or it_dependent (a person works from a system report).
+#   frequency      event (each time it happens), daily, weekly, monthly, quarterly,
+#                  semiannual or annual.
+#   level          key, non-key, compensating or supporting, most important first (see levels.yaml):
+#                    key           relied on to address the risk, tested by auditors
+#                    non-key       matters, but is not relied on alone
+#                    compensating  covers for a control that is missing or not working, usually for a limited time
+#                    supporting    helps other controls work (documentation, baselines, tuning)
+#   owned_by       Role accountable for the control.
+#   performed_by   Role that does the work day to day.
+#   reviewed_by    Role that checks the work (optional).
+#   stage / theme  Where it sits in the topic: one stage, or one theme.
+#   categories     Kinds of technology it applies to: application, database,
+#                  operating_system, jobs, network, identity, cloud,
+#                  engineering_tools or logging.
+#   platforms      Optional. Platform names exactly as on the site. A name the
+#                  site doesn't have is skipped with a warning.
+#   criteria       What good looks like, in groups. Each group has:
+#                    heading   what the group is about
+#                    part      optional: configuration (set up correctly) or
+#                              monitoring (checked on an ongoing basis)
+#                    items     plain sentences. Write "text:" and "sox_only: true"
+#                              for an item needed only for SOX in-scope apps.
+#   steps          How to run it, in order. Each has:
+#                    who       role doing the step
+#                    do        what to do
+#                    evidence  what to keep as proof
+#                    part      optional: configuration or monitoring
+#   references     Optional. A list of "label" and "link" (starting with https://).
+
+topic: Access management
+
+risks:
+  - title: Inappropriate access is granted
+    statement: >-
+      A person is given access to a system or data that their job doesn't need. This can happen when a
+      request is not approved, is approved by the wrong person, or is granted differently from what
+      was approved. The result could be someone viewing, changing or moving financial or sensitive
+      data without a business reason.
+    owned_by: Application owner
+    stage: Provisioning
+    in_sox_scope: yes
+    covered_by:
+      - control: access-requests
+        coverage: full
+        why: Access is granted only from a recorded request approved by the manager and the owner, and what was granted is checked against it.
+      - control: role-design
+        coverage: partial
+        why: Documented roles give approvers a clear picture of what each job should and should not have.
+      - control: access-review
+        coverage: partial
+        why: Finds access that was granted without a proper approval or that no longer fits the job.
+
+  - title: Privileged access is misused or excessive
+    statement: >-
+      Someone uses administrator access to change data, settings or other people's access, by mistake or
+      without authority. This can happen when privileged access is held by too many people, granted
+      permanently, or used through everyday or shared accounts. The result could be wrong or unauthorized
+      changes with no clear record of who made them.
+    owned_by: Head of Engineering
+    theme: Privileged access
+    in_sox_scope: yes
+    covered_by:
+      - control: privileged-access
+        coverage: full
+        why: Admin rights sit on separate named accounts, are time-limited where possible, and their use is logged and reviewed by someone independent.
+      - control: access-review
+        coverage: partial
+        why: Privileged access is reviewed every month for tier 0 and tier 1 systems and every quarter for others, so excess rights are found and removed.
+      - control: access-requests
+        coverage: partial
+        why: Privileged access needs the same recorded approval as any other access.
+
+  - title: Access is not removed after someone leaves or moves
+    statement: >-
+      A person who has left, or moved to a job that no longer needs it, keeps access to systems or
+      data. This can happen when access removal isn't triggered by HR events or isn't checked for
+      timeliness. The result could be the access being used without authority, and staying open
+      because nobody is looking for it.
+    owned_by: Application owner
+    stage: Deprovisioning
+    in_sox_scope: yes
+    covered_by:
+      - control: leavers-movers
+        coverage: full
+        why: Access is removed when the HR event happens, timeliness is measured against a complete HR list, and a lookback checks for later activity where access stayed.
+      - control: access-review
+        coverage: partial
+        why: Catches accounts that belong to leavers or movers and were missed.
+      - control: service-accounts
+        coverage: partial
+        why: Service accounts have a named owner, so they are reassigned or closed when the owner leaves.
+
+  - title: Access builds up over time without review
+    statement: >-
+      Access to systems and data builds up beyond what people need over time. This can happen when
+      access isn't reviewed periodically against a complete list. The result could be excessive access
+      and accounts that should have been closed staying hidden.
+    owned_by: Application owner
+    stage: Periodic review
+    in_sox_scope: yes
+    covered_by:
+      - control: access-review
+        coverage: full
+        why: Owners review a complete, system-generated list on a set schedule, and every removal is completed and evidenced.
+      - control: role-design
+        coverage: partial
+        why: A yearly look at what each role grants stops roles from growing unnoticed.
+      - control: leavers-movers
+        coverage: partial
+        why: Removes access at the moment a person moves, so less builds up between reviews.
+
+  - title: Service accounts are misused or have no owner
+    statement: >-
+      A service account is used without anyone noticing, or has more rights than its job needs. This
+      can happen when it has no owner, allows interactive sign-in, or its credentials are never
+      rotated. The result could be misuse of the account's access, including by people who have since
+      left.
+    owned_by: Application owner
+    theme: Service accounts
+    in_sox_scope: yes
+    covered_by:
+      - control: service-accounts
+        coverage: full
+        why: Each account has a named owner and purpose, no interactive sign-in, least privilege, vaulted and rotated credentials.
+      - control: access-review
+        coverage: partial
+        why: Service accounts are in the key periodic review, with owner and purpose shown, so unowned or excessive ones are found.
+      - control: privileged-access
+        coverage: partial
+        why: Service accounts with administrator rights follow the privileged access rules too.
+
+  - title: One person holds conflicting duties
+    statement: >-
+      One person can carry out and approve the same action, or holds access that should be split
+      between people, such as developing code and writing to production. This can happen when
+      conflicting combinations aren't defined or checked. The result could be an error or fraud going
+      through without a second person seeing it.
+    owned_by: Head of Engineering
+    theme: Segregation of duties
+    in_sox_scope: yes
+    covered_by:
+      - control: sod-conflicts
+        coverage: full
+        why: Conflicting combinations are defined, checked when access is granted and monitored afterward with a documented mitigating review.
+      - control: role-design
+        coverage: partial
+        why: Conflicting permissions are identified when roles are designed, so roles are not built with a conflict inside them.
+      - control: privileged-access
+        coverage: partial
+        why: Developers do not hold production write access, and secondary admin accounts are checked for.
+
+  - title: Accounts are taken over because sign-in is weakly protected
+    statement: >-
+      Someone signs in to a system as another person, or from outside the firm's network, using a
+      stolen or guessed password. This can happen when sign-in does not go through single sign-on,
+      multi-factor sign-in is not required for privileged and remote access, or local accounts keep weak
+      password and lockout settings. The result could be unauthorized access to financial or sensitive
+      data, recorded under someone else's name.
+    owned_by: Application owner
+    theme: Authentication
+    in_sox_scope: yes
+    covered_by:
+      - control: authentication-settings
+        coverage: full
+        why: Sign-in goes through single sign-on where available, privileged and remote access need multi-factor sign-in, and local accounts have enforced password and lockout settings.
+      - control: privileged-access
+        coverage: partial
+        why: Administrator accounts are separate, named and protected by multi-factor sign-in.
+
+controls:
+  - ref: role-design
+    title: Roles are documented with their permissions
+    why: >-
+      Access can only be judged appropriate if the team knows what each role is meant to allow. When
+      roles are written down, approvers and reviewers have something to compare against, and risky
+      permissions are spotted before anyone is given them.
+    applies_when:
+      - The system uses roles, groups or permission sets to control what people can do.
+    nature: preventive
+    method: manual
+    frequency: annual
+    level: supporting
+    owned_by: Application owner
+    performed_by: Role owner
+    reviewed_by: Control owner
+    stage: Roles to permissions
+    categories: [application, database, operating_system, identity, cloud, engineering_tools]
+    criteria:
+      - heading: What is documented for each role
+        items:
+          - Every role, group or permission set has a written description of the job it is for, the permissions it grants in words a reviewer can read, and an owner role who decides who may hold it.
+          - Privileged permissions are marked, for example membership of a directory administrator group, SQL Server sysadmin or db_owner, Windows local Administrators, AWS IAM Identity Center administrator permission sets, Kubernetes cluster-admin or GHES site administrators.
+          - Combinations of permissions that one person should not hold together are listed.
+      - heading: Keeping it current
+        items:
+          - The documentation is reviewed in full at least once a year, and again whenever a role is created, changed or retired.
+          - The review compares the documentation with what the role actually grants in the system, not with memory. Differences are fixed in the system or the documentation, and the fix is recorded.
+          - The reviewer is someone other than the person who maintains the role.
+          - text: Each version of the role documentation and the review that approved it are kept for the period in the firm's [records retention schedule](#todo-records-retention-schedule).
+            sox_only: true
+    steps:
+      - who: Role owner
+        do: For each role, write down the job it is for and the permissions it grants, and mark any privileged or conflicting permissions.
+        evidence: The role documentation, showing the date and the owner
+      - who: Role owner
+        do: Export the permissions each role actually has in the system and compare them to the documentation.
+        evidence: The export, with the date, and notes on each difference
+      - who: Control owner
+        do: Review the documentation and the comparison, confirm differences were resolved, and sign off.
+        evidence: The sign-off, with the date
+      - who: Role owner
+        do: When a role is created, changed or retired, update the documentation before the change is used.
+        evidence: The updated documentation and the request that triggered the change
+
+  - ref: access-requests
+    title: Access is granted only from an approved request
+    why: >-
+      Every grant of access should trace back to someone with authority saying yes. A recorded
+      approval stops access being handed out informally, and checking what was granted against what
+      was approved catches mistakes in setup.
+    applies_when:
+      - People are given new access, or their existing access is changed, to a system or its data.
+    nature: preventive
+    method: it_dependent
+    frequency: event
+    level: key
+    owned_by: Application owner
+    performed_by: Access administrator
+    reviewed_by: Control owner
+    stage: Provisioning
+    categories: [application, database, operating_system, identity, cloud, engineering_tools]
+    criteria:
+      - heading: The request
+        items:
+          - Every grant or change of access starts with a recorded request that names the person, the role or group wanted (or why something else is needed) and the reason. The system keeps who asked, who approved and when.
+      - heading: Approval
+        items:
+          - The person's manager confirms the access fits the job, and the owner of the system or data confirms it may be given. Privileged access is approved by the system owner and follows the privileged access control.
+          - Nobody approves access for themselves, and approval is recorded before the access is granted.
+          - The person who grants the access is not the person who requested or approved it.
+          - Access for contractors and vendor staff has an end date set when it is created.
+      - heading: What was granted
+        items:
+          - The access granted matches what was approved, with nothing extra. When someone's access changes, access they no longer need is removed in the same request.
+          - text: The requests, approvals, records of what was granted and the checks below are kept for the period in the firm's records retention schedule.
+            sox_only: true
+      - heading: Checking the process works
+        part: monitoring
+        items:
+          - On the schedule set in your team's written procedure, someone compares a system-generated list of access grants for the period, taken from the system's own change or audit log, with the approved requests. The list is checked for completeness (see [Can you trust the report?](/guides/can-you-trust-the-report/)), and any grant without a request is investigated.
+    steps:
+      - who: Requester
+        do: Raise a request for a defined role or group, with the person's name and the reason.
+        evidence: The request record
+      - who: Manager
+        do: Confirm the access fits the person's job, and approve or decline.
+        evidence: The recorded approval, showing the approver and the time
+      - who: System owner
+        do: Confirm the access may be given, and approve or decline.
+        evidence: The recorded approval, showing the approver and the time
+      - who: Access administrator
+        do: Grant exactly what was approved, remove anything the person no longer needs, and link the change to the request.
+        evidence: The system record of the grant, showing the date and what was given
+      - who: Control owner
+        do: On the schedule set in your procedure, take the list of grants for the period from the system's change or audit log, check it is complete, compare it with the approved requests and investigate any grant without one.
+        evidence: The list with its completeness check, and the comparison with notes on each unmatched grant
+        part: monitoring
+
+  - ref: privileged-access
+    title: Privileged access is limited and controlled
+    why: >-
+      Administrator rights can change data, settings and other people's access. Keeping them on
+      separate named accounts, giving them only when needed and logging their use limits the damage a
+      mistake or a stolen password can do, and shows who did what.
+    applies_when:
+      - People or tools hold administrator or other privileged rights on a system, database, server, cloud account, cluster or tool.
+    nature: preventive
+    method: it_dependent
+    frequency: event
+    level: key
+    owned_by: Head of Engineering
+    performed_by: Platform engineer
+    reviewed_by: Control owner
+    theme: Privileged access
+    categories: [application, database, operating_system, identity, cloud, engineering_tools, logging]
+    criteria:
+      - heading: Who holds privileged access
+        part: configuration
+        items:
+          - Privileged access goes only to people whose job needs it, approved through the access request control. Developers do not hold standing write access to production; where they must act there, access is time-limited, approved and reviewed afterward.
+          - Administrative work uses a separate named account tied to one person, protected by multi-factor sign-in. It is not shared, not used for email or browsing, and sessions time out when idle.
+          - If a shared emergency account must exist, it is sealed, and every use is logged and reviewed.
+      - heading: Limits on use
+        part: configuration
+        items:
+          - Where the platform allows it, elevated rights are given on request for a limited time and end on their own.
+          - Privileged sessions and actions are logged, and the people whose actions they record can't change the logs.
+      - heading: Staying controlled
+        part: monitoring
+        items:
+          - Everyone with privileged access is reviewed every month for tier 0 and tier 1 systems and every quarter for others, or as your team's written procedure sets (see [Recommended timelines by BCP tier](/guides/recommended-timelines-by-bcp-tier/) for our recommendation). Access no longer needed is removed, and people holding a second admin account that gives them conflicting access are found.
+          - Privileged activity is reviewed by someone who is not one of the administrators in the log; where that can't be avoided, someone else reviews the reviewer's own entries. Unexpected actions are investigated and the outcome recorded.
+          - text: The lists of privileged users, the reviews and the activity reviews are kept for the period in the firm's records retention schedule.
+            sox_only: true
+    steps:
+      - who: Platform engineer
+        do: List every privileged role and group on the platform, such as directory administrator groups, SQL Server sysadmin and db_owner, Windows local Administrators, and cloud and cluster administrator permissions.
+        evidence: The list, showing the system and the date it was produced
+        part: configuration
+      - who: Platform engineer
+        do: Move administrative work to separate named admin accounts, and set up time-limited elevation where the platform supports it.
+        evidence: A dated export of the account and elevation settings when set up, and the change history for those settings (for example, from the platform's audit log) for the rest of the period
+        part: configuration
+      - who: Platform engineer
+        do: Turn on logging for privileged sessions and actions and send it to the logging system.
+        evidence: The logging configuration and a sample log entry
+        part: configuration
+      - who: Control owner
+        do: On the schedule set in your procedure, review the list of privileged users, check for secondary admin accounts and for developers with production write access, and ask for removal of anything unneeded.
+        evidence: The reviewed list with decisions, and tickets for removals
+        part: monitoring
+      - who: Reviewer
+        do: As someone who is not one of the administrators in the log, review privileged activity, compare it to approved requests or changes, and investigate anything unexpected.
+        evidence: The log extract with notes on each item, showing the reviewer and the date
+        part: monitoring
+
+  - ref: access-review
+    title: Periodic user access review
+    why: >-
+      Even well-run provisioning leaves gaps over time as people move and systems change. A regular
+      review by the people who know the jobs finds access that is no longer needed, and it only works
+      if the list reviewed is complete and every removal is carried through.
+    applies_when:
+      - People have accounts or permissions on the system.
+    nature: detective
+    method: it_dependent
+    frequency: quarterly
+    level: key
+    owned_by: Application owner
+    performed_by: Reviewer
+    reviewed_by: Control owner
+    stage: Periodic review
+    categories: [application, database, operating_system, identity, cloud, engineering_tools]
+    criteria:
+      - heading: The list being reviewed
+        items:
+          - The list is generated by the system, shows when it was produced, and covers every account, including service, privileged and vendor accounts. Each line shows the person, the access held and what it allows in plain words (or a link to the role documentation), their job or manager, and when the account last signed in.
+          - The person producing the list checks that it is complete and accurate, for example by comparing the count with the system or a second source, and keeps that check with the review.
+      - heading: The review
+        items:
+          - Ordinary access is reviewed every quarter. Privileged access is reviewed every month for tier 0 and tier 1 systems and every quarter for others. Your team's written procedure sets the schedule and the time to finish; [Recommended timelines by BCP tier](/guides/recommended-timelines-by-bcp-tier/) has our recommendation. A late review is recorded as late, with the reason.
+          - The reviewer is the person's manager or the system or data owner, someone who knows whether the access is needed. Nobody reviews their own access.
+          - Every line has a keep or remove decision made by the reviewer and traceable to them, for example in the review tool or a file returned from their own account.
+          - Accounts with no sign-in for the period set in your procedure are disabled, or reviewed for removal.
+      - heading: Removals
+        items:
+          - Every removal is raised as a ticket, carried out and checked in the system. Removals past their due date are tracked and escalated to the control owner.
+          - text: The list, the decisions, the removal evidence and the sign-off are kept for the period in the firm's records retention schedule.
+            sox_only: true
+    steps:
+      - who: Access administrator
+        do: Produce the full list of users and access from the system and check that it is complete.
+        evidence: The list showing the date and time, and the completeness check
+      - who: Reviewer
+        do: Decide for each line whether to keep or remove the access, and record the decision yourself.
+        evidence: The marked-up list, showing the reviewer and the date
+      - who: Access administrator
+        do: Carry out each removal and confirm in the system that the access is gone.
+        evidence: Tickets for each removal and a fresh extract showing the result
+      - who: Control owner
+        do: Check that every line has a decision, every removal is complete and no one reviewed their own access, and sign off.
+        evidence: The sign-off with the date
+
+  - ref: leavers-movers
+    title: Leavers and movers lose access on time
+    why: >-
+      Access that is left open after a person leaves or changes job is an easy way in for misuse.
+      Tying removal to the HR event, measuring how quickly it happens and checking for later activity
+      shows the gap is closed.
+    applies_when:
+      - People who have access to the system leave the firm or change jobs.
+    nature: preventive
+    method: it_dependent
+    frequency: event
+    level: key
+    owned_by: Application owner
+    performed_by: Access administrator
+    reviewed_by: Control owner
+    stage: Deprovisioning
+    categories: [application, database, operating_system, identity, cloud, engineering_tools]
+    criteria:
+      - heading: Removal
+        part: configuration
+        items:
+          - Removal starts from an HR event, not from someone remembering. A leaver's directory account is disabled within the time set in your team's written procedure (our recommendation is in [Recommended timelines by BCP tier](/guides/recommended-timelines-by-bcp-tier/)), and their open cloud sign-in sessions are revoked.
+          - For movers, access no longer needed for the new job is removed within the time set in your procedure.
+          - Access that doesn't depend on the directory is removed separately, such as local database logins, cloud users and access keys, personal access tokens, SSH keys and tool accounts. Contractors and vendor staff follow the same process when their engagement ends.
+      - heading: Measuring timeliness
+        part: monitoring
+        items:
+          - The list of leavers and movers comes from the HR system, includes contractors and vendor staff, and is checked for completeness, for example against HR's own count for the period.
+          - On the schedule set in your procedure, that list is compared with the accounts removed, so a missed person is found. Each removal is measured against the HR date and the time limit, and late removals are listed with the reason and what was done.
+      - heading: Lookback
+        part: monitoring
+        items:
+          - A lookback is needed when access was removed after the time limit, or when old access stayed with no handover or cross-training reason. Sign-in and activity after the leave or move date are then checked, and anything found is investigated.
+          - When old access stayed for a documented handover or cross-training reason, that reason is the evidence and no lookback is needed.
+          - text: The HR lists, removal records, timeliness results and lookbacks are kept for the period in the firm's records retention schedule.
+            sox_only: true
+    steps:
+      - who: Access administrator
+        do: When the HR event arrives, disable the directory account, revoke open cloud sign-in sessions, and remove access held outside the directory, including tokens and keys.
+        evidence: The ticket and the system record of the removal, with date and time
+      - who: Access administrator
+        do: For movers, remove access the new job does not need, or record the handover reason for keeping it.
+        evidence: The removal record or the documented reason
+      - who: Control owner
+        do: On the schedule set in your procedure, check the HR list of leavers and movers is complete, compare it to the removals, and measure how long each took.
+        evidence: The HR list with its completeness check, and the comparison with timeliness for each person
+        part: monitoring
+      - who: Control owner
+        do: For each leaver or mover whose access was removed late or stayed without a documented reason, check sign-in and activity logs after the leave or move date, and investigate anything found.
+        evidence: The log extract and notes on each item
+        part: monitoring
+
+  - ref: service-accounts
+    title: Service accounts are owned and restricted
+    why: >-
+      Service accounts run jobs and connect systems, often with strong rights and passwords nobody
+      changes. Without an owner, a clear purpose and tight limits, they are an easy way to misuse
+      access that nobody is watching.
+    applies_when:
+      - Applications, jobs, pipelines or integrations sign in with accounts that are not for a person.
+    nature: preventive
+    method: it_dependent
+    frequency: event
+    level: non-key
+    owned_by: Application owner
+    performed_by: Service account owner
+    reviewed_by: Control owner
+    theme: Service accounts
+    categories: [application, database, operating_system, identity, cloud, jobs, engineering_tools]
+    criteria:
+      - heading: Ownership and purpose
+        items:
+          - Every service account has a named owner role and a written purpose, and is on a complete list that is updated when accounts are created. When the owner leaves or moves, the account is reassigned or closed.
+      - heading: Limits on use
+        part: configuration
+        items:
+          - Service accounts can't be used to sign in interactively, for example by denying interactive and remote desktop logon. Cloud automation uses workload identities, such as managed identities and service principals, rather than user accounts.
+          - Each account holds only the permissions its job needs. Administrator rights are given only where the purpose needs them, and then follow the privileged access control.
+          - Default and vendor-supplied accounts have their passwords changed and vaulted, and are renamed or disabled where possible.
+      - heading: Credentials
+        part: configuration
+        items:
+          - Credentials are kept in a vault and can't be read in clear text. They are rotated on the schedule set in your team's written procedure, and when someone who could reach them leaves.
+      - heading: Staying controlled
+        part: monitoring
+        items:
+          - Service accounts are part of the periodic access review, with their owner and purpose shown. Accounts with no owner, or unused for the period set in your procedure, are investigated and closed if not needed.
+          - text: The service account list, the owner records and the rotation records are kept for the period in the firm's records retention schedule.
+            sox_only: true
+    steps:
+      - who: Service account owner
+        do: Record the owner and purpose when the account is created, and list the permissions it needs.
+        evidence: The service account record and the request
+      - who: Platform engineer
+        do: Deny interactive logon, limit permissions to those listed, and store the credentials in the vault with rotation set.
+        evidence: A dated export of the account settings and vault entry when set up, and the change history for them for the rest of the period
+        part: configuration
+      - who: Control owner
+        do: On the schedule set in your procedure, compare the list of service accounts in the systems to the owner list, and follow up on accounts with no owner or no recent use.
+        evidence: The comparison with notes on each account followed up
+        part: monitoring
+
+  - ref: sod-conflicts
+    title: Segregation of duties conflicts are prevented or monitored
+    why: >-
+      When one person can do two jobs that should check each other, an error or fraud can pass
+      unnoticed. Defining the conflicts, checking for them when access is granted and watching for
+      those that appear later keeps a second pair of eyes in the process.
+    applies_when:
+      - One person could hold access that lets them both start and approve an action, or hold two sets of access that should be kept apart.
+    nature: preventive
+    method: it_dependent
+    frequency: event
+    level: key
+    owned_by: Head of Engineering
+    performed_by: Access administrator
+    reviewed_by: Control owner
+    theme: Segregation of duties
+    categories: [application, database, identity, cloud, engineering_tools]
+    criteria:
+      - heading: Defining conflicts
+        items:
+          - A written list of conflicting access combinations exists, drawn from the role documentation. It covers conflicts within one system and across systems, including those from a secondary or admin account held by the same person, and is reviewed at least once a year and when roles change.
+      - heading: Checking when access is granted
+        items:
+          - Each access request is checked against the list before it is approved.
+          - A request that would create a conflict is declined, or approved only with a documented mitigating review.
+      - heading: Monitoring existing conflicts
+        part: monitoring
+        items:
+          - On the schedule set in your team's written procedure, each person's access is compared with the list of conflicts and the results are recorded.
+          - Each conflict found is removed or has a mitigating review that names who does it, how often and what they look at.
+          - The mitigating review is carried out by someone other than the person with the conflict.
+          - text: The conflict list, the results of the checks and the mitigating reviews are kept for the period in the firm's records retention schedule.
+            sox_only: true
+    steps:
+      - who: Role owner
+        do: Write down the combinations of access that must not be held by one person, and update the list when roles change.
+        evidence: The conflict list, showing the date and the owner
+      - who: Access administrator
+        do: Check each access request against the list before granting it, and record the result.
+        evidence: The check recorded on the request
+      - who: Control owner
+        do: On the schedule set in your procedure, compare each person's access across systems to the list and record each conflict found.
+        evidence: The comparison with the conflicts found
+        part: monitoring
+      - who: Control owner
+        do: For each conflict that stays, document the mitigating review and confirm it is carried out by someone else.
+        evidence: The mitigating review record and its results
+        part: monitoring
+
+  - ref: authentication-settings
+    title: Authentication settings are enforced
+    why: >-
+      Access controls only work if people have to prove who they are. Single sign-on, multi-factor
+      sign-in for the riskiest access, and sound password settings for any local accounts that remain make
+      it hard to use someone else's account, and keep each action tied to one person.
+    applies_when:
+      - People sign in to an application, database, server, cloud account or tool.
+    nature: preventive
+    method: automated
+    frequency: quarterly
+    level: key
+    owned_by: Application owner
+    performed_by: Platform engineer
+    reviewed_by: Control owner
+    theme: Authentication
+    categories: [application, database, operating_system, identity, cloud, engineering_tools]
+    criteria:
+      - heading: How people sign in
+        part: configuration
+        items:
+          - Where the system supports single sign-on with the firm's identity service, it is turned on and is the way people sign in. Local accounts that remain are listed, each with the reason it exists.
+          - Multi-factor sign-in is required for privileged access and for any access from outside the firm's network, including remote access to servers, consoles and tools.
+      - heading: Local accounts that remain
+        part: configuration
+        items:
+          - Password length and complexity, password history, expiry or screening against known-compromised passwords, and lockout after repeated failed attempts are set, and match the firm's password rules.
+          - Sessions end after a period of inactivity, and shared or anonymous sign-in is not allowed.
+      - heading: Staying enforced
+        part: monitoring
+        items:
+          - On the schedule set in your team's written procedure, the live settings are compared with the intended ones. Each difference is fixed or approved, and the outcome is recorded.
+          - Only a small named group can change authentication settings, and their changes are logged and reviewed by someone outside that group.
+          - text: A dated export of the settings when they are set up and at the start of each financial year, with the change history for the rest of the year, is kept for the period in the firm's records retention schedule.
+            sox_only: true
+    steps:
+      - who: Platform engineer
+        do: Turn on single sign-on where the system supports it, list the local accounts that remain, and require multi-factor sign-in for privileged and remote access.
+        evidence: A dated export of the sign-in and multi-factor settings, and the list of local accounts with reasons
+        part: configuration
+      - who: Platform engineer
+        do: Set password, lockout and session timeout settings for local accounts to match the firm's password rules.
+        evidence: A dated export of the password, lockout and session settings
+        part: configuration
+      - who: Control owner
+        do: On the schedule set in your procedure, export the live settings, compare them with the intended ones and follow up on each difference.
+        evidence: The dated export, the comparison and notes on each difference
+        part: monitoring
+      - who: Control owner
+        do: Review the log of changes to authentication settings and match each one to an approved request.
+        evidence: The log extract with notes on each item
+        part: monitoring
