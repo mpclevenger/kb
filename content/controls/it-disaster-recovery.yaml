@@ -1,7 +1,7 @@
 # Controls and risks for one topic. Plain text; edit with any text editor.
 # After editing: python manage.py check_controls, then
 # python manage.py sync_controls --user <you> --publish. See README.md in this folder.
-# A control or risk is matched to the site by its title. Renaming a title makes a NEW item.
+# Each control and risk has an id from the RCM. The site finds items by that id.
 #
 # FILE
 #   topic          Name of the topic exactly as it appears on the site.
@@ -9,6 +9,7 @@
 #   controls       The controls themselves.
 #
 # RISK (each entry under "risks")
+#   id             The risk's ID from the RCM, for example R-MC-01. Required and unique.
 #   title          Short name of the risk.
 #   statement      What could go wrong, why, and what it would lead to.
 #   owned_by       Role accountable for the risk (a role, not a name).
@@ -16,13 +17,13 @@
 #                  place it under a theme. Never both.
 #   in_sox_scope   yes or no. Is this a risk for SOX in-scope apps?
 #   covered_by     Controls that reduce this risk. Each has:
-#                    control   the short name ("ref") of a control in this file
+#                    control   the id of the control (it can be in any topic's file)
 #                    coverage  full or partial
 #                    why       one line saying how the control helps
 #
 # CONTROL (each entry under "controls")
-#   ref            Short name used only inside this file, so risks can point to it.
-#                  The site gives the control its real ID (for example MC-01).
+#   id             The control's ID from the RCM, for example MC-01. Required and unique.
+#                  The site shows this ID and finds the control by it, so a title can change.
 #   title          Name of the control.
 #   why            Why the control exists, in two or three sentences.
 #   applies_when   Plain statements. The control applies if any one is true.
@@ -57,7 +58,8 @@
 topic: IT disaster recovery
 
 risks:
-  - title: Data can't be recovered after loss or corruption
+  - id: R-DR-01
+    title: Data can't be recovered after loss or corruption
     statement: >-
       Data or configuration on a system is lost or damaged and there is no usable copy to restore. This
       can happen when backups are missing, set up to the wrong need, or failing without anyone noticing.
@@ -67,17 +69,18 @@ risks:
     stage: Back up and restore
     in_sox_scope: yes
     covered_by:
-      - control: backups
+      - control: DR-01
         coverage: full
         why: Backups are set up to the system's needs, and failures are watched for and fixed.
-      - control: restore-tests
+      - control: DR-02
         coverage: partial
         why: Proves the copies can actually be restored, not just that a job ran.
-      - control: recovery-plan
+      - control: DR-03
         coverage: partial
         why: Describes how to use the copies to bring the system back.
 
-  - title: Backups exist but can't be restored
+  - id: R-DR-02
+    title: Backups exist but can't be restored
     statement: >-
       A backup is taken but turns out to be incomplete, corrupt or unusable when it is needed. This can
       happen when restores are never tried or the backup does not include everything the system needs.
@@ -86,14 +89,15 @@ risks:
     stage: Back up and restore
     in_sox_scope: yes
     covered_by:
-      - control: restore-tests
+      - control: DR-02
         coverage: full
         why: A restore is tried on a schedule and gaps are fixed and recorded.
-      - control: backups
+      - control: DR-01
         coverage: partial
         why: Backup success is monitored, which catches many problems before a restore is needed.
 
-  - title: A serious outage has no tested way back
+  - id: R-DR-03
+    title: A serious outage has no tested way back
     statement: >-
       A critical system fails or its site is lost and the team does not know the order of steps, the people
       or the targets for getting it back. This can happen when the recovery plan is missing, out of date or
@@ -103,14 +107,15 @@ risks:
     stage: Test recovery
     in_sox_scope: yes
     covered_by:
-      - control: recovery-plan
+      - control: DR-03
         coverage: full
         why: A written plan is kept current and exercised for the most critical systems.
-      - control: restore-tests
+      - control: DR-02
         coverage: partial
         why: Restore results show whether the plan's time and data-loss targets are realistic.
 
-  - title: Backups are read or changed by the wrong people
+  - id: R-DR-04
+    title: Backups are read or changed by the wrong people
     statement: >-
       Backup copies are viewed, altered or deleted by people who do not need that access. This can happen
       when backup storage is open to many administrators or shares permissions with the live system. The
@@ -119,12 +124,12 @@ risks:
     theme: Backup access
     in_sox_scope: yes
     covered_by:
-      - control: backup-access
+      - control: DR-04
         coverage: full
         why: Only named people and tools can reach backups, and what they do is logged and reviewed.
 
 controls:
-  - ref: backups
+  - id: DR-01
     title: Backups match the system's needs and are monitored
     why: >-
       A backup that was never set up for the system's needs, or that quietly fails, is no protection.
@@ -170,7 +175,7 @@ controls:
         evidence: The comparison with notes on each gap
         part: monitoring
 
-  - ref: restore-tests
+  - id: DR-02
     title: Restores are tested
     why: >-
       A backup is only proven when someone restores from it. Testing on a schedule finds missing
@@ -213,7 +218,7 @@ controls:
         evidence: The sign-off with the date
         part: monitoring
 
-  - ref: recovery-plan
+  - id: DR-03
     title: A recovery plan exists and is tested for the most critical systems
     why: >-
       In a real outage people work from stress and memory. A written plan, practiced beforehand, turns
@@ -254,7 +259,7 @@ controls:
         do: Check that follow-up items are fixed and the plan was updated, then sign off.
         evidence: The sign-off with the date
 
-  - ref: backup-access
+  - id: DR-04
     title: Access to backups is restricted
     why: >-
       Backups hold a full copy of the data and are the last line of defense. Limiting who can read,

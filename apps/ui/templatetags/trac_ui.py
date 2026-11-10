@@ -40,7 +40,8 @@ TOPIC_ICONS = frozenset(
 
 # (key, label, route name or "#"). A route that doesn't exist yet is left out.
 PRIMARY_NAV = [
-    ("library", "Library", "core:home"),
+    ("home", "Home", "core:home"),
+    ("library", "Library", "core:library"),
     ("guides", "Best practices and guides", "wiki:index"),
     ("rcm", "Risks and controls", "rcm:explorer"),
     ("review", "Review queue", "review:queue"),

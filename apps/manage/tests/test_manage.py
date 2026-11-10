@@ -153,21 +153,13 @@ def test_invalid_topic_is_not_saved(tr, access):
     assert not CatalogChange.objects.exists()
 
 
-def test_prefix_editable_until_controls_exist(tr, access):
-    page = tr.get(reverse("manage:topic_edit", args=[access.pk]))
-    assert b"Locked:" not in page.content
+def test_prefix_is_a_plain_code_that_stays_editable(tr, access):
     create_control(tr.user, access)
     page = tr.get(reverse("manage:topic_edit", args=[access.pk]))
-    assert b"Locked:" in page.content
+    assert b"come from the RCM" in page.content
     tr.post(reverse("manage:topic_edit", args=[access.pk]), topic_data(access, id_prefix="ZZ"))
     access.refresh_from_db()
-    assert access.id_prefix == "MA"
-
-
-def test_prefix_locked_by_risks_alone(tr, access):
-    services.create_risk(tr.user, access, title="Risk", statement="s", owner_role="IAM")
-    page = tr.get(reverse("manage:topic_edit", args=[access.pk]))
-    assert b"Locked:" in page.content
+    assert access.id_prefix == "ZZ"
 
 
 def test_deactivate_and_reactivate_topic(tr, access):

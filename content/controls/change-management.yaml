@@ -1,7 +1,7 @@
 # Controls and risks for one topic. Plain text; edit with any text editor.
 # After editing: python manage.py check_controls, then
 # python manage.py sync_controls --user <you> --publish. See README.md in this folder.
-# A control or risk is matched to the site by its title. Renaming a title makes a NEW item.
+# Each control and risk has an id from the RCM. The site finds items by that id.
 #
 # FILE
 #   topic          Name of the topic exactly as it appears on the site.
@@ -9,6 +9,7 @@
 #   controls       The controls themselves.
 #
 # RISK (each entry under "risks")
+#   id             The risk's ID from the RCM, for example R-MC-01. Required and unique.
 #   title          Short name of the risk.
 #   statement      What could go wrong, why, and what it would lead to.
 #   owned_by       Role accountable for the risk (a role, not a name).
@@ -16,13 +17,13 @@
 #                  place it under a theme. Never both.
 #   in_sox_scope   yes or no. Is this a risk for SOX in-scope apps?
 #   covered_by     Controls that reduce this risk. Each has:
-#                    control   the short name ("ref") of a control in this file
+#                    control   the id of the control (it can be in any topic's file)
 #                    coverage  full or partial
 #                    why       one line saying how the control helps
 #
 # CONTROL (each entry under "controls")
-#   ref            Short name used only inside this file, so risks can point to it.
-#                  The site gives the control its real ID (for example MC-01).
+#   id             The control's ID from the RCM, for example MC-01. Required and unique.
+#                  The site shows this ID and finds the control by it, so a title can change.
 #   title          Name of the control.
 #   why            Why the control exists, in two or three sentences.
 #   applies_when   Plain statements. The control applies if any one is true.
@@ -60,7 +61,8 @@
 topic: Change management
 
 risks:
-  - title: Unreviewed or unauthorized changes reach production
+  - id: R-MC-01
+    title: Unreviewed or unauthorized changes reach production
     statement: >-
       A change reaches production code, configuration or data without being reviewed and approved by
       someone other than its author. This can happen when review is optional, can be bypassed, or is
@@ -71,20 +73,21 @@ risks:
     stage: Build and review
     in_sox_scope: yes
     covered_by:
-      - control: peer-review
+      - control: MC-01
         coverage: full
         why: A person other than the author, and other than the last person to push, must approve every change before it can be merged.
-      - control: release-gates
+      - control: MC-04
         coverage: partial
         why: Required checks and approvals are enforced again at the moment of release.
-      - control: change-requests
+      - control: MC-07
         coverage: partial
         why: Each change traces to a recorded request, so the reviewer can see what it was meant to do.
-      - control: reconciliation
+      - control: MC-06
         coverage: partial
         why: Finds, after the fact, any production change that has no approval behind it.
 
-  - title: Changes bypass the pipeline
+  - id: R-MC-02
+    title: Changes bypass the pipeline
     statement: >-
       A change reaches production without going through the pipeline, for example on a server, in a
       database or in a cloud console. This can happen when people hold standing write access to
@@ -94,17 +97,18 @@ risks:
     stage: Release
     in_sox_scope: yes
     covered_by:
-      - control: pipeline-only
+      - control: MC-02
         coverage: full
         why: Nobody holds standing write access to production for day-to-day work, so the pipeline is the normal way in, and who can write is checked on a schedule.
-      - control: emergency-changes
+      - control: MC-05
         coverage: partial
         why: Covers the rare cases where access is opened up, by requiring a reason and a review afterward.
-      - control: reconciliation
+      - control: MC-06
         coverage: partial
         why: Compares the full list of production deployments to approved changes, so a bypass shows up as unmatched.
 
-  - title: The pipeline itself is changed to skip controls
+  - id: R-MC-03
+    title: The pipeline itself is changed to skip controls
     statement: >-
       The pipeline, its protection rules or its secrets are changed so that review, tests or approvals
       no longer apply. This can happen when pipeline files and settings have no named owners or their
@@ -114,17 +118,18 @@ risks:
     stage: Build and review
     in_sox_scope: yes
     covered_by:
-      - control: pipeline-config
+      - control: MC-03
         coverage: full
         why: Pipeline definitions, environments, rules and secrets can only change through review by named owners, and someone outside that group reviews the change log.
-      - control: peer-review
+      - control: MC-01
         coverage: partial
         why: Pipeline files are code, so changes to them need an independent approval too.
-      - control: release-gates
+      - control: MC-04
         coverage: partial
         why: Checks that can't be skipped limit what a changed pipeline can get away with.
 
-  - title: Emergency changes are not reviewed
+  - id: R-MC-04
+    title: Emergency changes are not reviewed
     statement: >-
       An emergency change reaches production and is never reviewed afterward. This can happen when the
       emergency path has no recorded reason or no follow-up review. The result could be a wrong or
@@ -133,14 +138,15 @@ risks:
     stage: Release
     in_sox_scope: yes
     covered_by:
-      - control: emergency-changes
+      - control: MC-05
         coverage: full
         why: Every emergency change has a recorded reason and is reviewed and approved after the fact.
-      - control: pipeline-only
+      - control: MC-02
         coverage: partial
         why: Emergency access to production is time-limited, logged and reviewed.
 
-  - title: Production changes can't be completely listed or traced to approvals
+  - id: R-MC-05
+    title: Production changes can't be completely listed or traced to approvals
     statement: >-
       The production changes for a period can't be completely listed or traced to their approvals.
       This can happen when the change list is built by hand or isn't matched to approvals regularly.
@@ -150,17 +156,18 @@ risks:
     stage: Monitor
     in_sox_scope: yes
     covered_by:
-      - control: reconciliation
+      - control: MC-06
         coverage: full
         why: A complete system-generated list is matched to approved changes every period.
-      - control: pipeline-only
+      - control: MC-02
         coverage: partial
         why: Funnels deployments through one place, so the list can be complete.
-      - control: change-requests
+      - control: MC-07
         coverage: partial
         why: Request numbers carried into the pull request and deployment let each change be traced back.
 
-  - title: Changes are made without a recorded request or approval
+  - id: R-MC-06
+    title: Changes are made without a recorded request or approval
     statement: >-
       A change is made to production code, configuration or data that nobody with authority asked for
       or agreed to. This can happen when work starts from a conversation, or when requests are not
@@ -170,14 +177,15 @@ risks:
     stage: Request and approve
     in_sox_scope: yes
     covered_by:
-      - control: change-requests
+      - control: MC-07
         coverage: full
         why: Every change starts from a recorded request that an authorized person, not the requester or builder, approves before release.
-      - control: reconciliation
+      - control: MC-06
         coverage: partial
         why: Finds production changes that cannot be matched to a request.
 
-  - title: Untested changes break systems or financial data
+  - id: R-MC-07
+    title: Untested changes break systems or financial data
     statement: >-
       A change goes live without being tested properly, or without the people who rely on it agreeing
       that it works. This can happen when tests are skipped, run in production, or their results are
@@ -187,14 +195,15 @@ risks:
     stage: Test
     in_sox_scope: yes
     covered_by:
-      - control: change-testing
+      - control: MC-08
         coverage: full
         why: Changes are tested outside production, failures stop the release, and users accept results where figures or reports are affected.
-      - control: release-gates
+      - control: MC-04
         coverage: partial
         why: The pipeline enforces that required checks passed at the moment of release.
 
-  - title: Direct changes to production databases go undetected
+  - id: R-MC-08
+    title: Direct changes to production databases go undetected
     statement: >-
       Data or structure in a production database is changed outside the pipeline, for example by an
       administrator running a statement, and nobody notices. This can happen when database auditing does
@@ -205,18 +214,18 @@ risks:
     theme: Direct database changes
     in_sox_scope: yes
     covered_by:
-      - control: direct-database-changes
+      - control: MC-09
         coverage: full
         why: Changes found in the database audit records are matched to approved requests, and unmatched ones are investigated.
-      - control: pipeline-only
+      - control: MC-02
         coverage: partial
         why: Removes standing write access for day-to-day work, so far fewer direct changes are possible.
-      - control: emergency-changes
+      - control: MC-05
         coverage: partial
         why: A direct change made in an emergency has a recorded reason and a review afterward.
 
 controls:
-  - ref: peer-review
+  - id: MC-01
     title: Peer-reviewed changes
     why: >-
       A second person catches mistakes and stops one person from putting an unchecked change into
@@ -265,7 +274,7 @@ controls:
         evidence: The list with the date, and tickets for any fixes
         part: monitoring
 
-  - ref: pipeline-only
+  - id: MC-02
     title: Production changes only through the pipeline
     why: >-
       If people can change production by hand, the review and testing steps can be skipped without
@@ -317,7 +326,7 @@ controls:
         evidence: The dated export, the comparison and tickets for removals
         part: monitoring
 
-  - ref: pipeline-config
+  - id: MC-03
     title: Pipeline configuration is protected
     why: >-
       The pipeline enforces most of the other change controls. If someone can quietly edit it, they
@@ -359,7 +368,7 @@ controls:
         evidence: The log extract with notes on each item, showing the reviewer and the date
         part: monitoring
 
-  - ref: release-gates
+  - id: MC-04
     title: Production deployment approval and test gates
     why: >-
       A change that passed review can still fail in production if tests are skipped or the wrong
@@ -399,7 +408,7 @@ controls:
         evidence: The releases reviewed, how they were chosen, and notes
         part: monitoring
 
-  - ref: emergency-changes
+  - id: MC-05
     title: Emergency changes are recorded and reviewed afterward
     why: >-
       Real emergencies need a faster path. That path is a gap in the normal controls, so it has to
@@ -443,7 +452,7 @@ controls:
         evidence: The list of emergency changes with review dates
         part: monitoring
 
-  - ref: reconciliation
+  - id: MC-06
     title: Production change reconciliation
     why: >-
       Preventive controls can fail without anyone noticing. Comparing everything that actually
@@ -487,7 +496,7 @@ controls:
         do: Review the matched list and the follow-up, and sign off.
         evidence: The sign-off with the date
 
-  - ref: change-requests
+  - id: MC-07
     title: Changes start from an approved request
     why: >-
       Every production change should trace back to someone with authority asking for it and agreeing
@@ -528,7 +537,7 @@ controls:
         do: Carry the request number into the pull request and the deployment.
         evidence: The pull request and deployment showing the request number
 
-  - ref: change-testing
+  - id: MC-08
     title: Changes are tested and accepted before release
     why: >-
       A change can be reviewed and approved and still be wrong. Testing outside production, and
@@ -568,7 +577,7 @@ controls:
         do: For a conversion or migration, compare the new data to the source before go-live.
         evidence: The comparison with counts and totals
 
-  - ref: direct-database-changes
+  - id: MC-09
     title: Direct database changes are reviewed
     why: >-
       Even with access tightly limited, administrators and break-glass accounts can still change data or

@@ -1,4 +1,4 @@
-"""The home page, the health check, the site search and the history page for any item."""
+"""The front page, the Library, the tool pages, the health check, the site search and the history page for any item."""
 
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection
@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404, render
 from apps.accounts.permissions import can_view, can_view_history, permission_required_for
 from apps.ui.bands import make_band
 
+from . import home_files
 from .models import AuditEvent
 from .search import GROUP_LABELS, run_search, query_words
 from .selectors import search_items
@@ -27,8 +28,29 @@ def health(request):
 
 @view_allowed
 def home(request):
-    """The Library by technology is the home page."""
-    return render(request, "platforms/library.html", {"nav_active": "library", "band": make_band([], title="Library")})
+    """The front page: what Tech Risk offers, with a card for each tool (content/home)."""
+    return render(request, "core/home.html", {
+        "page": home_files.landing(), "tools": home_files.tools(), "nav_active": "home", "show_comment_box": False,
+    })
+
+
+@view_allowed
+def library(request):
+    """The Library by technology."""
+    return render(request, "platforms/library.html", {
+        "nav_active": "library", "band": make_band([("Home", "/"), ("Library", None)], title="Library"),
+    })
+
+
+@view_allowed
+def tool(request, slug):
+    """One tool's page: what it is, who it's for, and the button to open it."""
+    found = next((t for t in home_files.tools() if t.slug == slug), None)
+    if found is None:
+        raise Http404("No such tool.")
+    return render(request, "core/tool.html", {
+        "tool": found, "band": make_band([("Home", "/"), (found.title, None)], title=found.title),
+    })
 
 
 @view_allowed

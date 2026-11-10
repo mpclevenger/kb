@@ -548,3 +548,19 @@ a.category-pill:hover { color: var(--category-ink); border-color: var(--category
 .search-result-title { font-weight: 600; }
 .search-snippet { margin: 0.2rem 0 0; color: var(--trac-ink); font-size: 0.9375rem; }
 .search-snippet mark { background: #fff1b8; color: inherit; padding: 0 0.1em; }
+
+/* Front page (core/home.html) and tool pages (core/tool.html) */
+.home-hero { max-width: var(--trac-prose-width); margin: var(--trac-space-4) 0 var(--trac-space-4); }
+.home-hero h1 { font-size: 2rem; margin-bottom: var(--trac-space-2); }
+.home-pitch { font-size: 1.125rem; color: var(--trac-ink-secondary); }
+.home-pitch > :last-child { margin-bottom: 0; }
+.home-tools { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--trac-space-3); grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); }
+.home-tool { display: flex; flex-direction: column; background: var(--trac-paper); border: 1px solid var(--trac-border); border-radius: var(--trac-radius); padding: var(--trac-space-4); }
+.home-tool-title { font-size: 1.25rem; margin: 0 0 var(--trac-space-2); }
+.home-tool-summary { flex: 1; color: var(--trac-ink); }
+.home-tool-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--trac-space-3); margin-top: var(--trac-space-2); }
+.home-tool-more { font-size: 0.95rem; }
+.home-tool-page { max-width: var(--trac-prose-width); }
+.home-tool-lead { font-size: 1.125rem; }
+.home-badge { display: inline-block; vertical-align: middle; font-size: 0.75rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 999px; background: var(--trac-warning-tint); color: var(--trac-warning); border: 1px solid var(--trac-warning-edge); }
+.home-banner { background: var(--trac-warning-tint); color: var(--trac-warning); border: 1px solid var(--trac-warning-edge); border-radius: var(--trac-radius); padding: var(--trac-space-2) var(--trac-space-3); margin-bottom: var(--trac-space-3); }

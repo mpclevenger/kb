@@ -99,7 +99,7 @@ def test_links_in_both_directions(access, owner, reviewer):
     page = owner.get(URL).content.decode()
     assert reverse("rcm:control", args=[control.ident]) in page
     assert URL in owner.get(reverse("rcm:control", args=[control.ident])).content.decode()
-    assert URL in owner.get("/").content.decode()
+    assert URL in owner.get("/library/").content.decode()
 
 
 def test_control_page_below_first_level_has_no_link(access, owner, reviewer):

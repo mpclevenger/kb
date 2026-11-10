@@ -11,6 +11,8 @@ Drivers and engine risks are not edited in the site: they come from the risk eng
 (see apps/rcm/engine_files.py).
 """
 
+import re
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
@@ -66,8 +68,12 @@ class Coverage(models.TextChoices):
     PARTIAL = "partial", "Partial"
 
 
+# What an ID from the RCM may look like, for example MC-01 or R-MC-01.
+ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,39}$")
+
+
 class RegisterEntity(GovernedEntity):
-    ident = models.CharField(max_length=12, unique=True)
+    ident = models.CharField(max_length=40, unique=True)
 
     class Meta:
         abstract = True

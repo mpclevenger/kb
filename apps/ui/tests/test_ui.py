@@ -222,14 +222,14 @@ def test_base_nav_marks_active_item():
     html = render_to_string("base.html", {"nav_active": "library", "is_tech_risk": True})
     assert html.count('aria-current="page"') == 1
     labels = re.findall(r'<li><a href="[^"]*"[^>]*>([^<]+)</a>', html.split('aria-label="Primary"')[1].split("</nav>")[0])
-    assert labels[0] == "Library" and labels[-2:] == ["Risks and controls", "Review queue"]
-    assert set(labels) <= {"Library", "Best practices and guides", "Risks and controls", "Review queue"}
+    assert labels[:2] == ["Home", "Library"] and labels[-2:] == ["Risks and controls", "Review queue"]
+    assert set(labels) <= {"Home", "Library", "Best practices and guides", "Risks and controls", "Review queue"}
     assert ("Best practices and guides" in labels) == bool(reverse_if_exists("wiki:index"))
 
 
-def test_nav_has_library_first_and_no_dictionary_or_platforms_item():
+def test_nav_has_home_then_library_and_no_dictionary_or_platforms_item():
     html = render_to_string("base.html", {"nav_active": "library"})
-    assert 'href="/" aria-current="page">Library<' in html
+    assert 'href="/library/" aria-current="page">Library<' in html
     assert ">Dictionary<" not in html and ">Platforms<" not in html
 
 

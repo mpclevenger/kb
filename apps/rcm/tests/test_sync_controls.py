@@ -12,7 +12,7 @@ from django.core.management.base import CommandError
 
 from apps.core import versioning as v
 from apps.core.content_sync import recorded
-from apps.rcm import levels
+from apps.rcm import control_files, levels
 from apps.core.tests.support import make_user
 from apps.rcm.models import ControlVersion, RiskControlLink, RiskVersion
 from apps.rcm.control_files import DEFAULT_FOLDER
@@ -27,14 +27,15 @@ BANNED = re.compile(
 GOOD = """
 topic: Change management
 risks:
-  - title: A risk
+  - id: R-MC-01
+    title: A risk
     statement: Something goes wrong.
     owned_by: Application owner
     stage: Release
     covered_by:
-      - {control: one, coverage: full, why: It helps.}
+      - {control: MC-01, coverage: full, why: It helps.}
 controls:
-  - ref: one
+  - id: MC-01
     title: A control
     why: Because.
     nature: preventive
@@ -116,7 +117,7 @@ def test_unknown_platform_is_skipped_with_a_warning(lead, tmp_path, capsys):
     ("stage: Release\n    categories", "stage: Ship it\n    categories", ("'Ship it'", "Stages:")),
     ("nature: preventive", "nature: preventative", ("'preventative'", "nature", "preventive")),
     ("coverage: full", "coverage: mostly", ("'mostly'", "coverage")),
-    ("control: one", "control: two", ("'two'", "short name")),
+    ("control: MC-01", "control: MC-99", ("'MC-99'", "isn't the id of a control")),
     ("topic: Change management", "topic: Nonsense", ("'Nonsense'", "topic")),
     ("    why: Because.\n", "", ("field 'why' is missing",)),
     ("    title: A control", "    title: A control\n    colour: red", ("'colour'", "isn't a known field")),
@@ -263,7 +264,7 @@ def test_publish_is_blocked_otherwise(lead, folder, settings):
 
 def test_dry_run_changes_nothing_and_says_what_would_happen(lead, folder):
     out = sync(folder=folder, dry_run=True)
-    assert "Would create control draft: Peer-reviewed changes." in out
+    assert "Would create control draft MC-01: Peer-reviewed changes." in out
     assert "Would change: 17 new" in out
     assert not ControlVersion.objects.exists() and not RiskVersion.objects.exists()
 
@@ -291,3 +292,23 @@ def test_export_then_sync_says_unchanged_for_everything(lead, folder, single, tm
 def test_export_of_unknown_topic_is_a_plain_error(lead, tmp_path):
     with pytest.raises(CommandError, match="No topic named"):
         call_command("export_controls", topic="Nonsense", folder=str(tmp_path))
+
+
+def test_ids_come_from_the_file_and_a_new_id_renames_the_same_control(lead, tmp_path, single):
+    from apps.rcm.models import Control
+
+    path = tmp_path / "topic.yaml"
+    path.write_text(GOOD, encoding="utf-8")
+    report = control_files.read_folder(tmp_path)
+    assert not report.problems
+    control_files.sync(report, lead, lambda m: None, publish=True)
+    control = Control.objects.get(ident="MC-01")
+    path.write_text(GOOD.replace("id: MC-01", "id: CHG-001").replace("control: MC-01", "control: CHG-001"), encoding="utf-8")
+    control_files.sync(control_files.read_folder(tmp_path), lead, lambda m: None, publish=True)
+    control.refresh_from_db()
+    assert control.ident == "CHG-001"
+    assert Control.objects.count() == 1
+
+
+def test_a_repeated_id_is_a_problem(lead, tmp_path):
+    fails_with(tmp_path, GOOD + GOOD.split("controls:\n", 1)[1], "'MC-01' is already used by another control")

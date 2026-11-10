@@ -6,19 +6,19 @@ These YAML files hold the controls and risks for TRAC, one file per topic (for e
 
 Edit the file, then check and sync with `.\trac.ps1 check` and `.\trac.ps1 sync` (add `-DryRun` to preview, `-Publish` in single-approver mode). How a sync decides what to do (new, unchanged, in progress, edited in the site, update), and what `--force` and the export do, is explained once in `content/README.md`.
 
-Controls and risks are matched by title. A changed entry becomes a proposed change ("Updated from content/controls/..."), and a control's risks, platforms and links follow the file. The export keeps the comment block at the top of the file but not comments written inside it.
+Every control and risk has an `id` from the RCM (for example `MC-01` or `R-MC-01`), and the site finds it by that ID. A changed entry becomes a proposed change ("Updated from content/controls/..."), and a control's risks, platforms and links follow the file. The export keeps the comment block at the top of the file but not comments written inside it.
 
-**Renaming a title creates a new control or risk.** The old one stays on the site; retire it in the site.
+You can change a title freely, because the ID stays the same. To change an ID, edit the `id` line (and any `covered_by` line that points to it); the next sync gives the same control the new ID. Change the ID or the title in one sync, not both at once, or the site treats it as a new item.
 
 ## What is in a file
 
 The comment block at the top of each file explains every field in one line. In short:
 
 - `topic`: the topic name, exactly as on the site.
-- `risks`: each has a title, a plain statement, an owner role, a stage (or a theme) and `covered_by`, the controls that reduce it, with `coverage` (full or partial) and a one-line `why`.
-- `controls`: each has a short `ref` (used only inside the file so risks can point at it), a title, why it exists, when it applies, nature, method, frequency, its level (key, non-key, compensating or supporting; most important first, see levels.yaml), owner, performer and reviewer roles, stage or theme, categories, optional platforms, criteria (what good looks like), steps and optional references.
+- `risks`: each has an `id` from the RCM, a title, a plain statement, an owner role, a stage (or a theme) and `covered_by`, the controls that reduce it, with `coverage` (full or partial) and a one-line `why`.
+- `controls`: each has an `id` from the RCM (risks point at it in `covered_by`, from any topic's file), a title, why it exists, when it applies, nature, method, frequency, its level (key, non-key, compensating or supporting; most important first, see levels.yaml), owner, performer and reviewer roles, stage or theme, categories, optional platforms, criteria (what good looks like), steps and optional references.
 
-You never type a control ID. The site assigns it (for example MC-01) when the control is created.
+The site never makes up an ID. A control or risk added in the site's own form asks for its RCM ID too.
 
 The four levels:
 - `key`: relied on to address the risk, tested by auditors.
@@ -45,8 +45,8 @@ Two YAML habits to know:
 ## Add a control
 
 1. Open the topic's file. Copy an existing entry under `controls:` and paste it at the end.
-2. Give it a new, unique `ref` and change the fields.
-3. To cover a risk with it, add a line under that risk's `covered_by:` with the `ref`, a coverage and a reason.
+2. Give it its `id` from the RCM and change the fields.
+3. To cover a risk with it, add a line under that risk's `covered_by:` with the control's `id`, a coverage and a reason.
 4. Run the check below.
 
 ## Check your changes before syncing

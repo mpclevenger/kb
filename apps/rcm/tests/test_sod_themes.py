@@ -269,5 +269,5 @@ def test_platform_pages_highlight_library(owner, topics):
 
     call_command("seed_platforms")
     platform = Platform.objects.first()
-    for url in (reverse("core:home"), platform.get_absolute_url()):
+    for url in (reverse("core:library"), platform.get_absolute_url()):
         assert active_nav(owner.get(url)) == ["Library"], url

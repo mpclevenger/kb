@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ page.title }} - TRAC{% endblock %}
+{# The words on this page live in content/home/: index.md for the pitch, tools/*.md for the cards. #}
+{% block content %}
+<section class="home-hero" aria-labelledby="home-heading">
+  <h1 id="home-heading">{{ page.title }}</h1>
+  <div class="home-pitch">{{ page.html|safe }}</div>
+</section>
+<ul class="home-tools" aria-label="Tech Risk tools">
+  {% for tool in tools %}
+  <li class="home-tool">
+    <h2 class="home-tool-title">{{ tool.title }}{% if tool.coming_soon %} <span class="home-badge">Coming soon</span>{% elif tool.under_construction %} <span class="home-badge">Under construction</span>{% endif %}</h2>
+    <p class="home-tool-summary">{{ tool.summary }}</p>
+    <div class="home-tool-actions">
+      {% if tool.coming_soon %}
+      <span class="btn btn-primary disabled" aria-disabled="true">Coming soon</span>
+      {% elif tool.url %}
+      <a class="btn btn-primary" href="{{ tool.url }}">{{ tool.button }}</a>
+      {% else %}
+      <span class="btn btn-primary disabled" aria-disabled="true">Link coming soon</span>
+      {% endif %}
+      {% if tool.also_url %}<a class="home-tool-more" href="{{ tool.also_url }}">{{ tool.also_label }}</a>{% endif %}
+      <a class="home-tool-more" href="{% url 'core:tool' tool.slug %}">About {{ tool.title }}<span class="visually-hidden"> (what it is and who it's for)</span></a>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}

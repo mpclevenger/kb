@@ -66,7 +66,7 @@ The platform installs `requirements.txt` and runs the `Procfile` (`web: sh docke
 | `ALLOW_SELF_APPROVAL` | `true` lets a proposer approve their own change (single-approver mode). Default `false`. Warning `trac.W001` shows in `manage.py check` while it is on |
 | `SSO_*_HEADER` | Header names the SSO add-on sets (user, name, email, groups) |
 | `SSO_GROUP_ROLE_MAP` | `group:role` pairs, for example `grp-techrisk:tech_risk,grp-audit:auditor` |
-| `TRUST_URL`, `RISK_URL`, `INITIATIVES_URL` | Optional links in the app switcher |
+| `TRUST_URL`, `RISK_URL`, `INITIATIVES_URL`, `SOX_SCHEDULE_URL` | Optional links in the app switcher and on the front page |
 | `TRAC_ADMIN_USER`, `TRAC_ADMIN_PASSWORD` | Container only: the admin account the start-up sync runs as; the password is needed only on the first start, to create it |
 
 In `sso` mode, users whose groups map to no role get read-only access. A request without the user header is treated as signed out.

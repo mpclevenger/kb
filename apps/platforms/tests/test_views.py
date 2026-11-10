@@ -52,20 +52,20 @@ def section(html, start, end):
 # Library (Home)
 
 def test_library_is_the_home_page_with_search_tabs_and_nine_cards(client):
-    html = get(client, reverse("core:home"))
-    assert reverse("core:home") == "/"
+    html = get(client, reverse("core:library"))
+    assert reverse("core:library") == "/library/"
     assert "<h1" in html and ">Library<" in html
     assert html.index("data-filter-input") < html.index('class="library-tabs"') < html.index('class="category-cards"')
     assert "js/filter.js" in html
     tabs = section(html, 'class="library-tabs"', "</nav>")
-    assert f'<a href="{reverse("core:home")}" aria-current="page">By technology</a>' in tabs
+    assert f'<a href="{reverse("core:library")}" aria-current="page">By technology</a>' in tabs
     assert f'<a href="{reverse("topics:index")}">By risk topic</a>' in tabs
     assert html.count('class="category-card ') == 9
 
 
 def test_old_library_url_redirects_to_home(client):
     response = client.get("/platforms/")
-    assert response.status_code == 302 and response["Location"] == reverse("core:home")
+    assert response.status_code == 302 and response["Location"] == reverse("core:library")
 
 
 def test_guidance_script_loads_only_on_the_library(client):
@@ -73,7 +73,7 @@ def test_guidance_script_loads_only_on_the_library(client):
 
 
 def test_library_has_two_groups_and_categories_in_order(client):
-    html = get(client, reverse("core:home"))
+    html = get(client, reverse("core:library"))
     stack, shared = html.index('id="the-stack"'), html.index('id="shared-services"')
     assert ">The stack</h2>" in html and ">Shared services</h2>" in html and stack < shared
     positions = [html.index(f'category-card category-{key}"') for key in Category.values]
@@ -87,7 +87,7 @@ def card(html, key):
 
 
 def test_card_has_a_top_bar_class_a_linked_title_and_platform_chips(client):
-    html = get(client, reverse("core:home"))
+    html = get(client, reverse("core:library"))
     database = card(html, "database")
     assert f'<a class="category-card-name" href="{reverse("platforms:category", args=["database"])}">Database</a>' in database
     sql = Platform.objects.get(name="SQL Server")
@@ -97,7 +97,7 @@ def test_card_has_a_top_bar_class_a_linked_title_and_platform_chips(client):
 
 
 def test_platform_appears_on_every_card_it_belongs_to(client):
-    html = get(client, reverse("core:home"))
+    html = get(client, reverse("core:library"))
     aws = Platform.objects.get(name="AWS")
     for key in aws.categories:
         assert f'href="{aws.url_in(key)}">AWS</a>' in card(html, key), key  # opens that card's page with AWS on
@@ -106,14 +106,14 @@ def test_platform_appears_on_every_card_it_belongs_to(client):
 
 
 def test_cards_list_no_services(client):
-    html = get(client, reverse("core:home"))
+    html = get(client, reverse("core:library"))
     for name in ("RDS", "IAM", "Appliance", "Unity Catalog"):
         assert name not in html
 
 
 def test_library_skips_inactive_platforms(client):
     Platform.objects.filter(name="VPN").update(is_active=False)
-    assert "VPN" not in get(client, reverse("core:home"))
+    assert "VPN" not in get(client, reverse("core:library"))
 
 
 def test_library_tabs_mark_the_topic_tab_when_asked():
@@ -292,10 +292,10 @@ def test_old_platform_address_opens_its_main_category_with_it_switched_on(client
 
 
 def test_library_pages_highlight_the_library_nav_which_points_home(client):
-    for url in (reverse("core:home"), reverse("platforms:category", args=["jobs"]),
+    for url in (reverse("core:library"), reverse("platforms:category", args=["jobs"]),
                 Platform.objects.get(name="Splunk").get_absolute_url()):
         nav = section(get(client, url), 'aria-label="Primary"', "</nav>")
-        assert_in_html('<a href="/" aria-current="page">Library</a>', nav)
+        assert_in_html('<a href="/library/" aria-current="page">Library</a>', nav)
 
 
 def test_category_page_query_count_is_flat(client):

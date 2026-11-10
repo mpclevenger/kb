@@ -1,7 +1,7 @@
 # Controls and risks for one topic. Plain text; edit with any text editor.
 # After editing: python manage.py check_controls, then
 # python manage.py sync_controls --user <you> --publish. See README.md in this folder.
-# A control or risk is matched to the site by its title. Renaming a title makes a NEW item.
+# Each control and risk has an id from the RCM. The site finds items by that id.
 #
 # FILE
 #   topic          Name of the topic exactly as it appears on the site.
@@ -9,6 +9,7 @@
 #   controls       The controls themselves.
 #
 # RISK (each entry under "risks")
+#   id             The risk's ID from the RCM, for example R-MC-01. Required and unique.
 #   title          Short name of the risk.
 #   statement      What could go wrong, why, and what it would lead to.
 #   owned_by       Role accountable for the risk (a role, not a name).
@@ -16,13 +17,13 @@
 #                  place it under a theme. Never both.
 #   in_sox_scope   yes or no. Is this a risk for SOX in-scope apps?
 #   covered_by     Controls that reduce this risk. Each has:
-#                    control   the short name ("ref") of a control in this file
+#                    control   the id of the control (it can be in any topic's file)
 #                    coverage  full or partial
 #                    why       one line saying how the control helps
 #
 # CONTROL (each entry under "controls")
-#   ref            Short name used only inside this file, so risks can point to it.
-#                  The site gives the control its real ID (for example MC-01).
+#   id             The control's ID from the RCM, for example MC-01. Required and unique.
+#                  The site shows this ID and finds the control by it, so a title can change.
 #   title          Name of the control.
 #   why            Why the control exists, in two or three sentences.
 #   applies_when   Plain statements. The control applies if any one is true.
@@ -60,7 +61,8 @@
 topic: Logging and alerting
 
 risks:
-  - title: Audit logs are missing or incomplete
+  - id: R-LA-01
+    title: Audit logs are missing or incomplete
     statement: >-
       Activity on in-scope systems is not recorded, or is recorded without enough detail. This can
       happen when logging is never turned on, covers only some events, or is kept only on the system it
@@ -70,14 +72,15 @@ risks:
     stage: Configure and evidence
     in_sox_scope: yes
     covered_by:
-      - control: audit-logging
+      - control: LA-01
         coverage: full
         why: The events that matter are logged with enough detail, sent to central logging, protected from change and evidenced with dates.
-      - control: log-feed-monitoring
+      - control: LA-02
         coverage: partial
         why: A systems list compared with the feeds actually arriving shows any system that was never set up.
 
-  - title: Logging stops and nobody notices
+  - id: R-LA-02
+    title: Logging stops and nobody notices
     statement: >-
       Logs from an in-scope system stop reaching the central logging tool, or logging is switched off.
       This can happen when a feed breaks after a change, or when nobody checks that logs are still
@@ -87,14 +90,15 @@ risks:
     stage: Keep it on
     in_sox_scope: yes
     covered_by:
-      - control: log-feed-monitoring
+      - control: LA-02
         coverage: full
         why: Alerts fire when a feed stops or logging settings change, someone actively checks them, and each gap is fixed and recorded.
-      - control: audit-logging
+      - control: LA-01
         coverage: partial
         why: Dated evidence of the intended settings makes an unexpected change easy to see.
 
-  - title: Logs are lost when a system fails over or is recovered
+  - id: R-LA-03
+    title: Logs are lost when a system fails over or is recovered
     statement: >-
       Logs from an in-scope system are not recorded after it moves to a standby server or is rebuilt.
       This can happen when the standby is not set up to log in the same way, or logging is not checked
@@ -103,14 +107,15 @@ risks:
     theme: Failover
     in_sox_scope: yes
     covered_by:
-      - control: log-feed-monitoring
+      - control: LA-02
         coverage: partial
         why: Logging is confirmed from the new server after a failover or restore, and a stopped feed raises an alert.
-      - control: audit-logging
+      - control: LA-01
         coverage: partial
         why: Standby and failover servers are set up to log in the same way as the main one.
 
-  - title: Alerts are ignored or sit unreviewed
+  - id: R-LA-04
+    title: Alerts are ignored or sit unreviewed
     statement: >-
       Alerts about in-scope systems are raised but not looked at in time. This can happen when nobody
       owns the queue, cover is missing out of hours, or the rules are so noisy that real signals are
@@ -119,14 +124,15 @@ risks:
     stage: Triage alerts
     in_sox_scope: yes
     covered_by:
-      - control: alert-triage
+      - control: LA-03
         coverage: full
         why: Every alert has an owner who looks at it within the time for the system's BCP tier and records a first decision.
-      - control: incident-support
+      - control: LA-05
         coverage: partial
         why: Alerts that look like a security incident are passed on to the security team straight away.
 
-  - title: Alerts are closed without being fixed or explained
+  - id: R-LA-05
+    title: Alerts are closed without being fixed or explained
     statement: >-
       An alert is closed without the cause being found or the problem fixed. This can happen when
       closing is a single click with no notes, or when nobody reads closed alerts. The result could be
@@ -135,14 +141,15 @@ risks:
     stage: Resolve and close
     in_sox_scope: yes
     covered_by:
-      - control: alert-resolution
+      - control: LA-04
         coverage: full
         why: Each alert that needs action has an owner and a due time, and closes with notes that someone else reads.
-      - control: alert-triage
+      - control: LA-03
         coverage: partial
         why: The first decision on each alert is recorded, so it is clear which ones needed action.
 
-  - title: A security incident is reported late or its evidence is lost
+  - id: R-LA-06
+    title: A security incident is reported late or its evidence is lost
     statement: >-
       A security incident affecting an in-scope system is reported to the security team late, or its
       evidence is lost. This can happen when system owners don't know who to contact, logs are not kept
@@ -152,15 +159,15 @@ risks:
     stage: Resolve and close
     in_sox_scope: no
     covered_by:
-      - control: incident-support
+      - control: LA-05
         coverage: full
         why: Logs are kept and available, contacts are known, suspected incidents are reported straight away and evidence is left as it was.
-      - control: audit-logging
+      - control: LA-01
         coverage: partial
         why: Logs that were kept and protected give the security team something to work from.
 
 controls:
-  - ref: audit-logging
+  - id: LA-01
     title: Audit logging is configured and evidenced
     why: >-
       Logs are the record of who did what on a system. If the right events are not logged, or the logs
@@ -214,7 +221,7 @@ controls:
         evidence: The updated evidence and the change record
         part: monitoring
 
-  - ref: log-feed-monitoring
+  - id: LA-02
     title: Log feeds are actively monitored and a stopped feed is fixed
     why: >-
       Logging that was set up correctly can still stop quietly, after a change, a failover or an expired
@@ -268,7 +275,7 @@ controls:
         evidence: The comparison with notes on each gap
         part: monitoring
 
-  - ref: alert-triage
+  - id: LA-03
     title: Alerts are triaged within the time for the system's tier
     why: >-
       An alert is only useful if a person looks at it soon enough to matter. A named owner, a recorded
@@ -307,7 +314,7 @@ controls:
         do: At least once a year, review the alert rules for noise and gaps.
         evidence: The review notes and any rule changes
 
-  - ref: alert-resolution
+  - id: LA-04
     title: Alerts are resolved and closed with notes
     why: >-
       Closing an alert should mean the cause was found and dealt with. Notes that someone else can follow,
@@ -343,7 +350,7 @@ controls:
         do: On the schedule set in your procedure, read the chosen closed alerts and the list of open ones, and follow up on weak notes or late items.
         evidence: The alerts reviewed, how they were chosen, and the review notes with any follow-up
 
-  - ref: incident-support
+  - id: LA-05
     title: System owners are ready to support a security incident
     why: >-
       The security team runs incident handling. The system owner's part is to have logs and contacts ready,

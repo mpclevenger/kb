@@ -4,6 +4,7 @@ Fixtures live in the conftest files. Plain helpers that test modules import by n
 live here.
 """
 
+import itertools
 import json
 
 from django.contrib.auth import get_user_model
@@ -63,8 +64,12 @@ def anonymous():
     return Client()
 
 
+_new_ids = itertools.count(1)
+
+
 def control_post(topic, stage=None, **over):
     data = {
+        "ident": f"T-C-{next(_new_ids):03d}",
         "title": "Quarterly review of user access",
         "topic": topic.pk,
         "stage": stage.pk if stage else "",
@@ -117,6 +122,7 @@ def published_control(topic, proposer, approver, **content):
 
 def risk_post(topic, **over):
     data = {
+        "ident": f"T-R-{next(_new_ids):03d}",
         "title": "Leavers keep access",
         "topic": topic.pk,
         "stage": "",

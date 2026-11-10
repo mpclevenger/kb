@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ tool.title }} - TRAC{% endblock %}
+{# The words on this page live in content/home/tools/{{ tool.slug }}.md. #}
+{% block content %}
+<article class="home-tool-page">
+  {% if tool.coming_soon %}<div class="home-banner" role="note"><strong>Coming soon.</strong> This tool isn't available yet.</div>{% elif tool.under_construction %}{% include "core/under_construction.html" %}{% endif %}
+  <p class="home-tool-lead">{{ tool.summary }}</p>
+  {% if tool.coming_soon %}
+      <span class="btn btn-primary disabled" aria-disabled="true">Coming soon</span>
+      {% elif tool.url %}
+  <p><a class="btn btn-primary" href="{{ tool.url }}">{{ tool.button }}</a></p>
+  {% else %}
+  <p><span class="btn btn-primary disabled" aria-disabled="true">Link coming soon</span></p>
+  {% endif %}
+  {% if tool.also_url %}<p><a href="{{ tool.also_url }}">{{ tool.also_label }}</a></p>{% endif %}
+  <div class="library-body">{{ tool.html|safe }}</div>
+  <p class="mt-4"><a href="{% url 'core:home' %}">Back to all Tech Risk tools</a></p>
+</article>
+{% endblock %}

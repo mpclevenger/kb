@@ -99,7 +99,7 @@ def test_levels_file_is_not_read_as_a_topic_file():
 CONTROL = """
 topic: Change management
 controls:
-  - ref: one
+  - id: MC-01
     title: A control
     why: Because.
     nature: preventive
@@ -124,7 +124,7 @@ def test_file_level_is_read(tmp_path):
 
 def test_unknown_level_in_a_file_names_file_and_control(tmp_path):
     report = read(tmp_path, "level: vital")
-    assert any("topic.yaml" in p and "'one'" in p and "field 'level'" in p and "key, non-key" in p for p in report.problems)
+    assert any("topic.yaml" in p and "'MC-01'" in p and "field 'level'" in p and "key, non-key" in p for p in report.problems)
 
 
 def test_missing_level_in_a_file_is_a_problem(tmp_path):

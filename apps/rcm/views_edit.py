@@ -88,10 +88,12 @@ class ControlFlow(Flow):
     form_class = ControlForm
     entity_model = Control
 
+    asks_for_id = True
+
     def create(self, user, form):
         content = self.payload(form)
         topic = content.pop("topic")
-        return services.create_control(user, topic, **content)
+        return services.create_control(user, topic, ident=form.cleaned_data["ident"], **content)
 
     def initial(self, version):
         data = super().initial(version)
@@ -108,10 +110,12 @@ class RiskFlow(Flow):
     form_class = RiskForm
     entity_model = Risk
 
+    asks_for_id = True
+
     def create(self, user, form):
         content = self.payload(form)
         topic = content.pop("topic")
-        return services.create_risk(user, topic, **content)
+        return services.create_risk(user, topic, ident=form.cleaned_data["ident"], **content)
 
     def initial(self, version):
         data = super().initial(version)
@@ -204,6 +208,8 @@ def run_flow(request, flow, entity=None):
     source = draft or base
     makes_new_version = entity is not None and (draft.number > 1 if draft else True)
     kwargs = {"with_summary": makes_new_version, **flow.form_kwargs(source)}
+    if entity is None and getattr(flow, "asks_for_id", False):
+        kwargs["with_ident"] = True  # a new control or risk takes its ID from the RCM
 
     if request.method == "POST":
         form = flow.form_class(request.POST, **kwargs)

@@ -1,7 +1,7 @@
 # Controls and risks for one topic. Plain text; edit with any text editor.
 # After editing: python manage.py check_controls, then
 # python manage.py sync_controls --user <you> --publish. See README.md in this folder.
-# A control or risk is matched to the site by its title. Renaming a title makes a NEW item.
+# Each control and risk has an id from the RCM. The site finds items by that id.
 #
 # FILE
 #   topic          Name of the topic exactly as it appears on the site.
@@ -9,6 +9,7 @@
 #   controls       The controls themselves.
 #
 # RISK (each entry under "risks")
+#   id             The risk's ID from the RCM, for example R-MC-01. Required and unique.
 #   title          Short name of the risk.
 #   statement      What could go wrong, why, and what it would lead to.
 #   owned_by       Role accountable for the risk (a role, not a name).
@@ -16,13 +17,13 @@
 #                  place it under a theme. Never both.
 #   in_sox_scope   yes or no. Is this a risk for SOX in-scope apps?
 #   covered_by     Controls that reduce this risk. Each has:
-#                    control   the short name ("ref") of a control in this file
+#                    control   the id of the control (it can be in any topic's file)
 #                    coverage  full or partial
 #                    why       one line saying how the control helps
 #
 # CONTROL (each entry under "controls")
-#   ref            Short name used only inside this file, so risks can point to it.
-#                  The site gives the control its real ID (for example MC-01).
+#   id             The control's ID from the RCM, for example MC-01. Required and unique.
+#                  The site shows this ID and finds the control by it, so a title can change.
 #   title          Name of the control.
 #   why            Why the control exists, in two or three sentences.
 #   applies_when   Plain statements. The control applies if any one is true.
@@ -60,7 +61,8 @@
 topic: Access management
 
 risks:
-  - title: Inappropriate access is granted
+  - id: R-MA-01
+    title: Inappropriate access is granted
     statement: >-
       A person is given access to a system or data that their job doesn't need. This can happen when a
       request is not approved, is approved by the wrong person, or is granted differently from what
@@ -70,17 +72,18 @@ risks:
     stage: Provisioning
     in_sox_scope: yes
     covered_by:
-      - control: access-requests
+      - control: MA-02
         coverage: full
         why: Access is granted only from a recorded request approved by the manager and the owner, and what was granted is checked against it.
-      - control: role-design
+      - control: MA-01
         coverage: partial
         why: Documented roles give approvers a clear picture of what each job should and should not have.
-      - control: access-review
+      - control: MA-04
         coverage: partial
         why: Finds access that was granted without a proper approval or that no longer fits the job.
 
-  - title: Privileged access is misused or excessive
+  - id: R-MA-02
+    title: Privileged access is misused or excessive
     statement: >-
       Someone uses administrator access to change data, settings or other people's access, by mistake or
       without authority. This can happen when privileged access is held by too many people, granted
@@ -90,17 +93,18 @@ risks:
     theme: Privileged access
     in_sox_scope: yes
     covered_by:
-      - control: privileged-access
+      - control: MA-03
         coverage: full
         why: Admin rights sit on separate named accounts, are time-limited where possible, and their use is logged and reviewed by someone independent.
-      - control: access-review
+      - control: MA-04
         coverage: partial
         why: Privileged access is reviewed every month for tier 0 and tier 1 systems and every quarter for others, so excess rights are found and removed.
-      - control: access-requests
+      - control: MA-02
         coverage: partial
         why: Privileged access needs the same recorded approval as any other access.
 
-  - title: Access is not removed after someone leaves or moves
+  - id: R-MA-03
+    title: Access is not removed after someone leaves or moves
     statement: >-
       A person who has left, or moved to a job that no longer needs it, keeps access to systems or
       data. This can happen when access removal isn't triggered by HR events or isn't checked for
@@ -110,17 +114,18 @@ risks:
     stage: Deprovisioning
     in_sox_scope: yes
     covered_by:
-      - control: leavers-movers
+      - control: MA-05
         coverage: full
         why: Access is removed when the HR event happens, timeliness is measured against a complete HR list, and a lookback checks for later activity where access stayed.
-      - control: access-review
+      - control: MA-04
         coverage: partial
         why: Catches accounts that belong to leavers or movers and were missed.
-      - control: service-accounts
+      - control: MA-06
         coverage: partial
         why: Service accounts have a named owner, so they are reassigned or closed when the owner leaves.
 
-  - title: Access builds up over time without review
+  - id: R-MA-04
+    title: Access builds up over time without review
     statement: >-
       Access to systems and data builds up beyond what people need over time. This can happen when
       access isn't reviewed periodically against a complete list. The result could be excessive access
@@ -129,17 +134,18 @@ risks:
     stage: Periodic review
     in_sox_scope: yes
     covered_by:
-      - control: access-review
+      - control: MA-04
         coverage: full
         why: Owners review a complete, system-generated list on a set schedule, and every removal is completed and evidenced.
-      - control: role-design
+      - control: MA-01
         coverage: partial
         why: A yearly look at what each role grants stops roles from growing unnoticed.
-      - control: leavers-movers
+      - control: MA-05
         coverage: partial
         why: Removes access at the moment a person moves, so less builds up between reviews.
 
-  - title: Service accounts are misused or have no owner
+  - id: R-MA-05
+    title: Service accounts are misused or have no owner
     statement: >-
       A service account is used without anyone noticing, or has more rights than its job needs. This
       can happen when it has no owner, allows interactive sign-in, or its credentials are never
@@ -149,17 +155,18 @@ risks:
     theme: Service accounts
     in_sox_scope: yes
     covered_by:
-      - control: service-accounts
+      - control: MA-06
         coverage: full
         why: Each account has a named owner and purpose, no interactive sign-in, least privilege, vaulted and rotated credentials.
-      - control: access-review
+      - control: MA-04
         coverage: partial
         why: Service accounts are in the key periodic review, with owner and purpose shown, so unowned or excessive ones are found.
-      - control: privileged-access
+      - control: MA-03
         coverage: partial
         why: Service accounts with administrator rights follow the privileged access rules too.
 
-  - title: One person holds conflicting duties
+  - id: R-MA-06
+    title: One person holds conflicting duties
     statement: >-
       One person can carry out and approve the same action, or holds access that should be split
       between people, such as developing code and writing to production. This can happen when
@@ -169,17 +176,18 @@ risks:
     theme: Segregation of duties
     in_sox_scope: yes
     covered_by:
-      - control: sod-conflicts
+      - control: MA-07
         coverage: full
         why: Conflicting combinations are defined, checked when access is granted and monitored afterward with a documented mitigating review.
-      - control: role-design
+      - control: MA-01
         coverage: partial
         why: Conflicting permissions are identified when roles are designed, so roles are not built with a conflict inside them.
-      - control: privileged-access
+      - control: MA-03
         coverage: partial
         why: Developers do not hold production write access, and secondary admin accounts are checked for.
 
-  - title: Accounts are taken over because sign-in is weakly protected
+  - id: R-MA-07
+    title: Accounts are taken over because sign-in is weakly protected
     statement: >-
       Someone signs in to a system as another person, or from outside the firm's network, using a
       stolen or guessed password. This can happen when sign-in does not go through single sign-on,
@@ -190,15 +198,15 @@ risks:
     theme: Authentication
     in_sox_scope: yes
     covered_by:
-      - control: authentication-settings
+      - control: MA-08
         coverage: full
         why: Sign-in goes through single sign-on where available, privileged and remote access need multi-factor sign-in, and local accounts have enforced password and lockout settings.
-      - control: privileged-access
+      - control: MA-03
         coverage: partial
         why: Administrator accounts are separate, named and protected by multi-factor sign-in.
 
 controls:
-  - ref: role-design
+  - id: MA-01
     title: Roles are documented with their permissions
     why: >-
       Access can only be judged appropriate if the team knows what each role is meant to allow. When
@@ -242,7 +250,7 @@ controls:
         do: When a role is created, changed or retired, update the documentation before the change is used.
         evidence: The updated documentation and the request that triggered the change
 
-  - ref: access-requests
+  - id: MA-02
     title: Access is granted only from an approved request
     why: >-
       Every grant of access should trace back to someone with authority saying yes. A recorded
@@ -296,7 +304,7 @@ controls:
         evidence: The list with its completeness check, and the comparison with notes on each unmatched grant
         part: monitoring
 
-  - ref: privileged-access
+  - id: MA-03
     title: Privileged access is limited and controlled
     why: >-
       Administrator rights can change data, settings and other people's access. Keeping them on
@@ -354,7 +362,7 @@ controls:
         evidence: The log extract with notes on each item, showing the reviewer and the date
         part: monitoring
 
-  - ref: access-review
+  - id: MA-04
     title: Periodic user access review
     why: >-
       Even well-run provisioning leaves gaps over time as people move and systems change. A regular
@@ -401,7 +409,7 @@ controls:
         do: Check that every line has a decision, every removal is complete and no one reviewed their own access, and sign off.
         evidence: The sign-off with the date
 
-  - ref: leavers-movers
+  - id: MA-05
     title: Leavers and movers lose access on time
     why: >-
       Access that is left open after a person leaves or changes job is an easy way in for misuse.
@@ -453,7 +461,7 @@ controls:
         evidence: The log extract and notes on each item
         part: monitoring
 
-  - ref: service-accounts
+  - id: MA-06
     title: Service accounts are owned and restricted
     why: >-
       Service accounts run jobs and connect systems, often with strong rights and passwords nobody
@@ -503,7 +511,7 @@ controls:
         evidence: The comparison with notes on each account followed up
         part: monitoring
 
-  - ref: sod-conflicts
+  - id: MA-07
     title: Segregation of duties conflicts are prevented or monitored
     why: >-
       When one person can do two jobs that should check each other, an error or fraud can pass
@@ -552,7 +560,7 @@ controls:
         evidence: The mitigating review record and its results
         part: monitoring
 
-  - ref: authentication-settings
+  - id: MA-08
     title: Authentication settings are enforced
     why: >-
       Access controls only work if people have to prove who they are. Single sign-on, multi-factor

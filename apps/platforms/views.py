@@ -1,6 +1,6 @@
 """Library pages: one page per category, where readers switch on a platform to add its specifics.
 
-The landing is Home (core:home). Old platform addresses open the platform's main category page.
+The Library is core:library; the front page is core:home. Old platform addresses open the platform's main category page.
 """
 
 from django.http import Http404
@@ -22,12 +22,12 @@ can_view = permissions.permission_required_for(permissions.can_view)
 
 def _library_crumbs(category):
     group = group_title(category)
-    return [("Library", reverse("core:home")), (group, f"{reverse('core:home')}#{slugify(group)}")]
+    return [("Library", reverse("core:library")), (group, f"{reverse('core:library')}#{slugify(group)}")]
 
 
 @can_view
 def index(request):
-    return redirect("core:home")
+    return redirect("core:library")
 
 
 @can_view

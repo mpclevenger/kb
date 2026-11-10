@@ -17,7 +17,7 @@
 {% elif not total %}
 <div class="empty-state">
   <h2 class="empty-state-headline">No results for '{{ query }}'</h2>
-  <p class="empty-state-text">Try fewer or different words, or browse instead: <a href="{% url 'core:home' %}">the Library</a> or <a href="{% url 'wiki:index' %}">the guides list</a>.</p>
+  <p class="empty-state-text">Try fewer or different words, or browse instead: <a href="{% url 'core:library' %}">the Library</a> or <a href="{% url 'wiki:index' %}">the guides list</a>.</p>
 </div>
 {% else %}
 <p class="text-muted">{{ total }} result{{ total|pluralize }} for '{{ query }}'.</p>

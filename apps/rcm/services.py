@@ -1,4 +1,8 @@
-"""The steps for creating a control, risk or driver (with its ID) and linking risks to controls and drivers."""
+"""The steps for creating a control, risk or driver (with its ID) and linking risks to controls and drivers.
+
+Controls and risks take their ID from the firm's RCM: the content files and the site's form both ask for it.
+`next_ident` is only a fallback for code that doesn't pass one (tests and the demo data).
+"""
 
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
@@ -28,14 +32,14 @@ def next_ident(key, width=2):
 
 
 @transaction.atomic
-def create_control(user, topic, **content):
-    ident = next_ident(topic.id_prefix)
+def create_control(user, topic, ident=None, **content):
+    ident = ident or next_ident(topic.id_prefix)
     return v.create_entity(Control, ControlVersion, user, {"ident": ident}, topic=topic, **content)
 
 
 @transaction.atomic
-def create_risk(user, topic, **content):
-    ident = next_ident(f"R-{topic.id_prefix}")
+def create_risk(user, topic, ident=None, **content):
+    ident = ident or next_ident(f"R-{topic.id_prefix}")
     return v.create_entity(Risk, RiskVersion, user, {"ident": ident}, topic=topic, **content)
 
 

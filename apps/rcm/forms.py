@@ -21,6 +21,8 @@ from apps.topics.models import Stage, Theme, Topic
 
 from . import levels, selectors
 from .models import (
+    ID_PATTERN,
+    Control,
     ControlVersion,
     Coverage,
     Driver,
@@ -30,6 +32,7 @@ from .models import (
     Nature,
     OWNER_ROLE_HELP,
     PART_KEYS,
+    Risk,
     RiskVersion,
     RuleAppliesTo,
 )
@@ -301,7 +304,14 @@ class GovernedForm(EditForm):
 
 
 class ScopedForm(GovernedForm):
-    """Fields shared by risks and controls."""
+    """Fields shared by risks and controls. A new one also asks for its ID from the RCM."""
+
+    entity_model = None
+    ident = forms.CharField(
+        max_length=40,
+        label="ID",
+        help_text="The ID from the RCM, for example MC-01. It can't be changed here later; change it in the content file.",
+    )
 
     topic = forms.ModelChoiceField(
         queryset=Topic.objects.none(),
@@ -325,8 +335,10 @@ class ScopedForm(GovernedForm):
         error_messages={"invalid_choice": "Pick a theme from the selected topic."},
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, with_ident=False, **kwargs):
         super().__init__(*args, **kwargs)
+        if not with_ident:
+            del self.fields["ident"]
         keep = self.initial.get("topic")
         active = Q(is_active=True)
         if keep:
@@ -348,6 +360,17 @@ class ScopedForm(GovernedForm):
         self.fields["stage"].queryset = Stage.objects.filter(topic_id=topic_id)
         self.fields["theme"].queryset = Theme.objects.filter(topic_id=topic_id)
 
+    def content_keys(self):
+        return [name for name in super().content_keys() if name != "ident"]
+
+    def clean_ident(self):
+        ident = self.cleaned_data["ident"].strip()
+        if not ID_PATTERN.match(ident):
+            raise forms.ValidationError("Use letters, numbers, dashes, dots or underscores, up to 40 characters.")
+        if self.entity_model.objects.filter(ident=ident).exists():
+            raise forms.ValidationError(f"{ident} is already used. Check the RCM for the right ID.")
+        return ident
+
 
 def _default_review(form):
     if not form.is_bound and not form.initial.get("review_by"):
@@ -362,6 +385,7 @@ def _default_review(form):
 
 class ControlForm(ScopedForm):
     version_model = ControlVersion
+    entity_model = Control
     link_fields = ("platforms",)
 
     title = forms.CharField(
@@ -450,6 +474,7 @@ def platform_choices(platforms):
 
 class RiskForm(ScopedForm):
     version_model = RiskVersion
+    entity_model = Risk
     link_fields = ("controls", "drivers")
 
     title = forms.CharField(

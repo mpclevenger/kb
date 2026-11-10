@@ -14,4 +14,5 @@ class Command(BaseCommand):
             ("Risk engine drivers and risks (content/engine)", "check_engine", {}),
             ("Controls and risks (content/controls)", "check_controls", {}),
             ("Platforms and guidance (content/platforms)", "check_platforms", {}),
+            ("Front page (content/home)", "check_home", {}),
         ])

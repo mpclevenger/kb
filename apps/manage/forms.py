@@ -6,17 +6,7 @@ from apps.core.forms import BootstrapFormMixin
 from apps.platforms.categories import Category
 from apps.platforms.models import AspectQuestion, Platform
 from apps.rcm.forms import ReferencesField
-from apps.rcm.models import IdSequence
 from apps.topics.models import Topic
-
-PREFIX_LOCKED_HELP = (
-    "Locked: controls or risks already use this prefix, and IDs are never renamed or reused."
-)
-
-
-def prefix_in_use(topic):
-    return IdSequence.objects.filter(key__in=[topic.id_prefix, f"R-{topic.id_prefix}"]).exists()
-
 
 class TopicForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
@@ -24,12 +14,10 @@ class TopicForm(BootstrapFormMixin, forms.ModelForm):
         fields = ["name", "id_prefix", "icon", "summary", "position", "is_active"]
         widgets = {"summary": forms.Textarea(attrs={"rows": 4})}
         labels = {"id_prefix": "ID prefix", "is_active": "Active"}
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance.pk and prefix_in_use(self.instance):
-            self.fields["id_prefix"].disabled = True
-            self.fields["id_prefix"].help_text = PREFIX_LOCKED_HELP
+        help_texts = {
+            "id_prefix": "The topic's short code, used in the platform questions file (catalog.yaml). "
+            "Control and risk IDs come from the RCM, not from this code.",
+        }
 
 
 class PlatformForm(BootstrapFormMixin, forms.ModelForm):

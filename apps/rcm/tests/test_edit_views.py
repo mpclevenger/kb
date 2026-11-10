@@ -46,7 +46,7 @@ def test_create_control_serializes_rows(owner, access):
     assert version.applies_when == ["You approve access"]
     assert version.criteria == [{"name": "The review", "items": ["Every user has a decision."]}]
     assert version.steps == [{"role": "Owner", "text": "Review the list.", "evidence": "Signed review"}]
-    assert control.ident.startswith("MA-")
+    assert control.ident == "T-C-001" or control.ident.startswith("T-C-")  # the ID typed on the form
 
 
 @pytest.mark.parametrize(

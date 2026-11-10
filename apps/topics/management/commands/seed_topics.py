@@ -2,8 +2,8 @@
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.db.models import ProtectedError
 
-from apps.rcm.prefixes import move_to_topic, rename_prefix
 from apps.topics.models import Stage, Theme, Topic
 
 SUMMARIES = {
@@ -42,23 +42,8 @@ SUMMARIES = {
     ),
 }
 
-# The firm's own ID codes replaced the first ones. Topics still on an old prefix are moved over, with
-# every control and risk ID already issued (CM-01 becomes MC-01). Safe to run again.
-PREFIX_RENAMES = {"AC": "MA", "CM": "MC"}
-
-# Items that moved to another topic (by title). An existing site moves them, with new IDs. Safe to run again.
-TOPIC_MOVES = [
-    ("PI", "OP", [
-        "Changes to scheduled jobs go through change control",
-        "Job failures are monitored, investigated and resolved",
-        "Access to the scheduler is limited",
-        "Interface and data transfer completeness",
-        "Scheduled jobs are changed without approval",
-        "Job failures go unnoticed or unresolved",
-        "Scheduler access is too broad",
-        "Data transfers into financial systems are incomplete or inaccurate",
-    ], ["Job scheduling and monitoring", "Interfaces and data transfers"]),
-]
+# Themes that moved to another topic. The old, empty copy is removed.
+MOVED_THEMES = {"Platforms and infrastructure": ["Job scheduling and monitoring", "Interfaces and data transfers"]}
 
 TOPICS = [
     ("Access management", "MA", "key",
@@ -102,16 +87,15 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **options):
-        for old, new in PREFIX_RENAMES.items():
-            if Topic.objects.filter(id_prefix=old).exists():
-                renamed = rename_prefix(old, new)
-                self.stdout.write(f"ID prefix {old} is now {new} ({renamed} IDs changed).")
         created = 0
         for position, (name, prefix, icon, stages, themes) in enumerate(TOPICS, start=1):
             topic, was_created = Topic.objects.get_or_create(
                 name=name, defaults={"id_prefix": prefix, "icon": icon, "position": position}
             )
             created += was_created
+            if topic.id_prefix != prefix:  # only a short code now; control and risk IDs come from the RCM
+                topic.id_prefix = prefix
+                topic.save(update_fields=["id_prefix"])
             if not topic.summary and name in SUMMARIES:
                 topic.summary = SUMMARIES[name]
                 topic.save(update_fields=["summary"])
@@ -121,8 +105,9 @@ class Command(BaseCommand):
                 )
             for i, theme in enumerate(themes, start=1):
                 Theme.objects.get_or_create(topic=topic, name=theme, defaults={"position": i})
-        for old, new, titles, themes in TOPIC_MOVES:
-            moved = move_to_topic(old, new, titles, themes)
-            if moved:
-                self.stdout.write(f"Moved {moved} controls and risks from {old} to {new}.")
+            for old in topic.themes.filter(name__in=MOVED_THEMES.get(name, [])):
+                try:
+                    old.delete()  # only once nothing uses it any more
+                except ProtectedError:
+                    pass
         self.stdout.write(f"Topics created: {created}. Total topics: {Topic.objects.count()}.")

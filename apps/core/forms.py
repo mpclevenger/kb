@@ -39,3 +39,4 @@ class BootstrapFormMixin:
                     widget = self.fields[name].widget
                     widget.attrs["class"] = f"{widget.attrs.get('class', '')} is-invalid".strip()
                     widget.attrs["aria-invalid"] = "true"
+

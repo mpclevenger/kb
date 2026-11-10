@@ -2,6 +2,7 @@
 {% block form_fields %}
 <section class="trac-form-section" aria-labelledby="sec-about">
   <h2 id="sec-about">About this risk</h2>
+  {% if "ident" in form.fields %}{% include "components/field_form.html" with field=form.ident %}{% endif %}
   {% include "components/field_form.html" with field=form.title %}
   <div class="row">
     <div class="col-md-6">

@@ -65,7 +65,17 @@ All rules live in one table at the top of `apps/accounts/permissions.py` (`ROLES
 
 ### Links to the other apps (TRUST, Risk, Initiatives)
 
-Set `TRUST_URL`, `RISK_URL` and `INITIATIVES_URL` on the hosting platform. An empty value hides the link.
+Set `TRUST_URL`, `RISK_URL`, `INITIATIVES_URL` and `SOX_SCHEDULE_URL` on the hosting platform. An empty value hides the link in the Apps menu, and the front page shows "Link coming soon" instead of the button.
+
+### The front page
+
+The front page's words live in `content/home/`, in Markdown like the guides:
+
+- `index.md` holds the page title and the short pitch.
+- Each file in `content/home/tools/` is one card and its "About" page. The header sets the card's `title`, its one-line `summary`, the `button` text, the `order` on the page, and the `link`: a TRAC page (`link: /guides/`), an `https://` address, or a setting on the hosting platform (`link: env TRUST_URL`). Add `under_construction: yes` for a demo people can try and comment on, or `coming_soon: yes` for a tool that isn't available yet (its button is turned off). The text below the header is the "About" page.
+- To add a tool, copy one of these files and give it a new name. To remove one, delete its file.
+
+Run `.\trac.ps1 check` after a change. These files aren't stored in the database, so the change shows once the site restarts with the new files.
 
 ### Initiative lifecycle guide and the tracker
 
@@ -162,7 +172,7 @@ Every line should end in dots and the last line should say `passed`. If somethin
 
 Work through these in order. Steps 1 to 3 are for whoever deploys and secures the site. For a quick start with one admin, use "Going live tomorrow (one admin)" below instead.
 
-1. **Settings on the hosting platform:** `DJANGO_SETTINGS_MODULE=config.settings.prod`, a long random `SECRET_KEY`, `DATABASE_URL`, `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS` (the site's address), `SSO_GROUP_ROLE_MAP` with the real AD groups, and the `TRUST_URL`, `RISK_URL` and `INITIATIVES_URL` links. See the README for the full list.
+1. **Settings on the hosting platform:** `DJANGO_SETTINGS_MODULE=config.settings.prod`, a long random `SECRET_KEY`, `DATABASE_URL`, `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS` (the site's address), `SSO_GROUP_ROLE_MAP` with the real AD groups, and the `TRUST_URL`, `RISK_URL`, `INITIATIVES_URL` and `SOX_SCHEDULE_URL` links. See the README for the full list.
 2. **Deploy.** Database changes run on their own at each release. Check that the platform also runs `python manage.py collectstatic --noinput` while building; without it the site has no styling.
 3. **Sign-in.** Before anyone outside the build team gets the link, either set `AUTH_MODE=sso`, or stay on `AUTH_MODE=open` with `OPEN_MODE_ROLE=read_only` (visitors only read and comment; see below). Never leave `OPEN_MODE_ROLE=tech_risk` on a shared site: `python manage.py check` warns with `trac.W002`. With SSO, make sure `ALLOW_SELF_APPROVAL` is `false` or not set. The security owner also decides on HTTPS redirect, HSTS and the `/admin/` page (`python manage.py check --deploy` lists them).
 4. **Two Tech Risk people sign in once.** Changes need a second person to approve them (or use single-approver mode, below).

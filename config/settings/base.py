@@ -116,6 +116,7 @@ SUITE_LINKS = {
     "TRUST": os.environ.get("TRUST_URL", ""),
     "Risk": os.environ.get("RISK_URL", ""),
     "Initiatives": os.environ.get("INITIATIVES_URL", ""),
+    "SOX schedule": os.environ.get("SOX_SCHEDULE_URL", ""),
 }
 
 LOGGING = {
