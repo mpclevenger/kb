@@ -32,6 +32,9 @@ practices:
   Data: |
     - Servers that hold sensitive data have disk encryption or equivalent protection, and file shares are limited to the groups that need them.
     - Temporary files, exports and logs left on the server are cleaned up on a schedule.
+  Reports: |
+    - Exports used as evidence, such as local administrator lists or patch status, come from the system itself with a visible date and host name.
+    - The command or report used is saved, so the same export can be produced again.
   Network: |
     - Host firewalls allow only the ports the server needs.
     - Remote administration is reachable only from administration networks, and legacy protocols that aren't needed are turned off.

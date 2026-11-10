@@ -37,6 +37,9 @@ practices:
     - Data in each database is classified, and sensitive columns are known and protected at rest.
     - Keys and certificates have named owners and are backed up separately so data can still be read after a rebuild.
     - Production data copied to test environments is masked or protected to the production level.
+  Reports: |
+    - Queries and extracts used as a control population or as evidence are saved, reviewed and kept under change control, not rewritten each time.
+    - Each run keeps the query, the run date and a record count that ties back to the source table. See [Reports used in controls](/guides/can-you-trust-the-report/).
   Network: |
     - Database ports are reachable only from application servers, administration networks and approved tools.
     - Connections use encryption in transit.

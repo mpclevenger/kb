@@ -3,8 +3,21 @@
 {% block title %}Library - TRAC{% endblock %}
 
 {% block content %}
+{# Starting points by task. To change one, edit the title, the line and the guide link (/guides/<file name>/). #}
+<section class="start-box" aria-labelledby="start-heading">
+  <h2 id="start-heading" class="start-heading">Start from what you're working on</h2>
+  <ul class="start-list">
+    <li><a href="/guides/initiative-lifecycle/">A new system, migration or big change</a><span>What to plan at each stage, from design to go-live.</span></li>
+    <li><a href="/guides/cicd-pipelines/">A change to production</a><span>How a change is requested, reviewed, tested and released.</span></li>
+    <li><a href="/guides/can-you-trust-the-report/">A report or dashboard a control relies on</a><span>Building it, proving it's complete and accurate, and who can see it.</span></li>
+    <li><a href="/guides/reading-a-vendors-soc-report/">A vendor or SaaS service</a><span>What to check in the vendor's assurance, and what stays with you.</span></li>
+    <li><a href="/guides/writing-a-control-procedure/">Writing or updating a control</a><span>A procedure someone else could follow and a reviewer could check.</span></li>
+    <li><a href="/guides/before-your-control-review-be-ready-to-answer/">Getting ready for a control review</a><span>What helps to have ready, and the questions to expect.</span></li>
+  </ul>
+</section>
+
 <div class="filter-box">
-  <label class="form-label" for="technology-filter">Find your technology</label>
+  <label class="form-label" for="technology-filter">Or find your technology</label>
   <input class="form-control" type="search" id="technology-filter" data-filter-input placeholder="For example: SQL Server" autocomplete="off">
   <p class="form-text" data-filter-empty hidden>Nothing matches. Try a shorter name, or browse by risk topic.</p>
 </div>

@@ -39,8 +39,8 @@ def pages(topic):
     return [
         reverse("rcm:explorer"),
         reverse("rcm:explorer") + "?view=controls",
-        reverse("rcm:control", args=["AC-01"]),
-        reverse("rcm:risk", args=["R-AC-01"]),
+        reverse("rcm:control", args=["MA-01"]),
+        reverse("rcm:risk", args=["R-MA-01"]),
         reverse("rcm:driver", args=["RD01"]),
         reverse("rcm:evidence_rules"),
     ]

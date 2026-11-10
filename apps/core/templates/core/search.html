@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load trac_labels %}
+{% block title %}Search - TRAC{% endblock %}
+{% block content %}
+<form class="mb-4" role="search" method="get" action="{% url 'core:search' %}">
+  <label class="form-label" for="search-page-input">What are you looking for?</label>
+  <div class="input-group">
+    <input class="form-control" id="search-page-input" type="search" name="q" value="{{ query }}" maxlength="200">
+    <button class="btn btn-primary" type="submit">Search</button>
+  </div>
+</form>
+
+{% for word in left_out %}<p class="text-muted mb-1">No results for '{{ word }}' on its own, so it was left out.</p>{% endfor %}
+
+{% if not query %}
+<p>Type a word or two to search the guides, controls, risks, Library and topics. For example: <em>access review</em> or <em>Databricks</em>.</p>
+{% elif not total %}
+<div class="empty-state">
+  <h2 class="empty-state-headline">No results for '{{ query }}'</h2>
+  <p class="empty-state-text">Try fewer or different words, or browse instead: <a href="{% url 'core:home' %}">the Library</a> or <a href="{% url 'wiki:index' %}">the guides list</a>.</p>
+</div>
+{% else %}
+<p class="text-muted">{{ total }} result{{ total|pluralize }} for '{{ query }}'.</p>
+{% for label, found in groups %}
+<section class="search-group" aria-labelledby="search-group-{{ forloop.counter }}">
+  <h2 class="h5" id="search-group-{{ forloop.counter }}">{{ label }} ({{ found|length }})</h2>
+  <ul class="search-results">
+    {% for result in found %}
+    <li class="search-result">
+      <div class="search-result-head">
+        {% if result.item.group == "guide" %}{% section_pill result.item.pill %}{% elif result.item.group == "control" %}{% type_pill "Control" %}{% elif result.item.group == "risk" %}{% type_pill "Risk" %}{% else %}{% type_pill result.item.pill %}{% endif %}
+        <a class="search-result-title" href="{{ result.item.url }}">{{ result.item.title }}</a>
+      </div>
+      {% if result.snippet %}<p class="search-snippet">{{ result.snippet }}</p>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endfor %}
+{% endif %}
+{% endblock %}

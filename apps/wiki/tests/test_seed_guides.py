@@ -19,7 +19,7 @@ INDEX = "wiki:index"
 
 AUDIT_TITLES = ["Working with auditors: what trips teams up", "Before your control review: be ready to answer"]
 EXCEPTIONS = "When an exception is appropriate"
-EVIDENCE = "Automating control evidence with a locked-down repository"
+EVIDENCE = "Automating control evidence with a well-controlled repository"
 GHES_TITLES = ["GitHub Actions runners", "Repository management"]
 DOCUMENTATION = "What every system should have documented"
 LIFECYCLE = "Initiative lifecycle"
@@ -119,8 +119,9 @@ def test_seeded_review_guide_covers_before_during_and_after(seeded):
 
 def test_seeded_exceptions_guide_covers_the_agreed_sections(seeded):
     body = seeded.get(title=EXCEPTIONS).body
-    for heading in ("When an exception is reasonable", "When it isn't", "What a reasonable compensating step looks like", "What to record"):
+    for heading in ("Exception criteria", "Compensating controls", "Risk treatment"):
         assert f"<h2>{heading}</h2>" in body
+    assert "<h3>Who accepts it</h3>" in body
     assert body.rstrip().endswith(f"<p>{HELP_LINE}</p>")
 
 

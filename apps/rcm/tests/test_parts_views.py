@@ -68,7 +68,7 @@ def test_control_page_shows_level_categories_and_platform_chips(access, owner, r
     assert "Required for SOX" not in header and "tone-key" in header
     assert "Database" in header and "Operating system" in header
     assert "Applies to:" in header and "Azure" in header and "SQL Server" in header
-    assert reverse("platforms:detail", args=[sql.slug]) in header
+    assert sql.get_absolute_url().replace("&", "&amp;") in header
 
 
 def test_no_platform_line_without_platforms(access, owner, reviewer):

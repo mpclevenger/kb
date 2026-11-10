@@ -33,6 +33,9 @@ practices:
     - Data stored in the cloud is classified, encrypted, and kept in approved regions.
     - Storage that holds sensitive data is not public, and this is checked.
     - Encryption keys have named owners, and who can use or delete them is limited.
+  Reports: |
+    - Dashboards and extracts from cloud and data platforms used in a key control keep their logic in reviewed, version-controlled definitions and run with each viewer's own permissions.
+    - Sharing, scheduled emails and downloads of those reports are limited to the people who need them. See [Reports used in controls](/guides/can-you-trust-the-report/).
   Network: |
     - Workloads sit in private networks, and exposure to the internet is by exception and approved.
     - Security groups and network rules are limited to the ports and sources needed, and are reviewed on the schedule in your team's written procedure.

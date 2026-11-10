@@ -22,7 +22,7 @@
 #
 # CONTROL (each entry under "controls")
 #   ref            Short name used only inside this file, so risks can point to it.
-#                  The site gives the control its real ID (for example CM-01).
+#                  The site gives the control its real ID (for example MC-01).
 #   title          Name of the control.
 #   why            Why the control exists, in two or three sentences.
 #   applies_when   Plain statements. The control applies if any one is true.
@@ -81,10 +81,10 @@ controls:
     why: >-
       A control is only as good as the report it starts from. If the report leaves something out, the
       control never sees it. Checking each report when it is set up, each time it is run and after every
-      change shows that the control works on the full picture. The guide "Can you trust the report?"
+      change shows that the control works on the full picture. The guide "Reports used in controls"
       explains how.
     applies_when:
-      - A control starts from a report, query or data extract, such as a user list, a list of changes or a list of job runs.
+      - A control starts from a report, dashboard, query or data extract, such as a user list, a list of changes or a list of job runs.
     nature: detective
     method: manual
     frequency: event
@@ -93,7 +93,7 @@ controls:
     performed_by: Report owner
     reviewed_by: Control owner
     theme: Reports and data used in controls
-    categories: [application, database, identity, cloud, jobs, engineering_tools, logging]
+    categories: [application, database, operating_system, network, identity, cloud, jobs, engineering_tools, logging]
     criteria:
       - heading: Where the report comes from
         part: configuration

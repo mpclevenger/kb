@@ -3,48 +3,39 @@ title: When an exception is appropriate
 section: build
 order: 1
 ---
-Sometimes a control can't run exactly as designed. On this page, an exception is a planned, approved departure from how a control normally runs, not a way of working. It is different from items a control flags, such as an unmatched change, and from a test exception, which is what auditors call a sample that didn't meet the control.
+Sometimes a control can't run exactly as designed. On this page, an exception is a planned, approved departure from how a control normally runs. It is different from items a control flags, such as an unmatched change, and from a test exception, which is what auditors call a sample that didn't meet the control.
 
-## When an exception is reasonable
+## Exception criteria
 
-- It is temporary and has an end date.
-- There is a compensating step that covers the risk while the exception lasts.
-- A named owner is accountable for it and for closing it.
-- The reason, the risk and the plan to return to normal are written down before it starts.
+An exception is appropriate only when all of the following conditions are met:
 
-## When it isn't
+- The control cannot reasonably operate as designed. Saving time or effort is not a sufficient reason.
+- The reason, the risk in the meantime, and the plan and date to restore the control are recorded and approved before the exception begins.
+- A named owner is accountable for the exception and its closure, and the person who accepted the risk is recorded.
+- A compensating control addresses the risk for the duration of the exception, and the evidence it produces is retained.
+- The exception has a defined end date and is not extended repeatedly. Before that date, the owner confirms it is still needed and records the decision.
 
-- The workaround has no end date, or keeps being extended.
-- It saves time or effort but the control could have run as designed.
-- It covers for a control that was never built or no longer works. That needs a fix, not an exception.
-- It is recorded after the fact, or not at all.
+## Compensating controls
 
-## What a reasonable compensating step looks like
+A compensating control runs on a fixed schedule, is evidenced each time, is performed by someone independent of the activity, and is precise enough to detect what the original control would have detected. Examples:
 
-A compensating step runs on a fixed schedule, is evidenced each time, is done by someone independent of the activity, and is detailed enough to catch what the original control would have caught. For example:
+- **Peer review isn't enforced in the repository.** A weekly report of every merge to the production branch is reviewed and signed off by someone outside the team.
+- **A shared administrator account can't be removed yet.** Its password is held in the vault with each check-out logged, and every use is matched to a ticket each week.
+- **The change approval tool is unavailable during a migration.** The named approver approves each change by email before release, and approvals are matched to the deployment log at month end.
 
-- Have a second person review the activity every week while the system can't block it.
-- Add logging, with an alert each time the exception is used.
-- Check the full population manually each month while an automated check is built.
-- Limit access to named people and review it monthly until the normal approval path is restored.
+## Risk treatment
 
-## Who accepts the risk
+An approved exception is a decision to knowingly accept a risk for a limited time. It does not fix the control, and it does not change how the control is assessed.
 
-An exception means the firm knowingly accepts a risk for a while. That decision belongs to the person accountable for the system or the business process, not to the team running the control.
+### What acceptance means
 
-- The business or system owner accepts the risk, at the level of seniority the firm's policy sets for how serious the risk is.
-- Tech Risk helps describe the risk and judge whether the compensating step is enough. It doesn't accept the risk on the owner's behalf.
-- The acceptance is recorded with the owner's name and date, and open exceptions are visible to management.
-- An accepted risk is different from an unnoticed one. If nobody decided to accept it, it isn't an exception; it's a gap to fix.
-- For a key control, an approved exception doesn't make the control effective. Testers will still report the gap. The compensating step helps only if it is designed and evidenced like a control in its own right.
+- The control is still not operating as designed. For a key control, an approved exception doesn't make the control effective, and testers will still report the gap.
+- Without a compensating control in place, the risk is fully open for as long as the exception lasts.
+- A compensating control reduces the risk only if it is designed, performed and evidenced like a control in its own right. Even then, it is assessed on its own and does not make the original control effective.
+- Acceptance must be formally evidenced: the review performed, the rationale for approval, and the approver's name with the date and time of approval, recorded through the firm's exception process. Without this record, the condition is not an approved exception.
 
-## What to record
+### Who accepts it
 
-- Reason: why the control can't run as designed.
-- Risk: what could go wrong in the meantime.
-- Compensating step: what you do instead, and the evidence it leaves.
-- Owner: the person accountable for the exception, and who accepted the risk.
-- End date: when the control returns to normal.
-- Review: when you check that the exception is still needed, and what you decided.
+- The business or system owner accepts the risk, at the appropriate level of seniority, and at a minimum the L3.
 
 If you're unsure, Tech Risk can help.

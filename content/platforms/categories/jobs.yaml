@@ -32,6 +32,9 @@ practices:
   Data: |
     - Jobs that move data between systems show completeness and accuracy: record counts or control totals reconcile between source and target.
     - Failed and partial runs are reviewed and resolved, and rerun rules are documented so data is not loaded twice.
+  Reports: |
+    - Jobs that build data for a key report check row counts, totals and freshness, and stop or alert when a check fails.
+    - A failed or partial run is visible to the report owner before the report is used.
   Network: |
     - Scheduler servers and agents communicate over restricted, encrypted paths, and agents accept instructions only from the scheduler.
     - Jobs reach source and target systems over approved paths only.

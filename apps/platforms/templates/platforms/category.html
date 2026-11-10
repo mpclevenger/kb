@@ -1,10 +1,43 @@
 {% extends "base.html" %}
+{% load trac_labels %}
 {% block title %}{{ category.label }} - Library - TRAC{% endblock %}
 {% block band %}
 {% include "platforms/_band.html" %}
 {% endblock %}
 
 {% block content %}
+{% for panel in panels %}
+<section class="platform-notes" data-platform-content="{{ panel.platform.slug }}" aria-label="About {{ panel.platform.name }}"{% if not panel.selected %} hidden{% endif %}>
+  <div class="platform-notes-head">
+    <h2 class="platform-notes-title">{{ panel.platform.name }}</h2>
+    {% if panel.edit %}<a class="btn btn-sm btn-outline-secondary" href="{{ panel.edit.1 }}">Edit {{ panel.platform.name }} guidance</a>{% endif %}
+  </div>
+  {% if panel.intro %}<p class="platform-notes-intro">{{ panel.intro }}</p>{% endif %}
+  <div class="guidance-facts">
+    {% for cat, url in panel.categories %}<a class="category-pill category-{{ cat.value }}" href="{{ url }}"{% if cat == category %} aria-current="page"{% endif %}>{{ cat.label }}</a>{% endfor %}
+    {% if panel.platform.hosting %}{% attribute_pill "Hosting" panel.platform.get_hosting_display tone="owner" %}{% endif %}
+    {% if panel.platform.owner %}{% attribute_pill "Owner" panel.platform.owner tone="owner" %}{% endif %}
+    {% if panel.platform.runs_on.is_active %}<span class="runs-on">Runs on: {% platform_chip panel.platform.runs_on %}</span>{% endif %}
+  </div>
+  {% if panel.platform.doc_links %}
+  <p class="guidance-docs">Documentation:
+    {% for link in panel.platform.doc_links %}<a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">{{ link.label }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
+  </p>
+  {% endif %}
+  {% if panel.guides %}
+  <p class="platform-notes-guides">Guides:
+    {% for guide in panel.guides %}{% section_pill guide.section %} <a href="{{ guide.url }}">{{ guide.title }}</a>{% if not forloop.last %}; {% endif %}{% endfor %}
+  </p>
+  {% endif %}
+  {% if panel.references %}
+  <p class="platform-notes-references">References:
+    {% for reference in panel.references %}<a href="{{ reference.url }}" target="_blank" rel="noopener noreferrer">{{ reference.label }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
+  </p>
+  {% endif %}
+  {% if not panel.has_specifics %}<p class="text-secondary mb-0">No {{ panel.platform.name }}-specific items on this page yet; the common practices below apply as written.</p>{% endif %}
+</section>
+{% endfor %}
+
 <section class="category-{{ category.value }}" aria-labelledby="well-controlled-heading">
   <h2 id="well-controlled-heading">{{ category.heading }}</h2>
   {% include "platforms/_aspect_rows.html" with show_gaps=True %}

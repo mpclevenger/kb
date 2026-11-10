@@ -22,7 +22,7 @@ def topics():
 
 @pytest.fixture
 def access(topics):
-    return topics.get(id_prefix="AC")
+    return topics.get(id_prefix="MA")
 
 
 @pytest.fixture
@@ -75,18 +75,18 @@ class TestIds:
     def test_control_ids_use_topic_prefix(self, access, owner):
         first, _ = services.create_control(owner, access, **control_fields())
         second, _ = services.create_control(owner, access, **control_fields())
-        assert (first.ident, second.ident) == ("AC-01", "AC-02")
+        assert (first.ident, second.ident) == ("MA-01", "MA-02")
 
     def test_risk_ids(self, access, owner):
         risk, _ = services.create_risk(owner, access, title="r", statement="s", owner_role="o")
-        assert risk.ident == "R-AC-01"
+        assert risk.ident == "R-MA-01"
 
     def test_ids_never_reused_after_discard(self, access, owner):
         entity, version = services.create_control(owner, access, **control_fields())
         v.discard_draft(version, owner)
         again, _ = services.create_control(owner, access, **control_fields())
-        assert again.ident == "AC-02"
-        assert IdSequence.objects.get(key="AC").last == 2
+        assert again.ident == "MA-02"
+        assert IdSequence.objects.get(key="MA").last == 2
 
 
 class TestControl:
@@ -95,7 +95,7 @@ class TestControl:
         assert control.current().criteria[0]["name"] == "The review"
 
     def test_stage_must_belong_to_topic(self, access, topics, owner):
-        other_stage = topics.get(id_prefix="CM").stages.first()
+        other_stage = topics.get(id_prefix="MC").stages.first()
         _, version = services.create_control(owner, access, **control_fields(stage=other_stage))
         with pytest.raises(ValidationError):
             version.full_clean()

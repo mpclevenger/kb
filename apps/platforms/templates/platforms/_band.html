@@ -1,24 +1,11 @@
-{# The shared band in the category color, plus "Applies to" chips (category pages) or facts and documentation links (platform pages). Needs band and category; members or platform when set. #}
-{% load trac_labels %}
+{# The shared band in the category color, plus the platform pills that switch each platform's specifics on and off. Needs band and category; toggles when the category has platforms. #}
 <div class="guidance-band category-{{ category.value }}">
   {% include "components/page_band.html" %}
-  {% if members %}
-  <ul class="guidance-chips" aria-label="Applies to">
-    <li class="guidance-chips-label">Applies to:</li>
-    {% for member in members %}<li>{% platform_chip member %}</li>
+  {% if toggles %}
+  <ul class="guidance-chips" aria-label="Show specifics for">
+    <li class="guidance-chips-label">Show specifics for:</li>
+    {% for t in toggles %}<li><a class="platform-toggle" href="{{ t.url }}" role="button" aria-pressed="{% if t.selected %}true{% else %}false{% endif %}" data-platform-toggle="{{ t.platform.slug }}">{{ t.platform.name }}</a></li>
     {% endfor %}
   </ul>
-  {% endif %}
-  {% if platform %}
-  <div class="guidance-facts">
-    {% for key in platform.categories %}{% category_pill key %}{% endfor %}
-    {% if platform.hosting %}{% attribute_pill "Hosting" platform.get_hosting_display tone="owner" %}{% endif %}
-    {% if platform.owner %}{% attribute_pill "Owner" platform.owner tone="owner" %}{% endif %}
-  </div>
-  {% if platform.doc_links %}
-  <p class="guidance-docs">Documentation:
-    {% for link in platform.doc_links %}<a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">{{ link.label }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
-  </p>
-  {% endif %}
   {% endif %}
 </div>

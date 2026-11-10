@@ -32,7 +32,7 @@ def client():
 
 def make_three():
     for title, level in (("Supporting helper", "supporting"), ("Plain extra", "non-key"), ("Top control", "key")):
-        publish_control("AC", title=title, categories=[Category.DATABASE], level=level)
+        publish_control("MA", title=title, categories=[Category.DATABASE], level=level)
 
 
 def test_category_page_shows_open_levels_and_folds_the_rest(client):
@@ -67,15 +67,15 @@ def test_platform_page_folds_too_and_open_flag_comes_from_file(client, tmp_path,
 
 
 def test_no_fold_when_every_control_is_open(client):
-    publish_control("AC", title="Only top", categories=[Category.DATABASE], level="key")
+    publish_control("MA", title="Only top", categories=[Category.DATABASE], level="key")
     html = client.get(Platform.objects.get(name="SQL Server").get_absolute_url()).content.decode()
     assert "Only top" in html and "More controls" not in html
 
 
 def test_query_count_is_flat_with_folded_controls(client):
     url = Platform.objects.get(name="SQL Server").get_absolute_url()
-    publish_control("AC", title="First", categories=[Category.DATABASE], level="key")
+    publish_control("MA", title="First", categories=[Category.DATABASE], level="key")
     small = count_queries(client, url)
     for n in range(4):
-        publish_control("AC", title=f"More {n}", categories=[Category.DATABASE], level="supporting")
+        publish_control("MA", title=f"More {n}", categories=[Category.DATABASE], level="supporting")
     assert count_queries(client, url) == small

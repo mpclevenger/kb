@@ -4,7 +4,7 @@
 {% block breadcrumbs %}{% include "manage/_crumbs.html" with current="Aspect questions" %}{% endblock %}
 {% block content %}
 {% page_header "Aspect questions" %}<a class="btn btn-primary" href="{% url 'manage:aspect_new' %}">New question</a>{% endpage_header %}
-<p class="text-secondary">Every platform page answers these plain technical questions, one per topic.</p>
+<p class="text-secondary">Every category page answers these plain technical questions, one per topic.</p>
 {% if questions %}
 <table class="trac-table">
   <caption>{{ questions|length }} question{{ questions|length|pluralize }}</caption>
@@ -22,6 +22,6 @@
 </table>
 {% else %}
 {% url 'manage:aspect_new' as new_url %}
-{% empty_state "No aspect questions yet" "Add one for each topic so platform pages can show gaps." "New question" new_url %}
+{% empty_state "No aspect questions yet" "Add one for each topic so category pages can show gaps." "New question" new_url %}
 {% endif %}
 {% endblock %}

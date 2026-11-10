@@ -35,6 +35,8 @@ practices:
   Data: |
     - Repositories do not hold secrets, personal data or data extracts, and scanning checks for them.
     - Build logs and artifacts are kept only as long as needed, and access to them is limited.
+  Reports: |
+    - Lists of changes, pull requests or deployments used to reconcile changes come from the tool's own history for the full period, with any filters recorded.
   Network: |
     - The tool is reachable from the internal network and approved remote access only.
     - Runners and build hosts have network access limited to what builds and deployments need.

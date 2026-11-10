@@ -46,7 +46,7 @@ def test_create_control_serializes_rows(owner, access):
     assert version.applies_when == ["You approve access"]
     assert version.criteria == [{"name": "The review", "items": ["Every user has a decision."]}]
     assert version.steps == [{"role": "Owner", "text": "Review the list.", "evidence": "Signed review"}]
-    assert control.ident.startswith("AC-")
+    assert control.ident.startswith("MA-")
 
 
 @pytest.mark.parametrize(
@@ -269,13 +269,13 @@ def test_create_risk_with_links(owner, access, live_control):
     "rows,message",
     [
         ([{"control": "", "coverage": "full", "rationale": "why"}], "pick a control"),
-        ([{"control": "AC-01", "coverage": "full", "rationale": ""}], "say why it covers this risk"),
+        ([{"control": "MA-01", "coverage": "full", "rationale": ""}], "say why it covers this risk"),
         ([{"control": "NOPE-99", "coverage": "full", "rationale": "why"}], "isn't a published control"),
-        ([{"control": "AC-01", "coverage": "most", "rationale": "why"}], "choose full or partial"),
+        ([{"control": "MA-01", "coverage": "most", "rationale": "why"}], "choose full or partial"),
         (
             [
-                {"control": "AC-01", "coverage": "full", "rationale": "a"},
-                {"control": "AC-01", "coverage": "partial", "rationale": "b"},
+                {"control": "MA-01", "coverage": "full", "rationale": "a"},
+                {"control": "MA-01", "coverage": "partial", "rationale": "b"},
             ],
             "already linked above",
         ),
@@ -283,7 +283,7 @@ def test_create_risk_with_links(owner, access, live_control):
     ],
 )
 def test_risk_link_rows_are_validated_and_kept(owner, access, live_control, rows, message):
-    assert live_control.ident == "AC-01"
+    assert live_control.ident == "MA-01"
     raw = rows if isinstance(rows, str) else json.dumps(rows)
     response = owner.post(reverse("rcm:risk_new"), risk_post(access, controls=raw, title="Kept risk title"))
     assert response.status_code == 200

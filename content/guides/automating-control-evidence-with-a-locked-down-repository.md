@@ -1,63 +1,56 @@
 ---
-title: Automating control evidence with a locked-down repository
+title: Automating control evidence with a well-controlled repository
 section: build
 order: 2
 ---
-Evidence collected by hand can be incomplete, edited afterward or missed, so a control may appear to have run when it did not, or may fail without anyone noticing. A scheduled workflow in a locked-down repository reduces that risk, provided the automation itself cannot be altered or misused by the people whose work it checks.
+Automating evidence collection makes a control more reliable and cheaper to run: every run captures the complete population on time, in the same format, with a tamper-evident record. That holds only if the people whose work the control checks cannot change the automation or its evidence. The sections below describe best practice, with the evidence to keep for each, most important first.
 
-## What can go wrong?
+## Is it a good fit?
 
-- **Incomplete evidence:** a screenshot or partial export does not show that the whole population was checked.
-- **Altered evidence:** files edited, replaced or deleted after the fact, so the record cannot be relied on.
-- **Self-review:** the people being checked change the automation or approve their own results.
-- **Over-privileged automation:** a workflow with broad credentials can read or change the very systems it reports on.
-- **Silent gaps:** a scheduled run fails and nobody notices, so a period has no evidence.
+Automation suits controls that run on a schedule and pull from a system with an API, export or query that can run under a read-only account. Manual evidence remains the better choice for one-off checks and for systems with no export.
 
-## How does the automation work?
+## The repository
 
-- A scheduled workflow runs at the control's frequency.
-- It pulls data from the system using a read-only account.
-- It saves the raw output and the details of the run to the evidence repository.
-- It runs checks, for example that the record count matches the source.
-- It opens a pull request or issue for the reviewer, who records a decision on each item and approves. The approval is the sign-off, and exceptions become issues tracked to closure.
+| What's in place | Evidence to keep |
+| --- | --- |
+| Access is limited to a small named team, and the people whose work is checked cannot change the repository or its evidence | The access list, included in the system's access review |
+| The default branch has the protections in [Repository management](/guides/repository-management/), with no administrator bypass | An export of the branch rules |
+| History is never rewritten or deleted | Branch rules showing force pushes and deletion are blocked |
+| Changes to settings and access by organization owners or site administrators are logged to Splunk | The alerts and their review |
+| It's recommended that each control automation has its own repository, used only for evidence | The repository list |
 
-## How is the repository protected?
+## The workflow
 
-- One private repository per control area, used only for evidence and the automation that produces it.
-- Access for a small named team. People whose work is checked can't change the repository or its evidence. Organization owners and site administrators still can, so changes to its settings and access are sent to Splunk through the audit log and looked at in the periodic review.
-- The default branch has the full set of protections described in [Repository management](/guides/repository-management/), including no administrator bypass.
-- History is never rewritten or deleted. Each period is tagged, for example 2026-Q4, and a tag ruleset (in recent versions; check yours) stops tags being moved or deleted.
+| What's in place | Evidence to keep |
+| --- | --- |
+| Workflow changes go through change management, and the developer cannot approve or deploy their own change | The approval rules, and a sample change showing a different developer and approver |
+| Source systems are read with read-only, least-privilege credentials | The account permissions for each source |
+| Secrets are available only to the evidence job | The environment settings showing which jobs can use them |
+| It's recommended that cloud sources use short-lived tokens; on-premises sources use a managed service account or a vaulted credential | The credential configuration |
+| It's recommended that evidence jobs run on a dedicated runner group (see [GitHub Actions runners](/guides/github-actions-runners/)) | The runner group settings |
 
-## How is the automation protected?
+## Audit trail for each run
 
-- Read-only, least-privilege credentials for each source system. For cloud sources this means short-lived tokens; for on-premises sources, a managed service account on a dedicated runner or a vaulted credential that only the evidence job can read.
-- Secrets held in an environment that only the evidence job can use, and a dedicated runner group. Workflow and runner security is in [GitHub Actions runners](/guides/github-actions-runners/).
-- Changes to the workflow go through review and change management, because the workflow is part of the control. Any change mid-period is recorded with what changed and when, so both versions can be understood.
-
-## What should every run save?
-
-| Item | Risk it addresses |
-|---|---|
-| The raw export, unedited | Evidence that was reshaped before it was kept |
-| The query or script version (commit SHA) | Uncertainty about how the data was pulled |
-| Run date and time | Uncertainty about when it was pulled |
-| Source system name | Uncertainty about where it came from |
+| What each run saves | Risk it addresses |
+| --- | --- |
+| The raw export, unedited | Evidence reshaped before it was kept |
+| The query or script version (commit SHA) | Unclear how the data was pulled |
+| Run date, time and source system | Unclear when or where it came from |
 | Record count and the source's own count | Incomplete population |
-| A SHA-256 checksum of each file, also written to the workflow run log | Changes made after the run |
-| The workflow run ID | Evidence that cannot be tied to a run log |
+| A SHA-256 checksum of each file, also in the run log | Changes made after the run |
+| The workflow run ID | Evidence not tied to a run |
 
-## How can you show the automation works?
+## Before go-live
 
-- A one-time reconciliation against a manual pull when the automation was set up, with the comparison kept.
-- An alert, and a record of its follow-up, when a scheduled run fails or does not run.
-- The repository's access list and rules, included in the periodic access review.
-- A short design note in the repository: what it pulls, from where, how often and how the review works.
-- Evidence kept past Actions artifact expiry, by committing it or moving it to the evidence store, for the period in the firm's [records retention schedule](#todo-records-retention-schedule).
+Collect this once, before the automation replaces the manual process:
 
-## When is manual evidence a better fit?
+- A reconciliation of the automated output against a manual pull for the same period.
+- A test of the alert for a failed or missed run.
+- A write-up of how the automation works, kept in the repository and referred to each period instead of explaining the process again. It covers the schedule, the source and account, what each run saves, the checks it performs, how the reviewer signs off and handles exceptions, and the date of each change.
 
-- One-off checks.
-- Systems with no API or export.
-- Controls whose automation has not yet been reconciled against a manual pull.
+## While it runs
+
+- Each failed or missed run, with its follow-up.
+- Each period's evidence, moved out of Actions artifacts before they expire and kept for the period in the firm's records retention schedule.
 
 If you're unsure, Tech Risk can help.

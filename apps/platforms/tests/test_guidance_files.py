@@ -147,7 +147,7 @@ def test_the_catalog_is_not_read_as_a_platform_file(lead, folder):
 def test_check_platforms_reports_and_exits(lead, folder, capsys):
     (folder / "catalog.yaml").write_text((PLATFORMS_DIR / "catalog.yaml").read_text(encoding="utf-8"), encoding="utf-8")
     call_command("check_platforms", folder=str(folder))
-    assert "All good: 12 platforms and 10 questions in the catalog, 2 guidance file(s)." in capsys.readouterr().out
+    assert "All good: 12 platforms and 12 questions in the catalog, 2 guidance file(s)." in capsys.readouterr().out
     edit(folder, "sql-server.yaml", "access:", "acess:")
     with pytest.raises(SystemExit):
         call_command("check_platforms", folder=str(folder))

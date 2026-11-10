@@ -6,7 +6,7 @@ order: 13
 ---
 For each SQL Server component, this guide covers what it does, what could go wrong, the controls that address it and how to show they work.
 
-SQL Server runs on Windows Server, on-premises or on a cloud virtual machine (for example, AWS EC2), or as a managed service (for example, Amazon RDS for SQL Server or Azure SQL). On a managed service the provider runs the operating system, patching and the backup service, and the system owner reviews the provider's SOC report (see [Reading a vendor's SOC report](/guides/reading-a-vendors-soc-report/)); the rest of this guide applies within the access the provider allows. The SQL Server platform page has the summary by risk area.
+SQL Server runs on Windows Server, on-premises or on a cloud virtual machine (for example, AWS EC2), or as a managed service (for example, Amazon RDS for SQL Server or Azure SQL). On a managed service the provider runs the operating system, patching and the backup service, and the system owner reviews the provider's SOC report (see [Reading a vendor's SOC report](/guides/reading-a-vendors-soc-report/)); the rest of this guide applies within the access the provider allows. The Database page in the Library, with SQL Server switched on, has the summary by risk area.
 
 ## The instance, its host and patching
 

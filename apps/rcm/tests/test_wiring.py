@@ -19,7 +19,7 @@ pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("sso")]
 @pytest.fixture
 def access():
     call_command("seed_topics")
-    return Topic.objects.get(id_prefix="AC")
+    return Topic.objects.get(id_prefix="MA")
 
 
 @pytest.fixture

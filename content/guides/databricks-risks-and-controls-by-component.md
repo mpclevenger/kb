@@ -118,7 +118,7 @@ Changes reach production through the pipeline described in [CI/CD pipelines as c
 - Dashboards are published without embedded credentials, so each viewer's own permissions apply, and sharing is limited to the groups that need it.
 - Genie isn't used to produce SOX evidence, because its queries aren't fixed or reviewed.
 
-**How to show it:** the dashboard's definition in Git, its publish settings and permissions. See [Building or changing a report used in controls](/guides/building-or-changing-a-report-used-in-controls/) for the full picture.
+**How to show it:** the dashboard's definition in Git, its publish settings and permissions. See [Reports used in controls](/guides/can-you-trust-the-report/) for the full picture.
 
 ### Recovering your data
 

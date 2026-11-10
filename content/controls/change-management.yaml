@@ -22,7 +22,7 @@
 #
 # CONTROL (each entry under "controls")
 #   ref            Short name used only inside this file, so risks can point to it.
-#                  The site gives the control its real ID (for example CM-01).
+#                  The site gives the control its real ID (for example MC-01).
 #   title          Name of the control.
 #   why            Why the control exists, in two or three sentences.
 #   applies_when   Plain statements. The control applies if any one is true.
@@ -594,7 +594,7 @@ controls:
       - heading: Matching to requests
         part: monitoring
         items:
-          - On the schedule set in your team's written procedure, a system-generated list of direct changes for the period is produced from the audit records. Accounts left out, such as the pipeline identity, are named with the reason, and the list is checked for completeness (see [Can you trust the report?](/guides/can-you-trust-the-report/)).
+          - On the schedule set in your team's written procedure, a system-generated list of direct changes for the period is produced from the audit records. Accounts left out, such as the pipeline identity, are named with the reason, and the list is checked for completeness (see [Reports used in controls](/guides/can-you-trust-the-report/)).
           - Each change is matched to an approved request, such as a data fix ticket or a break-glass record, that covers what was changed.
           - Anything unmatched, or beyond what the request approved, is investigated and the outcome recorded. Unauthorized changes are corrected and reported to the system owner.
           - The reviewer is not one of the administrators whose changes are in the records. Where that can't be avoided, someone else reviews the reviewer's own entries.

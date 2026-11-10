@@ -22,7 +22,7 @@
 #
 # CONTROL (each entry under "controls")
 #   ref            Short name used only inside this file, so risks can point to it.
-#                  The site gives the control its real ID (for example CM-01).
+#                  The site gives the control its real ID (for example MC-01).
 #   title          Name of the control.
 #   why            Why the control exists, in two or three sentences.
 #   applies_when   Plain statements. The control applies if any one is true.

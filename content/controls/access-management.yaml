@@ -22,7 +22,7 @@
 #
 # CONTROL (each entry under "controls")
 #   ref            Short name used only inside this file, so risks can point to it.
-#                  The site gives the control its real ID (for example CM-01).
+#                  The site gives the control its real ID (for example MC-01).
 #   title          Name of the control.
 #   why            Why the control exists, in two or three sentences.
 #   applies_when   Plain statements. The control applies if any one is true.
@@ -277,7 +277,7 @@ controls:
       - heading: Checking the process works
         part: monitoring
         items:
-          - On the schedule set in your team's written procedure, someone compares a system-generated list of access grants for the period, taken from the system's own change or audit log, with the approved requests. The list is checked for completeness (see [Can you trust the report?](/guides/can-you-trust-the-report/)), and any grant without a request is investigated.
+          - On the schedule set in your team's written procedure, someone compares a system-generated list of access grants for the period, taken from the system's own change or audit log, with the approved requests. The list is checked for completeness (see [Reports used in controls](/guides/can-you-trust-the-report/)), and any grant without a request is investigated.
     steps:
       - who: Requester
         do: Raise a request for a defined role or group, with the person's name and the reason.

@@ -74,3 +74,6 @@ In `sso` mode, users whose groups map to no role get read-only access. A request
 ## Maintaining
 
 `MAINTAINING.md` is the plain-language guide for updating content, roles (AD groups), wording, colors and shared components.
+
+## Working notes
+

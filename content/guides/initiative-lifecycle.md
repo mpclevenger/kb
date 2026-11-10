@@ -7,6 +7,18 @@ How to manage risk and controls through each stage of a major initiative, from i
 
 How much sign-off each stage needs depends on the initiative's [oversight level](/guides/oversight-levels/).
 
+## Guiding principles
+
+These apply at every stage. The stages below set out what each one means in practice.
+
+- Every confirmation records its basis (artifact reviewed, independently observed or tested, or owner attestation only) and where the evidence is kept. Auditors can see which confirmations rest on attestation alone.
+- Whoever builds or configures a control does not review its testing or its first operation.
+- Control coverage has no gaps. The old system's controls keep running, with evidence, until cutover, and that evidence is kept after the old system is retired. Any period a control can't operate is covered by an interim control with an agreed end condition.
+- Each stage exit is recorded at the time, with the date and where the evidence is kept, not pieced together afterwards.
+- Evidence stays in its system of record. The initiative tracker holds the reference and the date it was confirmed.
+
+## Stages at a glance
+
 ```mermaid
 flowchart TD
   accTitle: Initiative stages and their exit gates
@@ -21,21 +33,9 @@ flowchart TD
   S0 --> S1 --> S2 --> S3 --> S4 --> S5 --> S6
 ```
 
-## Principles
-
-- Every confirmation needs a basis and an evidence reference. The basis is one of: artifact reviewed, independently observed or tested, or owner attestation only. Auditors can see which confirmations rest on attestation alone.
-- Every gate needs a named approver. Record who approved the stage exit, when, and where the approval evidence is kept. Nobody approves a gate they don't own.
-- Control dry runs and first-operation evidence are reviewed by someone who did not build the control.
-- Control impact assessments start from the control library for the affected systems and are confirmed with control owners.
-- Interim controls have an end condition from stage 1. Each must show operation evidence for the whole window before it is retired.
-- The old system's controls keep running, with evidence, until cutover, and that evidence is kept after the old system is retired. Testers look at both parts of the year.
-- Evidence stays in the system of record. The initiative tracker holds the reference and the date it was confirmed.
-
 ## Stage 0: Intake
 
 **Exit gate:** Intake accepted; baseline go-live date fixed; initiative added to the book of work.
-
-**Gate approver:** Head of Tech Risk.
 
 <!-- This table is written in HTML because each cell holds a bullet list, which a Markdown table cannot do. Edit only the text inside the <li> items. -->
 <table>
@@ -65,8 +65,6 @@ A dated list of every system, report and control the initiative touches, with wh
 
 **Exit gate:** Solution design signed off; control impact assessment complete; every affected control has an impact type.
 
-**Gate approver:** Sponsor (design sign-off) and Head of Tech Risk (control impact assessment).
-
 **How:** For a complete control impact assessment, start from the control library filtered to the systems named at intake, then confirm the list with each control owner. Record who was consulted.
 
 <!-- This table is written in HTML because each cell holds a bullet list, which a Markdown table cannot do. Edit only the text inside the <li> items. -->
@@ -93,7 +91,7 @@ The roles and the duties that conflict, who agreed the model and when, and how a
 
 #### Item 4: Migration approach documented
 
-What data moves, how completeness and accuracy will be shown (counts, balances, samples), and who signs off the reconciliation. If reports used in key controls move or change, see [Building or changing a report used in controls](/guides/building-or-changing-a-report-used-in-controls/).
+What data moves, how completeness and accuracy will be shown (counts, balances, samples), and who signs off the reconciliation. If reports used in key controls move or change, see [Reports used in controls](/guides/can-you-trust-the-report/).
 
 #### Item 5: Interim and compensating controls agreed
 
@@ -104,8 +102,6 @@ For each one: the owner, what it covers, how it will be evidenced and its end co
 ## Stage 2: Build and configure
 
 **Exit gate:** Build complete in non-production; configuration baselined.
-
-**Gate approver:** Program manager (build complete).
 
 <!-- This table is written in HTML because each cell holds a bullet list, which a Markdown table cannot do. Edit only the text inside the <li> items. -->
 <table>
@@ -134,8 +130,6 @@ A comparison of build team access with production access showing nobody can both
 ## Stage 3: Test and validate
 
 **Exit gate:** Test exit approved; defects within tolerance; control testing complete; migration rehearsal reconciled.
-
-**Gate approver:** Business owner (user acceptance testing, or UAT) and Change Advisory Board (test exit).
 
 **How:** The person who dry-runs a control must not have built or configured it. Record the tester's name and role. At least one dry run of each new control is observed by someone outside the program. Dry-run results show the design works; they aren't evidence that the control operated in production.
 
@@ -175,8 +169,6 @@ The defect log at test exit, with each open defect's severity, what was decided 
 
 **Exit gate:** Go/no-go approved; production change approved; access provisioned as designed; rollback ready.
 
-**Gate approver:** Go/no-go chair (named) and Change Advisory Board.
-
 <!-- This table is written in HTML because each cell holds a bullet list, which a Markdown table cannot do. Edit only the text inside the <li> items. -->
 <table>
 <thead><tr><th>Controls to consider</th><th>Evidence to keep</th></tr></thead>
@@ -212,8 +204,6 @@ A job log or report showing the pre-cutover backup completed and when, and the r
 ## Stage 5: Hypercare and stabilize
 
 **Exit gate:** First operation of each new or changed control evidenced; hypercare incidents closed; interim controls retired or extended.
-
-**Gate approver:** Head of Tech Risk (control readiness) and business owner (hypercare exit).
 
 **How:** Hypercare is the period of close support after go-live. First-operation evidence is reviewed independently, not self-certified by the program. Interim controls must show operation evidence for the whole window before they are retired. One run shows a control works, but testers need enough runs before year-end to rely on it, so a go-live late in the year may need the interim control kept running.
 
@@ -252,8 +242,6 @@ The hypercare incident log with every incident closed or handed over to business
 ## Stage 6: Close
 
 **Exit gate:** Control readiness outcome recorded; retired controls confirmed; evidence archived; handover to business-as-usual owners.
-
-**Gate approver:** Head of Tech Risk.
 
 <!-- This table is written in HTML because each cell holds a bullet list, which a Markdown table cannot do. Edit only the text inside the <li> items. -->
 <table>

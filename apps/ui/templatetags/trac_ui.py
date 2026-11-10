@@ -35,7 +35,7 @@ CALLOUT_TYPES = {
 SECTION_TONES = frozenset({"why", "need", "good", "how", "neutral"})
 
 TOPIC_ICONS = frozenset(
-    {"key", "git-branch", "file-search", "bug", "cloud", "lifebuoy", "building", "lock", "checklist", "network"}
+    {"key", "git-branch", "file-search", "bug", "cloud", "lifebuoy", "building", "lock", "checklist", "network", "clock"}
 )
 
 # (key, label, route name or "#"). A route that doesn't exist yet is left out.

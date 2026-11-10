@@ -77,8 +77,13 @@ class Platform(models.Model):
         return self.name
 
     def get_absolute_url(self):
+        """The platform's main category page with this platform's specifics switched on."""
+        return self.url_in(self.primary_category) if self.categories else ""
+
+    def url_in(self, category):
+        """A category page with this platform's specifics switched on."""
         try:
-            return reverse("platforms:detail", args=[self.slug])
+            return f"{reverse('platforms:category', args=[category])}?platform={self.slug}"
         except NoReverseMatch:
             return ""
 

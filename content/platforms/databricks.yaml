@@ -30,6 +30,9 @@ considerations:
   Data: |
     - Sensitive columns use masking or row filters where classification calls for it.
     - Production data is not copied to development workspaces unless it is masked.
+  Reports: |
+    - AI/BI dashboards used in a key control are deployed by the pipeline and published without embedded credentials, so each viewer's Unity Catalog permissions apply.
+    - Report logic lives in reviewed Unity Catalog views, not inside the dashboard, and Genie isn't used to produce SOX evidence. See [Databricks risks and controls by component](/guides/databricks-risks-and-controls-by-component/).
   Network: |
     - Workspaces use private connectivity and IP access lists where available. Clusters sit in the firm's private network, and serverless compute uses network policies.
   Vendor: |

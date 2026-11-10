@@ -27,7 +27,7 @@ def topics():
 
 @pytest.fixture
 def access():
-    return Topic.objects.get(id_prefix="AC")
+    return Topic.objects.get(id_prefix="MA")
 
 
 @pytest.fixture
@@ -90,13 +90,13 @@ class TestIndex:
         assert "<strong>2</strong> controls" in page
         assert "<strong>1</strong> risk" in page
         assert "<strong>4</strong> stages" in page
-        assert page.count('class="topic-tile"') == 10
+        assert page.count('class="topic-tile"') == 11
 
     def test_hides_inactive_topics(self, client, access):
         Topic.objects.filter(pk=access.pk).update(is_active=False)
         page = html(client, reverse("topics:index"))
         assert "Access management" not in page
-        assert page.count('class="topic-tile"') == 9
+        assert page.count('class="topic-tile"') == 10
 
     def test_drafts_and_retired_not_counted(self, client, access, author, approver):
         add_control(access, author, approver, publish_it=False)
@@ -128,7 +128,7 @@ class TestDetail:
         assert reverse("topics:index") in page
 
     def test_other_topics_excluded(self, client, access, author, approver):
-        other = Topic.objects.get(id_prefix="CM")
+        other = Topic.objects.get(id_prefix="MC")
         add_control(other, author, approver, title="Release approval")
         page = html(client, reverse("topics:detail", args=[access.slug]))
         assert "Release approval" not in page
@@ -185,7 +185,7 @@ class TestDetail:
         url = reverse("topics:detail", args=[access.slug])
         assert "Common questions" not in html(client, url)
         add_faq(access, author, approver, "Do service accounts need review?", "Yes, every year.")
-        add_faq(Topic.objects.get(id_prefix="CM"), author, approver, "Who approves releases?")
+        add_faq(Topic.objects.get(id_prefix="MC"), author, approver, "Who approves releases?")
         page = html(client, url)
         assert "Common questions" in page
         assert "<summary>Do service accounts need review?</summary>" in page
@@ -258,7 +258,7 @@ class TestLifecycle:
         assert "What can go wrong" in shown and "How we control it" in shown
         assert "Excess access granted" in shown and "Grant access" in shown
         assert "Quarterly review" not in shown
-        assert "R-AC-01" in shown and "AC-01" in shown
+        assert "R-MA-01" in shown and "MA-01" in shown
 
     def test_empty_stage_says_none_yet(self, client, access):
         shown = panel(html(client, reverse("topics:detail", args=[access.slug])))
@@ -280,7 +280,7 @@ class TestLifecycle:
             assert title not in page
 
     def test_stage_from_other_topic_or_bad_value_falls_back_to_first(self, client, access):
-        foreign = Stage.objects.filter(topic__id_prefix="CM").first()
+        foreign = Stage.objects.filter(topic__id_prefix="MC").first()
         for value in (foreign.pk, "abc"):
             page = html(client, reverse("topics:detail", args=[access.slug]), {"stage": value})
             assert [bool(a) for _, a in self.arrows(page)] == [True, False, False, False]
@@ -296,7 +296,7 @@ class TestEverything:
     def test_lists_controls_and_risks_with_type_pills(self, client, access):
         section = html(client, reverse("topics:detail", args=[access.slug])).split('id="everything"')[1]
         assert "Grant access" in section and "Excess access granted" in section
-        assert "AC-01" in section and "R-AC-01" in section
+        assert "MA-01" in section and "R-MA-01" in section
         assert '<span class="type-pill type-pill-control">Control</span>' in section
         assert '<span class="type-pill type-pill-risk">Risk</span>' in section
 
@@ -348,7 +348,7 @@ class TestAppliesTo:
     def test_unpublished_or_other_topic_controls_do_not_count(self, client, access, author, approver):
         platform = Platform.objects.create(name="Some platform", categories=["identity"])
         add_control(access, author, approver, platforms=[platform], publish_it=False)
-        add_control(Topic.objects.get(id_prefix="CM"), author, approver, platforms=[platform])
+        add_control(Topic.objects.get(id_prefix="MC"), author, approver, platforms=[platform])
         assert self.row(html(client, reverse("topics:detail", args=[access.slug]))) == ""
 
 

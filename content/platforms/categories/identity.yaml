@@ -33,6 +33,9 @@ practices:
   Data: |
     - Directory data about people, groups and credentials is restricted to those who administer it.
     - Attributes used for access decisions, such as department and manager, have an owner and a source of truth.
+  Reports: |
+    - User and group lists used in access reviews come straight from the directory with a visible run date, and the export settings are saved so the list can be produced again.
+    - The count is compared with the directory, so no accounts are missing from the review. See [Reports used in controls](/guides/can-you-trust-the-report/).
   Network: |
     - Administration is possible only from administration networks.
     - Sign-in from outside the firm's network requires multi-factor authentication.

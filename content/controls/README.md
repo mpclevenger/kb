@@ -18,7 +18,7 @@ The comment block at the top of each file explains every field in one line. In s
 - `risks`: each has a title, a plain statement, an owner role, a stage (or a theme) and `covered_by`, the controls that reduce it, with `coverage` (full or partial) and a one-line `why`.
 - `controls`: each has a short `ref` (used only inside the file so risks can point at it), a title, why it exists, when it applies, nature, method, frequency, its level (key, non-key, compensating or supporting; most important first, see levels.yaml), owner, performer and reviewer roles, stage or theme, categories, optional platforms, criteria (what good looks like), steps and optional references.
 
-You never type a control ID. The site assigns it (for example CM-01) when the control is created.
+You never type a control ID. The site assigns it (for example MC-01) when the control is created.
 
 The four levels:
 - `key`: relied on to address the risk, tested by auditors.

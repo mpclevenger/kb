@@ -19,7 +19,7 @@ from .models import (
 
 
 def next_ident(key, width=2):
-    """Next ID for a prefix, e.g. AC-07. Locks the counter row so IDs are unique and never reused."""
+    """Next ID for a prefix, e.g. MA-07. Locks the counter row so IDs are unique and never reused."""
     seq, _ = IdSequence.objects.get_or_create(key=key)
     seq = IdSequence.objects.select_for_update().get(pk=seq.pk)
     seq.last += 1

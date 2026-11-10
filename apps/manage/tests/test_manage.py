@@ -57,7 +57,7 @@ def owner():
 @pytest.fixture
 def access():
     call_command("seed_topics")
-    return Topic.objects.get(id_prefix="AC")
+    return Topic.objects.get(id_prefix="MA")
 
 
 @pytest.fixture
@@ -161,7 +161,7 @@ def test_prefix_editable_until_controls_exist(tr, access):
     assert b"Locked:" in page.content
     tr.post(reverse("manage:topic_edit", args=[access.pk]), topic_data(access, id_prefix="ZZ"))
     access.refresh_from_db()
-    assert access.id_prefix == "AC"
+    assert access.id_prefix == "MA"
 
 
 def test_prefix_locked_by_risks_alone(tr, access):

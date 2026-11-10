@@ -413,6 +413,10 @@ a.lifecycle-stage-label[aria-current="step"]:hover { background: var(--trac-mist
 .section-card[open] > .section-card-summary .section-card-chevron { transform: rotate(45deg); }
 .section-card-body { padding: var(--trac-space-3) var(--trac-space-4) var(--trac-space-4); }
 .section-card-body > :last-child { margin-bottom: 0; }
+/* Text inside a card uses the card's full width; the card itself already sets a comfortable page width. */
+.section-card-body .prose, .section-card-body .criteria, .section-card-body .step-list,
+.section-card-body .callout, .section-card-body p, .section-card-body ul, .section-card-body ol,
+.section-card-body blockquote { max-width: none; }
 .section-card .criteria-group-name { color: var(--tone-ink); }
 .section-card .criteria-item::before { border-color: var(--tone-accent); }
 .section-card .criteria-item::after { border-color: var(--tone-accent); }
@@ -528,3 +532,19 @@ a.category-pill:hover { color: var(--category-ink); border-color: var(--category
 }
 .status-tab:hover { background: var(--trac-mist); }
 .status-tab.active { background: var(--trac-navy); border-color: var(--trac-navy); color: #fff; }
+
+/* Search box in the top bar, and the results page. */
+.trac-search { display: flex; gap: var(--trac-space-1); align-items: center; }
+.trac-search .form-control { width: 16rem; max-width: 100%; }
+@media (max-width: 767.98px) {
+  .trac-topbar-tools { flex-wrap: wrap; width: 100%; margin-left: 0; padding-bottom: var(--trac-space-2); }
+  .trac-search { flex: 1 1 100%; }
+  .trac-search .form-control { width: auto; flex: 1 1 auto; }
+}
+.search-group { margin-bottom: var(--trac-space-4); }
+.search-results { list-style: none; margin: 0; padding: 0; }
+.search-result { padding: var(--trac-space-2) 0; border-bottom: 1px solid var(--trac-border); }
+.search-result-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--trac-space-2); }
+.search-result-title { font-weight: 600; }
+.search-snippet { margin: 0.2rem 0 0; color: var(--trac-ink); font-size: 0.9375rem; }
+.search-snippet mark { background: #fff1b8; color: inherit; padding: 0 0.1em; }

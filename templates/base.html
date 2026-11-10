@@ -18,6 +18,11 @@
       <a class="trac-wordmark" href="/">TRAC</a>
       {% primary_nav %}
       <div class="trac-topbar-tools">
+        <form class="trac-search" role="search" method="get" action="{% url 'core:search' %}">
+          <label class="visually-hidden" for="trac-search-input">Search TRAC</label>
+          <input class="form-control form-control-sm" id="trac-search-input" type="search" name="q" value="{{ search_query|default:'' }}" placeholder="Search guides, controls and the Library" autocomplete="off" maxlength="200">
+          <button class="btn btn-sm btn-outline-secondary" type="submit">Search</button>
+        </form>
         {% if suite_links %}
         <div class="dropdown trac-switcher">
           <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Apps</button>

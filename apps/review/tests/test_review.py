@@ -39,7 +39,7 @@ def control(access, tr, tr2):
 
 
 def comment_data(**extra):
-    return {"path": "/rcm/controls/AC-01/", "label": "Access review", "section": "General", "comment": "Unclear.", **extra}
+    return {"path": "/rcm/controls/MA-01/", "label": "Access review", "section": "General", "comment": "Unclear.", **extra}
 
 
 # Comment box
@@ -63,9 +63,9 @@ def test_posting_a_comment_saves_it_and_redirects_with_message(reader, control):
     response = reader.post(reverse("review:comment"), comment_data(section="How to run it"), follow=True)
     item = Feedback.objects.get()
     assert (item.about_url, item.section, item.comment, item.submitted_by) == (
-        "/rcm/controls/AC-01/", "How to run it", "Unclear.", reader.user
+        "/rcm/controls/MA-01/", "How to run it", "Unclear.", reader.user
     )
-    assert response.redirect_chain[-1][0] == "/rcm/controls/AC-01/"
+    assert response.redirect_chain[-1][0] == "/rcm/controls/MA-01/"
     page = response.content.decode()
     assert "your comment was sent to Tech Risk" in page
     assert reverse("review:mine") in page
@@ -115,8 +115,8 @@ def test_queue_lists_in_review_versions_of_several_types(tr, tr2, access):
     _, faq_version = v.create_entity(Faq, FaqVersion, tr.user, question="Do we review?", answer="Yes.")
     v.submit(faq_version, tr.user)
     html = tr.get(reverse("review:queue")).content.decode()
-    assert "AC-01 Access review v1" in html and "Control" in html
-    assert 'href="/rcm/controls/AC-01/?version=1"' in html
+    assert "MA-01 Access review v1" in html and "Control" in html
+    assert 'href="/rcm/controls/MA-01/?version=1"' in html
     assert "Do we review? v1" in html and "FAQ 1" not in html and "Faq" in html
     assert html.count("Yours — another Tech Risk member must approve") == 1
 
@@ -153,7 +153,7 @@ def test_first_drafts_use_their_own_name(tr, tr2, access):
     _, rule_version = v.create_entity(EvidenceRule, EvidenceRuleVersion, tr.user, name="Screenshot standard", items=["x"])
     v.submit(rule_version, tr.user)
     html = tr.get(reverse("review:queue")).content.decode()
-    assert "R-AC-01 Leavers keep access v1" in html
+    assert "R-MA-01 Leavers keep access v1" in html
     assert "Screenshot standard v1" in html and "Evidence rule 1" not in html
 
 

@@ -9,9 +9,16 @@ from apps.core.versioning import current_versions
 from .models import Faq, Page
 
 
+# Guides merged into another one before go-live: their old pages are left out of every list and
+# search, and their links go to the guide that replaced them (views_read.page). No retire step needed.
+MERGED_GUIDES = {
+    "building-or-changing-a-report-used-in-controls": "can-you-trust-the-report",
+}
+
+
 def current_pages():
     """(page, version) pairs for published, non-retired pages, sorted by title."""
-    versions = current_versions(Page)
+    versions = [v for v in current_versions(Page) if v.entity.slug not in MERGED_GUIDES]
     prefetch_related_objects(versions, "platform")  # lists show the platform name
     pairs = [(version.entity, version) for version in versions]
     return sorted(pairs, key=lambda pair: pair[1].title.lower())

@@ -30,6 +30,8 @@ practices:
   Data: |
     - Traffic that carries sensitive data is encrypted in transit.
     - Logs and scan results hold sensitive detail and are limited to the people who need them.
+  Reports: |
+    - Firewall rule and remote access exports used in reviews come from the device or its management console with a visible date, and include every rule rather than a filtered view.
   Network: |
     - Segmentation separates user, server, administration and internet-facing networks, and rules between them are limited to what is needed.
     - Administrative interfaces of network devices are reachable only from administration networks.

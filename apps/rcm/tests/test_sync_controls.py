@@ -84,7 +84,7 @@ def shipped_control_count():
 
 def test_creates_drafts_with_links_and_can_run_again(lead, folder):
     call_command("sync_controls", user="lead", folder=folder)
-    controls = ControlVersion.objects.filter(entity__ident__startswith="CM-")
+    controls = ControlVersion.objects.filter(entity__ident__startswith="MC-")
     assert controls.count() == 9
     assert not controls.exclude(status="draft").exists()
     assert controls.get(title="Peer-reviewed changes").level in levels.keys()
@@ -197,7 +197,7 @@ def test_a_changed_entry_becomes_a_proposal(lead, folder, single):
     sync(folder=folder, publish=True)
     edit_file(folder, "A second person catches mistakes", "A second pair of eyes catches mistakes")
     out = sync(folder=folder)
-    assert "Proposed a change to CM-01: Peer-reviewed changes." in out
+    assert "Proposed a change to MC-01: Peer-reviewed changes." in out
     assert "1 updated, 16 unchanged" in out
     draft = ControlVersion.objects.get(title="Peer-reviewed changes", status="draft")
     assert draft.number == 2 and "second pair of eyes" in draft.why
@@ -244,7 +244,7 @@ def test_force_replaces_a_site_edit(lead, folder, single):
     sync(folder=folder, publish=True)
     site_edit(lead)
     edit_file(folder, "A second person catches mistakes", "Changed wording for mistakes")
-    assert "Proposed a change to CM-01" in sync(folder=folder, force=True)
+    assert "Proposed a change to MC-01" in sync(folder=folder, force=True)
     assert "Changed wording" in ControlVersion.objects.get(title="Peer-reviewed changes", status="draft").why
 
 
@@ -271,7 +271,7 @@ def test_dry_run_changes_nothing_and_says_what_would_happen(lead, folder):
 def test_dry_run_on_a_changed_entry(lead, folder, single):
     sync(folder=folder, publish=True)
     edit_file(folder, "A second person catches mistakes", "Changed wording for mistakes")
-    assert "Would propose a change to CM-01: Peer-reviewed changes." in sync(folder=folder, dry_run=True)
+    assert "Would propose a change to MC-01: Peer-reviewed changes." in sync(folder=folder, dry_run=True)
     assert not ControlVersion.objects.filter(status="draft").exists()
 
 

@@ -43,7 +43,6 @@
   background: var(--category-tint); border-left: 5px solid var(--category); border-radius: var(--trac-radius);
 }
 .practice[open] > summary { margin-bottom: var(--trac-space-2); }
-.runs-on { margin-top: var(--trac-space-4); }
 .guide-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--trac-space-2); }
 
 /* Library tabs */
@@ -86,3 +85,42 @@
 .more-controls[open] > .more-controls-summary { margin-bottom: var(--trac-space-2); }
 .more-controls-body { padding-left: var(--trac-space-3); }
 .more-controls-level { margin: var(--trac-space-2) 0 0.25rem; font-size: 0.8125rem; font-weight: 600; color: var(--trac-ink-secondary); }
+
+/* Platform pills on a category page: pressed pills show that platform's specifics. */
+.platform-toggle {
+  display: inline-block; padding: 0.2rem 0.75rem; border-radius: 999px; font-size: 0.875rem; font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.55); color: inherit; text-decoration: none; background: transparent;
+}
+.platform-toggle:hover { background: rgba(255, 255, 255, 0.12); color: inherit; }
+.platform-toggle[aria-pressed="true"] { background: #ffffff; color: var(--trac-ink); border-color: #ffffff; }
+.platform-toggle[aria-pressed="true"]::before { content: "\2713\00a0"; }
+.platform-notes {
+  margin-bottom: var(--trac-space-3); padding: var(--trac-space-3) var(--trac-space-4);
+  border: 1px solid var(--trac-border); border-left: 5px solid var(--trac-blue); border-radius: var(--trac-radius);
+  background: var(--trac-paper);
+}
+.platform-notes-head { display: flex; justify-content: space-between; align-items: center; gap: var(--trac-space-2); margin-bottom: var(--trac-space-2); }
+.platform-notes-title { font-size: 1.125rem; margin: 0; }
+.platform-notes-intro { margin-bottom: var(--trac-space-2); }
+.platform-notes .guidance-facts { margin-bottom: var(--trac-space-2); }
+.platform-notes-guides, .platform-notes-references, .platform-notes .guidance-docs { font-size: 0.9375rem; margin: 0 0 var(--trac-space-1); }
+.runs-on { font-size: 0.875rem; }
+.platform-specific {
+  margin-top: var(--trac-space-2); padding: var(--trac-space-2) var(--trac-space-3);
+  border-left: 3px solid var(--trac-blue); background: rgba(47, 93, 138, 0.06); border-radius: 0 var(--trac-radius) var(--trac-radius) 0;
+}
+.platform-specific-label { font-size: 0.8125rem; font-weight: 700; color: var(--trac-blue); margin: 0 0 var(--trac-space-1); }
+
+/* Library home: starting points by task. */
+.start-box { margin-bottom: var(--trac-space-4); }
+.start-heading { font-size: 1.25rem; margin-bottom: var(--trac-space-2); }
+.start-list {
+  list-style: none; padding: 0; margin: 0;
+  display: grid; gap: var(--trac-space-2); grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+}
+.start-list li {
+  background: var(--trac-paper); border: 1px solid var(--trac-border); border-radius: var(--trac-radius);
+  padding: var(--trac-space-2) var(--trac-space-3);
+}
+.start-list a { display: block; font-weight: 600; }
+.start-list span { display: block; font-size: 0.875rem; color: var(--trac-muted, #5b6573); margin-top: 0.15rem; }

@@ -1,4 +1,7 @@
-"""Library pages: one page per category and one page per platform. The landing is Home (core:home)."""
+"""Library pages: one page per category, where readers switch on a platform to add its specifics.
+
+The landing is Home (core:home). Old platform addresses open the platform's main category page.
+"""
 
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -33,9 +36,14 @@ def category(request, key):
         raise Http404
     category = Category(key)
     guidance = selectors.current_guidance(category=key)
-    members = selectors.category_platforms(key)
+    members = list(selectors.category_platforms(key).select_related("runs_on"))
+    selected = [p.slug for p in members if p.slug in request.GET.getlist("platform")]
     controls = selectors.applicable_controls(current_controls(), categories=[key], platforms=members)
     edit_url = reverse("platforms:guidance_edit", kwargs={"key": key})
+    platform_guidance = [(p, selectors.current_guidance(platform=p)) for p in members]
+    rows = selectors.add_platform_specifics(
+        selectors.aspect_rows(controls, selectors.active_questions(), guidance), platform_guidance
+    )
     context = {
         "nav_active": "library",
         "category": category,
@@ -45,11 +53,41 @@ def category(request, key):
             summary=guidance.intro if guidance else "",
             action=_edit_button(request, edit_url),
         ),
-        "members": members,
-        "rows": selectors.aspect_rows(controls, selectors.active_questions(), guidance),
+        "toggles": [
+            {"platform": p, "selected": p.slug in selected, "url": _toggle_url(request, key, selected, p.slug)}
+            for p in members
+        ],
+        "panels": _platform_panels(request, platform_guidance, rows, selected),
+        "selected": selected,
+        "rows": rows,
         "references": guidance.references if guidance else [],
     }
     return render(request, "platforms/category.html", context)
+
+
+def _toggle_url(request, key, selected, slug):
+    """The page address with one platform switched on or off (used when scripts are off)."""
+    chosen = [s for s in selected if s != slug] if slug in selected else [*selected, slug]
+    query = "&".join(f"platform={s}" for s in chosen)
+    return reverse("platforms:category", args=[key]) + (f"?{query}" if query else "")
+
+
+def _platform_panels(request, platform_guidance, rows, selected):
+    """One short "about this platform" panel per platform on the page: intro, facts, documentation, guides."""
+    guides = _guides_by_platform()
+    panels = []
+    for platform, guidance in platform_guidance:
+        panels.append({
+            "platform": platform,
+            "selected": platform.slug in selected,
+            "categories": [(Category(key), platform.url_in(key)) for key in platform.categories],
+            "intro": guidance.intro if guidance else "",
+            "references": guidance.references if guidance else [],
+            "guides": guides.get(platform.pk, []),
+            "has_specifics": any(p.pk == platform.pk for row in rows for p, _ in row.specifics),
+            "edit": _edit_button(request, reverse("platforms:guidance_edit", kwargs={"slug": platform.slug})),
+        })
+    return panels
 
 
 def _edit_button(request, edit_url):
@@ -57,51 +95,19 @@ def _edit_button(request, edit_url):
     return ("Edit guidance", edit_url) if permissions.can_propose(request.user) else None
 
 
-def _guides(platform):
-    """Published wiki pages about this platform."""
-    return [
-        {"title": version.title, "section": version.section, "url": page.get_absolute_url()}
-        for page, version in wiki_selectors.current_pages()
-        if version.platform_id == platform.pk
-    ]
+def _guides_by_platform():
+    """Published wiki pages, grouped by the platform they are about."""
+    grouped = {}
+    for page, version in wiki_selectors.current_pages():
+        if version.platform_id:
+            grouped.setdefault(version.platform_id, []).append(
+                {"title": version.title, "section": version.section, "url": page.get_absolute_url()}
+            )
+    return grouped
 
 
 @can_view
 def detail(request, slug):
+    """Platforms no longer have their own page: open the main category page with the platform switched on."""
     platform = get_object_or_404(Platform, slug=slug, is_active=True)
-    primary = Category(platform.primary_category)
-    controls = current_controls()
-    questions = selectors.active_questions()
-    practices, references = [], []
-    for key in platform.categories:
-        guidance = selectors.current_guidance(category=key)
-        rows = selectors.aspect_rows(selectors.applicable_controls(controls, categories=[key]), questions, guidance)
-        practices.append({"category": Category(key), "rows": rows, "count": sum(row.has_content for row in rows)})
-        references += guidance.references if guidance else []
-    guidance = selectors.current_guidance(platform=platform)
-    edit_url = reverse("platforms:guidance_edit", kwargs={"slug": platform.slug})
-    references += guidance.references if guidance else []
-    specific = selectors.aspect_rows(
-        selectors.applicable_controls(controls, platforms=[platform]), questions, guidance
-    )
-    context = {
-        "nav_active": "library",
-        "platform": platform,
-        "category": primary,
-        "band": make_band(
-            [
-                *_library_crumbs(primary),
-                (primary.label, reverse("platforms:category", args=[primary.value])),
-                (platform.name, None),
-            ],
-            title=platform.name,
-            summary=guidance.intro if guidance else "",
-            action=_edit_button(request, edit_url),
-        ),
-        "practices": practices,
-        "specific_rows": [row for row in specific if row.has_content],
-        "guides": _guides(platform),
-        "references": list({r["url"]: r for r in references}.values()),
-        "edit_url": edit_url,
-    }
-    return render(request, "platforms/detail.html", context)
+    return redirect(platform.get_absolute_url())

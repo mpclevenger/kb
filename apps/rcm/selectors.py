@@ -68,9 +68,13 @@ def fold_by_level(items, level_of):
     This is the one rule behind "important controls first, the rest under More controls" on every
     reader page. `level_of(item)` gives an item's level key. `shown` holds the items whose level is
     open in levels.yaml, most important first. `more` is a list of LevelGroup for the folded levels.
+    If nothing is at an open level, nothing is folded: the items are shown as they are, since a
+    "More controls" fold with nothing above it would hide the only controls there are.
     """
     ranked = sort_by_level(items, level_of)
     shown = [item for item in ranked if levels.is_open(level_of(item))]
+    if not shown:
+        return ranked, []
     more = []
     for item in ranked:
         key = level_of(item)

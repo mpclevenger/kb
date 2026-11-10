@@ -130,6 +130,15 @@ def test_publish_publishes_new_and_updated_guides_in_single_approver_mode(folder
     assert "Second version." in Page.objects.get(slug="sample-guide").current().body
 
 
+def test_a_title_changed_in_the_file_updates_the_same_guide(folder, owner, settings, capsys):
+    settings.ALLOW_SELF_APPROVAL = True
+    sync(owner, folder, capsys, "--publish")
+    write(folder, title="Sample guide, renamed")
+    out = sync(owner, folder, capsys, "--publish")
+    assert "published an update" in out and Page.objects.count() == 1
+    assert Page.objects.get(slug="sample-guide").current().title == "Sample guide, renamed"
+
+
 def test_dry_run_reports_and_changes_nothing(folder, owner, settings, capsys):
     out = sync(owner, folder, capsys, "--dry-run")
     assert f"{TITLE}: would draft as a new guide." in out and "Dry run, nothing changed" in out
@@ -210,3 +219,24 @@ def test_export_keeps_a_table_with_lists_as_html(published_real_guides, tmp_path
     text = (tmp_path / "initiative-lifecycle.md").read_text(encoding="utf-8")
     assert "<!-- This table is written in HTML" in text and "<ul><li>" in text
     assert "## Stage 2: Build and configure" in text and "#### Item 3:" in text
+
+
+@pytest.mark.django_db
+def test_a_merged_guide_redirects_to_the_guide_that_replaced_it(sso):
+    from apps.core.tests.support import As
+
+    response = As("reader").get("/guides/building-or-changing-a-report-used-in-controls/")
+    assert response.status_code == 301
+    assert response["Location"] == "/guides/can-you-trust-the-report/"
+
+
+@pytest.mark.django_db
+def test_a_merged_guide_is_left_out_of_lists_and_search():
+    from apps.core.tests.support import make_user
+    from apps.wiki import selectors
+    from apps.wiki.tests.support import make_page
+
+    proposer, approver = make_user("p", "tech_risk"), make_user("a", "tech_risk")
+    make_page(proposer, approver, title="Building or changing a report used in controls")
+    kept = make_page(proposer, approver, title="Reports used in controls")
+    assert [page for page, _ in selectors.current_pages()] == [kept]

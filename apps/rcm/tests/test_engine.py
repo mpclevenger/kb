@@ -171,7 +171,7 @@ def test_a_bad_indicator_type_names_the_file_and_the_driver(engine):
     (lambda d: d["RD01"].pop("owner_role"), "drivers.json, RD01: 'owner_role' is missing"),
     (lambda d: d["RD01"].update(extra=1), "drivers.json, RD01: 'extra' isn't a known field"),
     (lambda d: d["RD01"].update(title=5), "drivers.json, RD01, field 'title': expected text"),
-    (lambda d: d["RD01"].update(trac_risks="R-AC-01"), "field 'trac_risks'"),
+    (lambda d: d["RD01"].update(trac_risks="R-MA-01"), "field 'trac_risks'"),
     (lambda d: d.update({"D-01": {}}), "drivers.json, D-01: the id must look like RD01"),
 ])
 def test_drivers_json_mistakes_are_explained(engine, mutate, fragment):
@@ -219,7 +219,7 @@ def test_new_drivers_become_drafts_with_engine_and_trac_fields(engine, lead):
     assert rd01.description.startswith("The application keeps its own user accounts")
     assert rd01.trigger == "(get(RD01)==TRUE)" and rd01.questionnaire_fields == ["RD01"]
     assert rd01.indicators[0] == {"type": "leading", "text": "Number of systems that keep their own user lists."}
-    assert rd01.trac_risks == ["R-AC-03"]
+    assert rd01.trac_risks == ["R-MA-03"]
     rd50 = Driver.objects.get(ident="RD50").versions.get()
     assert rd50.title == "Feeds the financial statements" and rd50.owner_role == NO_OWNER_YET
     assert sorted(Driver.objects.values_list("ident", flat=True))[:2] == ["RD01", "RD02"]
@@ -338,10 +338,10 @@ def test_a_driver_that_left_the_engine_is_left_alone_with_a_note(engine, lead, s
 
 
 def test_check_engine_reports_unknown_trac_risks_as_warnings(engine, capsys):
-    edit_drivers(lambda d: d["RD02"].update(trac_risks=["R-AC-77"]))
+    edit_drivers(lambda d: d["RD02"].update(trac_risks=["R-MA-77"]))
     out = io.StringIO()
     call_command("check_engine", stdout=out)
-    assert "Warning: drivers.json, RD02: TRAC risk R-AC-77 doesn't exist in the site." in out.getvalue()
+    assert "Warning: drivers.json, RD02: TRAC risk R-MA-77 doesn't exist in the site." in out.getvalue()
     assert "All good: 8 drivers, 2 engine risks." in out.getvalue()
 
 
@@ -409,9 +409,9 @@ def test_the_explorer_links_to_the_engine_risks(loaded):
 @pytest.mark.usefixtures("sso")
 def test_the_driver_page_shows_engine_details_indicators_and_links(loaded, access, lead):
     risk, version = services.create_risk(lead, access, title="Leavers keep access", statement="s", owner_role="IAM")
-    assert risk.ident == "R-AC-01"
+    assert risk.ident == "R-MA-01"
     publish(version, As("approver", "tr").user)
-    edit_drivers(lambda d: d["RD01"].update(trac_risks=["R-AC-01"]))
+    edit_drivers(lambda d: d["RD01"].update(trac_risks=["R-MA-01"]))
     call_command("sync_engine", user="lead", force=True, stdout=io.StringIO())
     driver = Driver.objects.get(ident="RD01")
     publish(driver.open_proposal(), As("approver", "tr").user)

@@ -12,7 +12,7 @@ Reviewers and auditors ask the same few questions about every control. Preparing
 - **Who.** Who runs it, who reviews it, and why they are independent of what they check.
 - **Completeness.** How you know the control sees every item, for example every user, every change or every job run.
 - **Evidence.** A real example that shows each step in your written procedure, with dates visible.
-- **Reports.** If the control relies on a report or query, how you know its output is complete and accurate. See [Can you trust the report?](/guides/can-you-trust-the-report/).
+- **Reports.** If the control relies on a report or query, how you know its output is complete and accurate. See [Reports used in controls](/guides/can-you-trust-the-report/).
 - **Vendors.** If a vendor runs part of the system, which of its controls you rely on and when you last reviewed its SOC report.
 - **The period.** Evidence for every run across the whole period, not only recent ones.
 - **Changes.** Whether anything about the control, the system or the people running it changed during the period.

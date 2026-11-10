@@ -10,11 +10,11 @@ The stages, exit gates and evidence are in the [Initiative lifecycle](/guides/in
 ```mermaid
 flowchart TD
   accTitle: How the oversight level is set
-  accDescr: The owner's intake answers decide the level. A tier 0 or tier 1 app or a SOX in-scope app plus another yes, or three or more yes answers, gives Enhanced. One or two yes answers give Standard. No yes answers give Light. The level then sets what is needed at each stage exit.
+  accDescr: The owner's intake answers decide the level. No yes answers give Light. One yes answer gives Standard. Two or more yes answers give Enhanced. The level then sets what is needed at each stage exit.
   Q[Intake answers] --> D{How many yes answers?}
-  D -->|Tier 0 or 1 or SOX app, plus another yes, or 3 or more yes| E[Enhanced]
-  D -->|1 or 2 yes| S[Standard]
   D -->|None| L[Light]
+  D -->|One| S[Standard]
+  D -->|Two or more| E[Enhanced]
   E --> NE[Approver sign-off at most stage exits]
   S --> NS[Mix of sign-off and Tech Risk review]
   L --> NL[Mostly owner confirms]
@@ -36,9 +36,9 @@ The owner answers these questions at intake. The level comes from the answers. T
 
 ## Which level
 
-- Enhanced: a BCP tier 0 or tier 1 app or a SOX in-scope app is affected and at least one other answer is yes, or three or more answers are yes.
-- Standard: one or two answers are yes.
 - Light: no answers are yes.
+- Standard: one answer is yes.
+- Enhanced: two or more answers are yes. Each further yes adds to the risk, so the initiative gets closer oversight.
 
 ## What is needed to move on
 

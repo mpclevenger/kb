@@ -19,7 +19,7 @@
 {% if intro.strip %}<article class="trac-paper library-body library-intro">{{ intro }}</article>{% endif %}
 {% section_toolbar %}
 {% for section in sections %}
-  {% include "components/section_card.html" with title=section.title heading_id=section.id content=section.html tone="neutral" open=start_open body_class="library-body" %}
+  {% include "components/section_card.html" with title=section.title heading_id=section.id content=section.html tone="neutral" open=section.open body_class="library-body" %}
 {% endfor %}
 {% endif %}
 {% include "components/references.html" with references=v.references %}

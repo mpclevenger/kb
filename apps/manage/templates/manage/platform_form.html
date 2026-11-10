@@ -27,7 +27,7 @@
 {% include "components/field_form.html" with field=form.summary %}
 <div class="mb-3">
   <div class="form-label">{{ form.doc_links.label }}</div>
-  {% include "components/references_editor.html" with field=form.doc_links help="Shown in the platform page header as Documentation. Add up to 10." %}
+  {% include "components/references_editor.html" with field=form.doc_links help="Shown in the platform's notes box on category pages as Documentation. Add up to 10." %}
 </div>
 {% include "components/field_form.html" with field=form.is_active %}
 {% endblock %}

@@ -4,7 +4,7 @@ A plain-English tour for the person who owns TRAC. You do not need to read code.
 
 ## What TRAC is, in three sentences
 
-TRAC is Tech Risk's website of guidance: guides, FAQs, control patterns, risks and platform pages that anyone in the firm can read and comment on. Only Tech Risk can write it, and every change must be approved by a second Tech Risk person before it becomes official. Every old version and every approval step is kept, so you can always show who changed what and when.
+TRAC is Tech Risk's website of guidance: guides, FAQs, control patterns, risks and Library pages (each category with switchable platform specifics) that anyone in the firm can read and comment on. Only Tech Risk can write it, and every change must be approved by a second Tech Risk person before it becomes official. Every old version and every approval step is kept, so you can always show who changed what and when.
 
 ## The building blocks
 
@@ -107,7 +107,7 @@ To change a rule, edit that table and run the tests. The test `apps/core/tests/t
 
 Read these aloud:
 
-- TRAC is Tech Risk's guidance website: guides, control patterns, risks and platform pages, all in one place.
+- TRAC is Tech Risk's guidance website: guides, control patterns, risks and Library pages, all in one place.
 - Everyone in the firm can read it and leave a comment on any page; only Tech Risk can write it.
 - Every change is a new version that a second Tech Risk person approves, so the published text is always reviewed and nothing is overwritten.
 - Every version and approval is logged, so we can show an auditor who changed what, when, and who approved it.

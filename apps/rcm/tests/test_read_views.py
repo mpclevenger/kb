@@ -26,7 +26,7 @@ def topics():
 
 @pytest.fixture
 def access():
-    return Topic.objects.get(id_prefix="AC")
+    return Topic.objects.get(id_prefix="MA")
 
 
 @pytest.fixture

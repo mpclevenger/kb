@@ -66,6 +66,8 @@ def index(request):
 
 @can_view
 def page(request, slug):
+    if slug in selectors.MERGED_GUIDES:
+        return redirect("wiki:page", selectors.MERGED_GUIDES[slug], permanent=True)
     item = detail.resolve_version(request, get_object_or_404(Page, slug=slug))
     version = item.version
     body, toc = add_heading_anchors(clean_html(version.body))
@@ -77,8 +79,15 @@ def page(request, slug):
         "body": mark_safe(body),
         # Each h2 section is shown as a card. Long guides start collapsed so they read as a list.
         "intro": mark_safe(intro),
-        "sections": [{**section, "html": mark_safe(section["html"])} for section in sections],
-        "start_open": len(sections) < COLLAPSE_FROM,
+        # A section holding a diagram always starts open, so the diagram is seen first.
+        "sections": [
+            {
+                **section,
+                "html": mark_safe(section["html"]),
+                "open": len(sections) < COLLAPSE_FROM or 'class="mermaid"' in section["html"],
+            }
+            for section in sections
+        ],
         "toc": toc,
         "footer": detail.footer(item),
         "history_url": detail.history_url(request, item.entity),

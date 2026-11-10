@@ -17,10 +17,11 @@ Everything below needs the **Tech Risk** role. Every change is a proposal: you s
 | Add or edit a control or risk | Risks and controls → **New control / New risk**, or open the item → **Edit** |
 | Change a risk driver, or see the engine's risks | Drivers and engine risks come from the risk engine's files, not the site. See "Refresh from the risk engine" in Part 2 |
 | Add or edit an evidence rule | Risks and controls → **Evidence rules** |
-| Write the guidance for a category or platform | Open the category or platform page → **Edit guidance** |
+| Write the guidance for a category or platform | Open the category page → **Edit guidance**; for a platform, switch on its pill and use **Edit <platform> guidance** in its box |
 | Add a platform, or put it in another category | Manage → Platforms |
 | Add a topic, or change its stages and themes | Manage → Topics |
-| Change the "risk area" questions used on platform pages | Manage → Aspect questions |
+| Change the starting points on the Library home ("Start from what you're working on") | Edit `apps/platforms/templates/platforms/library.html`: each item is a title, a line and a guide link |
+| Change the "risk area" questions used on category pages | Manage → Aspect questions |
 | See the key controls for SOX in-scope apps | Open `/rcm/sox/` (linked from the Library). It lists every published key control; set a control's **Level** to the first level in `content/controls/levels.yaml` (Key) and it appears there |
 | Change the control levels (add one, rename one, choose which are shown by default) | Edit `content/controls/levels.yaml`: to add a level, add an entry; to show a level by default, set `open: true`. Then run the check |
 | Retire a guide, FAQ, control, risk or driver | Open it → **Retire**, give a reason. A second Tech Risk member approves it in the usual way |
@@ -128,7 +129,7 @@ Colors live in the CSS files in `static/css/`. Each file starts with a comment s
 - `trac.css`: the main colors (top of the file, under `:root`), category colors (`.category-…`), and the shared pieces above
 - `library.css`: guide section colors (`.library-section-…`)
 - `topics.css`: topic pages and lifecycle colors
-- `guidance.css`: Library, category and platform pages
+- `guidance.css`: Library and category pages, including the platform pills
 
 After changing a color, run the tests. One test checks that every text color is readable on its background and names the one that isn't.
 

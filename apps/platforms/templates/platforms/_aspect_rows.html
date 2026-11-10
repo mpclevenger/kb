@@ -1,4 +1,4 @@
-{% load trac_labels trac_ui %}{# One row per aspect question. Pass rows; show_gaps adds "Guidance coming soon" and "No control yet" where a row has none. The category color comes from the surrounding element. #}
+{% load trac_labels trac_ui %}{# One row per aspect question, with each platform's own line underneath (shown when its pill is on; needs selected). Pass rows; show_gaps adds "Guidance coming soon" and "No control yet" where a row has none. The category color comes from the surrounding element. #}
 <ul class="place-list">
   {% for row in rows %}
   <li class="place-row">
@@ -8,6 +8,12 @@
     </div>
     <div class="place-guidance">
       {% if row.line %}{{ row.line|bullets }}{% elif show_gaps %}<p class="text-secondary">Guidance coming soon</p>{% endif %}
+      {% for platform, line in row.specifics %}
+      <div class="platform-specific" data-platform-content="{{ platform.slug }}"{% if platform.slug not in selected %} hidden{% endif %}>
+        <p class="platform-specific-label">On {{ platform.name }}</p>
+        {{ line|bullets }}
+      </div>
+      {% endfor %}
     </div>
     <div class="place-controls">
       {% for control, version in row.controls %}{% control_pill control.ident version.title control.get_absolute_url %}

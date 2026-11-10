@@ -23,6 +23,6 @@ def add_faq(author):
         question=DEMO_FAQ_QUESTION,
         answer="Yes. Service accounts can change data like any user, so include them and confirm each one "
                "still has an owner.",
-        topic=Topic.objects.get(id_prefix="AC"),
+        topic=Topic.objects.get(id_prefix="MA"),
     )
     return True

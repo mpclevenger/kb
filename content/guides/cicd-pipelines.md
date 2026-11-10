@@ -34,13 +34,13 @@ flowchart TD
 A reviewer checking change management will ask four questions. A good pipeline answers each from its own records.
 
 - **Was every change requested and approved?** Each production change traces to a request and an approved pull request.
-- **Was the approver someone other than the author?** The approval record names a different person.
+- **Was the approver the right person?** The approval record names someone other than the author who has the knowledge and seniority to judge the change, such as a tech lead or the code owner for that area. Higher-risk changes call for a more senior approver.
 - **Could anyone change production another way?** Nobody has standing access that skips the pipeline for day-to-day work, and any exception is logged and reviewed.
 - **Is the list of changes complete?** A system-generated list of every production deployment in a period can be matched to approvals.
 
 ## How do you make sure every change is reviewed?
 
-The pull request is the change approval, so the repository is set up so it can't be skipped: a pull request, an approver other than the author, passing checks and no bypass on the default and release branches. The details are in [Repository management](/guides/repository-management/).
+The pull request is the change approval, so the repository is set up so it can't be skipped: a pull request, an appropriate approver other than the author, passing checks and no bypass on the default and release branches. The details are in [Repository management](/guides/repository-management/).
 
 - The same path covers application code, configuration, infrastructure as code, database schema and job definitions, and each pull request carries its request number.
 
@@ -58,7 +58,7 @@ Anyone who can edit the pipeline can edit the controls out of it, so pipeline de
 
 - Named owners approve every change to pipeline files (see [Repository management](/guides/repository-management/)).
 - A small, named group manages deployment environments and secrets, and changes to those settings are logged and reviewed. Workflow and runner security is in [GitHub Actions runners](/guides/github-actions-runners/).
-- The production deployment step has its own gates: required checks that can't be skipped, and a named approver other than the author where the risk calls for one. A way back is known before each release.
+- The production deployment step has its own gates: required checks that can't be skipped, and a named approver other than the author, at a seniority that fits the risk of the release. A way back is known before each release.
 
 ## What about emergencies and proving completeness?
 
@@ -70,7 +70,7 @@ Some fixes can't wait for the normal path.
 
 ## How does this work on GitHub Enterprise Server and Databricks?
 
-- **GitHub Enterprise Server:** the pull request, environment and deployment history are the evidence, and the audit log is streamed to Splunk. See the GitHub Enterprise Server platform page and the two guides linked above.
+- **GitHub Enterprise Server:** the pull request, environment and deployment history are the evidence, and the audit log is streamed to Splunk. See the Engineering tools page in the Library, with GitHub Enterprise Server switched on, and the two guides linked above.
 - **Databricks:** notebooks, jobs and pipelines are kept in Git and deployed with Declarative Automation Bundles (formerly Databricks Asset Bundles), run by the pipeline as a service principal. People don't have edit rights in the production workspace, and workspace audit logs show production changes came from the deployment identity.
 
 If you're unsure, Tech Risk can help.

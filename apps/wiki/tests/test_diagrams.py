@@ -135,7 +135,9 @@ def test_diagrams_draw_as_svg_without_errors(live_server, browser_page):
         assert "Syntax error" not in browser_page.content()
         assert "mermaid version" not in browser_page.content()
         assert browser_page.locator("pre.mermaid:not([data-processed])").count() == 0
-    assert browser_page.locator("details.section-card[open]").count() == 0
+    # A card holding a diagram starts open; the other cards of a long guide stay closed
+    assert browser_page.locator("details.section-card[open]").count() == 1
+    assert browser_page.locator("details.section-card[open] pre.mermaid").count() == 1
 
 
 @pytest.mark.django_db(transaction=True)
@@ -148,3 +150,24 @@ def test_a_page_without_a_diagram_does_not_load_mermaid(live_server, browser_pag
     browser_page.goto(live_server.url + reverse("wiki:page", args=[page.slug]))
     browser_page.wait_for_load_state("networkidle")
     assert not [url for url in loaded if "mermaid" in url]
+
+
+@pytest.mark.django_db(transaction=True)
+def test_clicking_a_stage_box_shows_that_stage_beside_the_diagram(live_server, browser_page):
+    user = make_user("proposer", "tech_risk")
+    approver = make_user("approver", "tech_risk")
+    shipped = parse_guide(GUIDES_DIR / "initiative-lifecycle.md")
+    page = make_page(user, approver, title=shipped.title, body=shipped.body)
+    browser_page.set_viewport_size({"width": 1400, "height": 1000})
+    browser_page.goto(live_server.url + reverse("wiki:page", args=[page.slug]))
+    browser_page.wait_for_selector("html[data-diagrams=ready]", timeout=30000)
+    assert browser_page.locator("pre.mermaid .diagram-link").count() == 7
+    browser_page.locator("pre.mermaid .diagram-link", has_text="Stage 3").click()
+    panel = browser_page.locator(".diagram-panel")
+    assert panel.locator("h3").inner_text() == "Stage 3: Test and validate"
+    assert "Migration rehearsal reconciled" in panel.inner_text()
+    assert panel.locator("[id]").count() == 0
+    assert browser_page.evaluate("location.hash") == ""
+    # The diagram's own card is open; the stage cards below stay closed
+    assert browser_page.locator("details.section-card[open]").count() == 1
+    browser_page.screenshot(path="/tmp/lifecycle.png", full_page=False)

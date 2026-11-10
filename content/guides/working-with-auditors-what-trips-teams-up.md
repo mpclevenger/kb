@@ -16,7 +16,7 @@ Auditors test what you can show, not what you meant to do. These are the habits 
 ## Populations and reports
 
 - **User lists and change lists can be reproduced.** Save the query or report settings, the run date and the record count.
-- **Completeness is shown, not assumed.** Show how you know a report is complete and accurate, using the source count and the query logic. See [Can you trust the report?](/guides/can-you-trust-the-report/).
+- **Completeness is shown, not assumed.** Show how you know a report is complete and accurate, using the source count and the query logic. See [Reports used in controls](/guides/can-you-trust-the-report/).
 - **Exclusions are recorded up front.** Document every exclusion, such as service accounts, and the reason before the control runs.
 - **Evidence is kept for every run in the period**, not only the latest, because samples are drawn from the whole period.
 

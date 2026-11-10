@@ -52,7 +52,7 @@ def rows_by_label(platform):
 
 def test_aspect_rows_flag_gaps(seeded, owner, approver):
     ghes = Platform.objects.get(name="GitHub Enterprise Server")
-    control(owner, approver, "AC", platforms=[ghes], level="key")
+    control(owner, approver, "MA", platforms=[ghes], level="key")
     rows = rows_by_label(ghes)
     assert len(rows["Access"].controls) == 1 and rows["Access"].has_content
     assert not rows["Recovery"].controls and not rows["Recovery"].has_content
@@ -61,8 +61,8 @@ def test_aspect_rows_flag_gaps(seeded, owner, approver):
 def test_applicable_controls_match_categories_or_platforms(seeded, owner, approver):
     sql = Platform.objects.get(name="SQL Server")
     by_category = control(owner, approver, "DR", categories=["database"], title="By category")
-    by_platform = control(owner, approver, "AC", platforms=[sql], title="By platform")
-    control(owner, approver, "CM", categories=["network"], title="Unrelated")
+    by_platform = control(owner, approver, "MA", platforms=[sql], title="By platform")
+    control(owner, approver, "MC", categories=["network"], title="Unrelated")
     controls = current_controls()
     assert {c.ident for c, _ in selectors.applicable_controls(controls, categories=["database"])} == {by_category.ident}
     assert {c.ident for c, _ in selectors.applicable_controls(controls, platforms=[sql])} == {by_platform.ident}

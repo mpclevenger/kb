@@ -19,7 +19,7 @@ platforms:
     runs_on: Windows Server
     docs: https://example.com/sql
 aspects:
-  - topic: AC
+  - topic: MA
     label: Access
     question: Who can log in?
 """
@@ -39,7 +39,7 @@ def small_catalog(tmp_path, text=SMALL):
 def test_the_shipped_catalog_is_valid(topics):
     catalog = read_catalog()
     assert catalog.problems == []
-    assert len(catalog.platforms) == 12 and len(catalog.aspects) == 10
+    assert len(catalog.platforms) == 12 and len(catalog.aspects) == 12
     kubernetes = next(p for p in catalog.platforms if p["name"] == "Kubernetes")
     assert kubernetes["hosting"] == "hybrid"
 
@@ -51,7 +51,7 @@ def test_a_small_catalog_is_read(topics, tmp_path):
         "name": "SQL Server", "categories": ["database", "jobs"], "hosting": "",
         "runs_on": "Windows Server", "docs": "https://example.com/sql",
     }
-    assert catalog.aspects == [{"topic": "AC", "label": "Access", "question": "Who can log in?"}]
+    assert catalog.aspects == [{"topic": "MA", "label": "Access", "question": "Who can log in?"}]
 
 
 @pytest.mark.parametrize("old, new, fragment", [
@@ -59,7 +59,7 @@ def test_a_small_catalog_is_read(topics, tmp_path):
     ("hosting: on_prem", "hosting: moon", "hosting 'moon' isn't allowed"),
     ("runs_on: Windows Server", "runs_on: Nowhere", "runs_on 'Nowhere' isn't another platform"),
     ("docs: https://example.com/sql", "docs: example.com", "'docs' should be a web link"),
-    ("topic: AC", "topic: ZZ", "'ZZ' isn't a topic ID prefix on this site"),
+    ("topic: MA", "topic: ZZ", "'ZZ' isn't a topic ID prefix on this site"),
     ("label: Access", "lable: Access", "'lable' isn't a known field"),
 ])
 def test_mistakes_get_plain_messages(topics, tmp_path, old, new, fragment):

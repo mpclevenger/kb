@@ -6,7 +6,7 @@ order: 14
 ---
 For each Active Directory component, this guide covers what it does, what could go wrong, the controls that address it and how to show they work.
 
-Whoever controls Active Directory controls every system that trusts it. So the directory, its domain controllers and everything used to administer them are treated as the most trusted systems and kept apart from everyday ones. This guide covers the on-premises side; the Entra ID platform page covers the cloud side, and the Active Directory platform page has the summary by risk area.
+Whoever controls Active Directory controls every system that trusts it. So the directory, its domain controllers and everything used to administer them are treated as the most trusted systems and kept apart from everyday ones. This guide covers the on-premises side; Entra ID in the Library covers the cloud side, and the Identity page in the Library, with Active Directory switched on, has the summary by risk area.
 
 ## Domain controllers
 

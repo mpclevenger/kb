@@ -36,7 +36,8 @@ def sync_guide(guide, user, *, publish=False, force=False, dry_run=False):
     """Bring one guide file into the site as a draft (or publish it). Returns a cs.Outcome."""
     title = guide.title
     found = PageVersion.objects.filter(title=title).select_related("entity").order_by("-number").first()
-    page = found.entity if found else None
+    # A guide whose title was changed in its file is still the same guide: fall back to its file name (the page slug).
+    page = found.entity if found else Page.objects.filter(slug=guide.slug).first()
     notes = []
     platform = _platform_for(guide, notes)
     suffix = f" (note: {notes[0]})" if notes else ""

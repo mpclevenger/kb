@@ -1,4 +1,4 @@
-"""Checks the Library, category and platform pages."""
+"""Checks the Library and category pages, including switching on a platform's specifics."""
 
 from datetime import date
 
@@ -98,10 +98,10 @@ def test_card_has_a_top_bar_class_a_linked_title_and_platform_chips(client):
 
 def test_platform_appears_on_every_card_it_belongs_to(client):
     html = get(client, reverse("core:home"))
-    aws = Platform.objects.get(name="AWS").get_absolute_url()
-    for key in Platform.objects.get(name="AWS").categories:
-        assert f'href="{aws}">AWS</a>' in card(html, key), key
-    assert html.count(f'href="{aws}">AWS</a>') == 4
+    aws = Platform.objects.get(name="AWS")
+    for key in aws.categories:
+        assert f'href="{aws.url_in(key)}">AWS</a>' in card(html, key), key  # opens that card's page with AWS on
+    assert html.count(">AWS</a>") == 4
     assert "AWS" not in card(html, "jobs") and "AWS" not in card(html, "network")
 
 
@@ -126,19 +126,31 @@ def test_library_tabs_mark_the_topic_tab_when_asked():
 
 # Category page
 
-def test_category_page_band_heading_and_applies_to_chips(client):
+def test_category_page_band_heading_and_platform_pills(client):
     html = category_page(client, "jobs")
     assert 'class="guidance-band category-jobs"' in html
     assert '<h1 class="band-title">Jobs and interfaces</h1>' in html
     assert ">Well-controlled jobs and interfaces</h2>" in html
     crumbs = section(html, 'aria-label="Breadcrumb"', "</nav>")
     assert crumbs.index("Library") < crumbs.index("The stack") and ">Home<" not in crumbs
-    chips = section(html, 'aria-label="Applies to"', "</ul>")
+    pills = section(html, 'aria-label="Show specifics for"', "</ul>")
     for name in ("In-house job scheduler", "SQL Server", "Windows Server", "Splunk", "Databricks", "GitHub Enterprise Server"):
-        assert f">{name}</a>" in chips
-    assert Platform.objects.get(name="SQL Server").get_absolute_url() in chips
-    assert "AWS" not in chips and "VPN" not in chips
+        assert f">{name}</a>" in pills
+    assert 'href="/platforms/category/jobs/?platform=sql-server" role="button" aria-pressed="false" data-platform-toggle="sql-server"' in pills
+    assert "AWS" not in pills and "VPN" not in pills
     assert "Shared services" in section(category_page(client, "identity"), 'aria-label="Breadcrumb"', "</nav>")
+
+
+def test_selected_pill_is_pressed_and_its_link_switches_it_off(client):
+    html = get(client, reverse("platforms:category", args=["jobs"]) + "?platform=sql-server")
+    pills = section(html, 'aria-label="Show specifics for"', "</ul>")
+    assert 'href="/platforms/category/jobs/" role="button" aria-pressed="true" data-platform-toggle="sql-server"' in pills
+    assert 'href="/platforms/category/jobs/?platform=sql-server&amp;platform=splunk"' in pills
+
+
+def test_platforms_not_on_the_page_are_ignored_in_the_address(client):
+    html = get(client, reverse("platforms:category", args=["jobs"]) + "?platform=vpn&platform=nope")
+    assert 'aria-pressed="true"' not in html
 
 
 def test_every_category_page_has_its_heading(client):
@@ -170,10 +182,10 @@ def test_category_page_without_guidance_has_no_intro_and_no_references(client):
 
 
 def test_category_rows_match_controls_by_category_or_platform_tag_and_topic(client):
-    by_category = publish_control("AC", title="Category tagged", categories=[Category.JOBS])
-    by_platform = publish_control("AC", [Platform.objects.get(name="Splunk")], title="Platform tagged")
-    other_category = publish_control("AC", title="Other category", categories=[Category.DATABASE])
-    other_topic = publish_control("CM", title="Other topic", categories=[Category.JOBS])
+    by_category = publish_control("MA", title="Category tagged", categories=[Category.JOBS])
+    by_platform = publish_control("MA", [Platform.objects.get(name="Splunk")], title="Platform tagged")
+    other_category = publish_control("MA", title="Other category", categories=[Category.DATABASE])
+    other_topic = publish_control("MC", title="Other topic", categories=[Category.JOBS])
     html = category_page(client, "jobs")
     access = section(html, ">Access</a>", "</li>")
     assert by_category.ident in access and by_platform.ident in access
@@ -194,152 +206,45 @@ def test_category_unknown_is_404(client):
     assert client.get("/platforms/category/mainframe/").status_code == 404
 
 
-# Platform page
+# Platform specifics on a category page (platforms no longer have their own page)
 
-def sql_page(client):
-    return platform_page(client, "SQL Server")
-
-
-def test_platform_page_band_has_primary_color_pills_for_every_category_facts_and_documentation(client):
-    Platform.objects.filter(name="SQL Server").update(owner="Database team")
-    html = sql_page(client)
-    band = section(html, 'class="guidance-band category-database"', "</main>")
-    assert '<h1 class="band-title">SQL Server</h1>' in band
-    facts = section(band, 'class="guidance-facts"', "</div>")
-    assert facts.index("category-database") < facts.index("category-jobs")
-    assert "On-premises" in facts and "Database team" in facts
-    docs = section(band, 'class="guidance-docs"', "</p>")
-    assert 'Documentation:' in docs
-    assert 'href="https://learn.microsoft.com/sql/sql-server/" target="_blank" rel="noopener noreferrer">SQL Server documentation</a>' in docs
-    crumbs = section(html, 'aria-label="Breadcrumb"', "</nav>")
-    assert crumbs.index("Library") < crumbs.index("The stack") < crumbs.index("Database") < crumbs.index("SQL Server")
+def database_page(client, *slugs):
+    query = "&".join(f"platform={s}" for s in slugs)
+    return get(client, reverse("platforms:category", args=["database"]) + (f"?{query}" if query else ""))
 
 
-def test_platform_band_color_follows_the_first_category(client):
-    Platform.objects.filter(name="SQL Server").update(categories=["jobs", "database"])
-    assert 'class="guidance-band category-jobs"' in sql_page(client)
-
-
-def test_documentation_line_is_hidden_without_links(client):
-    html = platform_page(client, "VPN")
-    assert "Documentation:" not in html
-    Platform.objects.filter(name="VPN").update(doc_links=[
-        {"label": "Internal VPN runbook", "url": "https://wiki.example.com/vpn"},
-        {"label": "Vendor guide", "url": "https://vendor.example.com/vpn"},
-    ])
-    docs = section(platform_page(client, "VPN"), 'class="guidance-docs"', "</p>")
-    assert docs.index("Internal VPN runbook") < docs.index("Vendor guide") and docs.count("noopener noreferrer") == 2
-
-
-def test_platform_heading_and_sections_in_order(client):
-    html = sql_page(client)
-    order = ["What good looks like on SQL Server", "Common practices", "Guides for", "References", "Runs on:"]
-    present = [html.index(text) for text in order if text in html]
-    assert present == sorted(present) and html.index("What good looks like on SQL Server") > 0
-
-
-def test_common_practices_are_one_collapsed_section_per_category_with_counts(client):
-    publish_guidance({"category": "database"}, lines={"Access": "Limit admin access.", "Recovery": "Test restores."})
-    publish_control("AC", title="Database access review", categories=[Category.DATABASE], level="key")
-    publish_control("CM", title="Jobs change review", categories=[Category.JOBS], level="key")
-    html = sql_page(client)
-    practices = section(html, 'id="practices-heading"', "</section>")
-    assert practices.count("<details") == 2
-    assert "<details open" not in practices and " open>" not in practices
-    database = section(practices, "<details", "</details>")
-    assert "category-database" in database and "<summary>Database (3)</summary>" in database
-    assert database.count('class="place-row"') == AspectQuestion.objects.count()
-    assert "Limit admin access." in database and "Test restores." in database
-    assert "No control yet" in database and "Jobs change review" not in database
-    jobs = practices[practices.index("<details", practices.index("</details>")):]
-    assert "category-jobs" in jobs and "<summary>Jobs and interfaces (1)</summary>" in jobs
-    assert "Jobs change review" in jobs
-
-
-def test_common_practices_count_is_zero_without_guidance_or_controls(client):
-    practices = section(platform_page(client, "VPN"), 'id="practices-heading"', "</section>")
-    assert "<summary>Network (0)</summary>" in practices and practices.count("<details") == 1
-
-
-def test_a_row_counts_once_whether_it_has_a_line_a_control_or_both(client):
-    publish_guidance({"category": "database"}, lines={"Change": "Review changes.", "Logging": "Send logs to Splunk."})
-    publish_control("LA", title="Log feed check", categories=[Category.DATABASE])
-    publish_control("LA", title="Alerting", categories=[Category.DATABASE])
-    publish_control("DR", title="Restore test", categories=[Category.DATABASE])
-    assert "<summary>Database (3)</summary>" in sql_page(client)
-
-
-def test_common_practices_use_category_tags_not_other_platforms_tags(client):
-    publish_control("AC", [Platform.objects.get(name="Windows Server")], title="Windows only")
-    assert "Windows only" not in sql_page(client)
-
-
-def test_specific_considerations_show_the_platform_lines_and_directly_tagged_controls(client):
+def test_platform_lines_sit_under_the_matching_row_and_show_only_when_switched_on(client):
     sql = Platform.objects.get(name="SQL Server")
     publish_guidance({"category": "database"}, lines={"Access": "Limit admin access."})
     publish_guidance({"platform": sql}, tag="p", lines={"Access": "Treat sysadmin and db_owner as privileged roles."})
-    tagged = publish_control("CM", [sql], title="SQL change review")
-    publish_control("AC", title="Database access review", categories=[Category.DATABASE])
-    specific = section(sql_page(client), 'id="specific-heading"', "</section>")
-    assert specific.count('class="place-row"') == 2
-    access = section(specific, ">Access</a>", "</li>")
-    assert "Treat sysadmin and db_owner as privileged roles." in access and "Limit admin access." not in access
-    topic_url = reverse("topics:detail", args=[AspectQuestion.objects.get(label="Access").topic.slug])
-    assert f'class="place-label" href="{topic_url}">Access</a>' in section(specific, "<li", "</li>")
-    assert tagged.ident in section(specific, ">Change</a>", "</li>")
-    assert "Database access review" not in specific
-    assert "No control yet" not in specific and "Guidance coming soon" not in specific
-    assert "No platform-specific considerations yet." not in specific
+    off = section(database_page(client), ">Access</a>", "</li>")
+    assert "Limit admin access." in off
+    assert '<div class="platform-specific" data-platform-content="sql-server" hidden>' in off
+    assert "On SQL Server" in off and "Treat sysadmin and db_owner as privileged roles." in off
+    on = section(database_page(client, "sql-server"), ">Access</a>", "</li>")
+    assert '<div class="platform-specific" data-platform-content="sql-server">' in on
+    assert on.index("Limit admin access.") < on.index("Treat sysadmin")
+    assert "On SQL Server" not in section(database_page(client), ">Change</a>", "</li>")
 
 
-@pytest.mark.usefixtures("sso")
-def test_specific_considerations_empty_state_is_for_tech_risk_only():
-    url = Platform.objects.get(name="SQL Server").get_absolute_url()
-    edit = reverse("platforms:guidance_edit", kwargs={"slug": "sql-server"})
-    tech_risk = section(As("author", "tr").get(url).content.decode(), 'id="specific-heading"', "</section>")
-    assert "Specific considerations" in tech_risk
-    assert '<p class="text-secondary">No platform-specific considerations yet.</p>' in tech_risk
-    assert f'href="{edit}"' in tech_risk
-    reader = As("reader", "ro").get(url).content.decode()
-    assert "Specific considerations" not in reader and "No platform-specific considerations" not in reader
+def test_several_platforms_can_be_switched_on_together(client):
+    sql, windows = Platform.objects.get(name="SQL Server"), Platform.objects.get(name="Windows Server")
+    Platform.objects.filter(pk=windows.pk).update(categories=["operating_system", "database"])
+    publish_guidance({"platform": sql}, tag="p", lines={"Access": "SQL line."})
+    publish_guidance({"platform": windows}, tag="w", lines={"Access": "Windows line."})
+    access = section(database_page(client, "sql-server", "windows-server"), ">Access</a>", "</li>")
+    assert access.count('class="platform-specific"') == 2 and " hidden>" not in access
 
 
-def test_platform_page_without_guidance_shows_gaps_in_common_practices(client):
-    html = platform_page(client, "VPN")
-    assert html.count("No control yet") == AspectQuestion.objects.count()
-    assert "Guides for" not in html and "Runs on:" not in html
-
-
-def test_runs_on_is_a_plain_line_at_the_bottom_linking_to_the_platform(client):
-    windows = Platform.objects.get(name="Windows Server")
-    html = sql_page(client)
-    line = f'<p class="runs-on">Runs on: <a class="platform-chip" href="{windows.get_absolute_url()}">Windows Server</a>'
-    assert line in html and html.index(line) > html.index('id="practices-heading"')
-    assert "Runs on:" not in platform_page(client, "Windows Server")
-
-
-def test_runs_on_is_hidden_when_the_platform_is_inactive(client):
-    Platform.objects.filter(name="Windows Server").update(is_active=False)
-    assert "Runs on:" not in sql_page(client)
-
-
-def test_platform_references_include_category_and_platform_references_once(client):
-    sql = Platform.objects.get(name="SQL Server")
-    publish_guidance({"category": "database"}, references=[{"label": "Database standard", "url": "https://example.com/db"}])
-    publish_guidance({"category": "jobs"}, tag="j", references=[{"label": "Database standard", "url": "https://example.com/db"}])
-    publish_guidance({"platform": sql}, tag="p", references=[{"label": "SQL hardening", "url": "https://example.com/sql"}])
-    refs = sql_page(client)
-    refs = refs[refs.index('id="references-heading"'):]
-    assert refs.index("Database standard") < refs.index("SQL hardening")
-    assert refs.count("Database standard") == 1
-
-
-def test_platform_guides_list_published_pages_with_section_pill(client):
+def test_platform_panel_shows_intro_facts_documentation_runs_on_guides_and_references(client):
     from apps.core import versioning as v
     from apps.wiki.models import Page, PageVersion
     from .support import tech_risk_pair
 
     sql = Platform.objects.get(name="SQL Server")
+    Platform.objects.filter(pk=sql.pk).update(owner="Database team")
+    publish_guidance({"platform": sql}, tag="p", intro="SQL Server instances on Windows.",
+                     references=[{"label": "SQL hardening", "url": "https://example.com/sql"}])
     owner, approver = tech_risk_pair("guide")
     page, version = v.create_entity(
         Page, PageVersion, owner, {"slug": "sql-admin"}, title="SQL Server admin guide", section="best_practice",
@@ -347,15 +252,43 @@ def test_platform_guides_list_published_pages_with_section_pill(client):
     )
     v.submit(version, owner)
     v.approve_and_publish(version, approver)
-    html = platform_page(client, "SQL Server")
-    guides = section(html, "Guides for SQL Server", "</section>")
-    assert 'class="type-pill type-pill-section-best_practice">Best practices<' in guides
-    assert '<a href="/guides/sql-admin/">SQL Server admin guide</a>' in guides
-    assert "Guides for" not in platform_page(client, "Splunk")
+    panel = section(database_page(client, "sql-server"), 'aria-label="About SQL Server"', "</section>")
+    assert "hidden" not in panel[:80]
+    assert "SQL Server instances on Windows." in panel and "Database team" in panel and "On-premises" in panel
+    assert 'href="/platforms/category/jobs/?platform=sql-server">Jobs and interfaces</a>' in panel
+    assert 'aria-current="page">Database</a>' in panel
+    windows = Platform.objects.get(name="Windows Server")
+    assert f'Runs on: <a class="platform-chip" href="{windows.get_absolute_url()}">Windows Server</a>' in panel
+    assert 'href="https://learn.microsoft.com/sql/sql-server/" target="_blank" rel="noopener noreferrer">SQL Server documentation</a>' in panel
+    assert 'type-pill-section-best_practice">Best practices<' in panel and '<a href="/guides/sql-admin/">SQL Server admin guide</a>' in panel
+    assert 'href="https://example.com/sql"' in panel
 
 
-def test_platform_unknown_slug_is_404(client):
+def test_panel_is_hidden_until_switched_on_and_notes_when_nothing_is_specific(client):
+    html = database_page(client)
+    assert '<section class="platform-notes" data-platform-content="sql-server" aria-label="About SQL Server" hidden>' in html
+    assert "No SQL Server-specific items on this page yet" in section(html, 'aria-label="About SQL Server"', "</section>")
+
+
+def test_runs_on_is_hidden_when_the_platform_is_inactive(client):
+    Platform.objects.filter(name="Windows Server").update(is_active=False)
+    assert "Runs on:" not in section(database_page(client, "sql-server"), 'aria-label="About SQL Server"', "</section>")
+
+
+@pytest.mark.usefixtures("sso")
+def test_platform_edit_button_is_for_tech_risk_only():
+    url = reverse("platforms:category", args=["database"]) + "?platform=sql-server"
+    edit = reverse("platforms:guidance_edit", kwargs={"slug": "sql-server"})
+    assert f'href="{edit}">Edit SQL Server guidance</a>' in As("author", "tr").get(url).content.decode()
+    assert edit not in As("reader", "ro").get(url).content.decode()
+
+
+def test_old_platform_address_opens_its_main_category_with_it_switched_on(client):
+    response = client.get(reverse("platforms:detail", args=["sql-server"]))
+    assert response.status_code == 302 and response["Location"] == "/platforms/category/database/?platform=sql-server"
     assert client.get(reverse("platforms:detail", args=["nope"])).status_code == 404
+    Platform.objects.filter(name="VPN").update(is_active=False)
+    assert client.get(reverse("platforms:detail", args=["vpn"])).status_code == 404
 
 
 def test_library_pages_highlight_the_library_nav_which_points_home(client):
@@ -365,22 +298,11 @@ def test_library_pages_highlight_the_library_nav_which_points_home(client):
         assert_in_html('<a href="/" aria-current="page">Library</a>', nav)
 
 
-def test_platform_page_query_count_is_flat(client):
-    sql = Platform.objects.get(name="SQL Server")
-    url = sql.get_absolute_url()
-    publish_control("AC", platforms=[sql], title="First")
-    small = count_queries(client, url)
-    for n, prefix in enumerate(["AC", "CM", "LA", "VM"]):
-        publish_control(prefix, platforms=[sql], title=f"More {n}")
-        publish_control(prefix, title=f"Category {n}")
-    assert count_queries(client, url) == small
-
-
 def test_category_page_query_count_is_flat(client):
     sql = Platform.objects.get(name="SQL Server")
-    url = reverse("platforms:category", args=["database"])
-    publish_control("AC", platforms=[sql], title="First")
+    url = reverse("platforms:category", args=["database"]) + "?platform=sql-server"
+    publish_control("MA", platforms=[sql], title="First")
     small = count_queries(client, url)
-    for n, prefix in enumerate(["AC", "CM", "LA", "VM"]):
+    for n, prefix in enumerate(["MA", "MC", "LA", "VM"]):
         publish_control(prefix, platforms=[sql], title=f"More {n}")
     assert count_queries(client, url) == small

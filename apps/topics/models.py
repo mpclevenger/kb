@@ -16,6 +16,7 @@ ICON_CHOICES = [
     ("lock", "Lock"),
     ("checklist", "Checklist"),
     ("network", "Network"),
+    ("clock", "Clock"),
 ]
 
 

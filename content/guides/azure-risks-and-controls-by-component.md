@@ -4,7 +4,7 @@ section: best_practice
 platform: Azure
 order: 16
 ---
-For each Azure building block, this guide covers what it does, what could go wrong, the controls that address it and how to show they work. The Azure platform page has the summary by risk area. Read it with the Entra ID platform page, since Azure access is managed through Microsoft Entra ID.
+For each Azure building block, this guide covers what it does, what could go wrong, the controls that address it and how to show they work. The Cloud page in the Library, with Azure switched on, has the summary by risk area. Read it with Entra ID in the Library, since Azure access is managed through Microsoft Entra ID.
 
 Microsoft runs the cloud itself: the data centers, the hardware and the services' underlying software. The system owner reviews Microsoft's SOC report (see [Reading a vendor's SOC report](/guides/reading-a-vendors-soc-report/)). The rest is shared between two groups, so this guide has two parts:
 

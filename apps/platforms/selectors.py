@@ -41,6 +41,7 @@ class AspectRow:
     line: str = ""
     controls: list = field(default_factory=list)  # controls at open levels, most important first
     more: list = field(default_factory=list)  # LevelGroups folded under "More controls"
+    specifics: list = field(default_factory=list)  # (platform, line) for platforms with their own line here
 
     @property
     def has_content(self):
@@ -57,4 +58,17 @@ def aspect_rows(controls, questions, guidance=None):
     for question in questions:
         shown, more = fold_pairs([(c, v) for c, v in controls if v.topic_id == question.topic_id])
         rows.append(AspectRow(question=question, line=lines.get(question.pk, ""), controls=shown, more=more))
+    return rows
+
+
+def add_platform_specifics(rows, platform_guidance):
+    """Attach each platform's own line to the matching row, in the order the platforms are given.
+
+    `platform_guidance` is a list of (platform, published guidance or None).
+    """
+    for platform, guidance in platform_guidance:
+        lines = guidance.line_map if guidance else {}
+        for row in rows:
+            if lines.get(row.question.pk):
+                row.specifics.append((platform, lines[row.question.pk]))
     return rows

@@ -6,7 +6,7 @@
     <li class="category-card category-{{ card.category.value }}" data-filter-card>
       <a class="category-card-name" href="{% url 'platforms:category' card.category.value %}">{{ card.category.label }}</a>
       <ul class="category-card-chips">
-        {% for platform in card.platforms %}<li data-filter-item>{% platform_chip platform %}</li>
+        {% for platform in card.platforms %}<li data-filter-item><a class="platform-chip" href="{% url 'platforms:category' card.category.value %}?platform={{ platform.slug }}">{{ platform.name }}</a></li>
         {% endfor %}
       </ul>
     </li>

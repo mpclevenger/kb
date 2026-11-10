@@ -24,7 +24,7 @@ flowchart LR
 ## The four responses
 
 - **Stop.** Stop the activity or remove the condition that creates the risk. For example, retire an unused interface instead of securing it, or decline a design that can't be controlled.
-- **Reduce.** Lower the chance or the impact with controls. This is where most of TRAC's guidance applies: design a control that prevents or detects the problem, and keep evidence that it runs.
+- **Reduce.** Lower the chance or the impact with controls. This is where most of TRAC's guidance applies: design a control that prevents or detects the problem, and keep evidence that it runs. If closing the gap takes work, see [Writing an action item that gets done](/guides/writing-an-action-item-that-gets-done/).
 - **Share.** Pass part of the risk to someone better placed to handle it, such as a vendor or an insurer. The firm still owns the outcome, so check what the vendor does and review their assurance.
 - **Accept.** Decide, knowingly, to live with the risk for now. The business or system owner makes that decision and it is recorded. See [When an exception is appropriate](/guides/when-an-exception-is-appropriate/).
 

@@ -48,6 +48,9 @@
 
 .library-body > p, .library-body > ul, .library-body > ol, .library-body > blockquote { max-width: var(--trac-prose-width); }
 .library-intro { margin-bottom: var(--trac-space-3); }
+.library-intro > p, .library-intro > ul, .library-intro > ol, .library-intro > blockquote,
+.section-card-body.library-body > p, .section-card-body.library-body > ul,
+.section-card-body.library-body > ol, .section-card-body.library-body > blockquote { max-width: none; }
 /* Guide sections shown as cards (wiki/page.html): the card supplies the frame, so tables sit flush. */
 .section-card-body.library-body table { margin-bottom: var(--trac-space-3); }
 .library-body td > ul { margin: 0; padding-left: 1.1rem; }
@@ -77,4 +80,21 @@
 pre.mermaid { margin: var(--trac-space-3) 0; text-align: center; background: transparent; border: 0; padding: 0; font-family: inherit; overflow-x: auto; }
 pre.mermaid:not([data-processed]) { text-align: left; white-space: pre; font-family: var(--trac-mono); color: var(--trac-ink-secondary); }
 pre.mermaid svg { max-width: 100%; height: auto; }
+/* Diagram boxes that show a section beside the diagram (trac-ui.js linkDiagramBoxes) */
+.diagram-explorer { display: grid; gap: var(--trac-space-3); margin: var(--trac-space-3) 0; }
+.diagram-explorer pre.mermaid { margin: 0; }
+@media (min-width: 900px) {
+  .diagram-explorer { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); align-items: start; }
+  .diagram-explorer pre.mermaid { position: sticky; top: var(--trac-space-3); }
+}
+.diagram-panel { border: 1px solid var(--trac-border); border-radius: 8px; background: var(--trac-paper); padding: var(--trac-space-3); min-height: 6rem; }
+.diagram-panel-hint { color: var(--trac-ink-secondary); margin: 0; }
+.diagram-panel-title { font-size: 1.15rem; margin: 0 0 var(--trac-space-2); }
+.diagram-panel-body > :last-child { margin-bottom: 0; }
+pre.mermaid .diagram-link { cursor: pointer; }
+pre.mermaid .diagram-link:hover rect, pre.mermaid .diagram-link:focus rect { fill: var(--trac-mist); }
+pre.mermaid .diagram-link.is-active rect { fill: var(--trac-mist); stroke-width: 3px; }
+pre.mermaid .diagram-link:focus { outline: none; }
+pre.mermaid .diagram-link:focus-visible rect { stroke-width: 3px; }
+@media print { .diagram-panel { display: none; } }
 @media print { pre.mermaid { break-inside: avoid; } }

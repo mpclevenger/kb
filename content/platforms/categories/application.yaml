@@ -39,6 +39,9 @@ practices:
     - Interfaces and reports used in controls are shown to be complete and accurate: record counts or control totals reconcile between source and target, and failed records are reviewed.
     - Edit or override of financial data is limited to defined roles and logged.
     - Test environments do not hold production data unless it is masked or protected to the same level.
+  Reports: |
+    - Reports and dashboards the application produces for a key control are listed with an owner, and their logic is reviewed and kept under change control.
+    - Each time a control uses one, the run date, the parameters and a completeness check against the source are kept. See [Reports used in controls](/guides/can-you-trust-the-report/).
   Network: |
     - Users reach the application through approved paths only, such as the internal network, the VPN or an access gateway.
     - Connections are encrypted in transit, and administrative interfaces are limited to administration networks.

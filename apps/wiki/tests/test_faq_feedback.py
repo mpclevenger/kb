@@ -42,7 +42,7 @@ def test_related_pages_locked_after_submit(risk):
 
 
 def test_anyone_can_comment(reader):
-    item = fb.leave_feedback(reader, "/rcm/controls/AC-01/", "AC-01 Quarterly user access review",
+    item = fb.leave_feedback(reader, "/rcm/controls/MA-01/", "MA-01 Quarterly user access review",
                              "How to run it", "Step 3 is unclear")
     assert (item.submitted_by, item.status) == (reader, FeedbackStatus.NEW)
 

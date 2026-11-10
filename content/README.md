@@ -96,7 +96,7 @@ Leave a blank line between paragraphs, and before and after a list or a table. A
 
 ## Platform and category files
 
-`content/platforms/` holds the platform list and the guidance shown on category and platform pages.
+`content/platforms/` holds the platform list and the guidance shown on the Library's category pages.
 
 ```
 content/platforms/catalog.yaml                  the list of platforms and the risk-area questions
@@ -104,7 +104,7 @@ content/platforms/categories/<category>.yaml    common practices for a category,
 content/platforms/<platform>.yaml               only what is different for one platform, for example sql-server.yaml
 ```
 
-**How the pages layer.** A category file holds the common practices: what good looks like for any database, any identity service and so on. A platform file holds only what differs on that platform, so do not repeat the category text. A platform page shows the common practices of every category the platform belongs to, then its own considerations. The `runs_on` line in the catalog links pages together: SQL Server runs on Windows Server, so someone running an application on Kubernetes on AWS reads the Application page, the Kubernetes page and the AWS page, each short because each says only what is its own.
+**How the pages layer.** A category file holds the common practices: what good looks like for any database, any identity service and so on. A platform file holds only what differs on that platform, so do not repeat the category text. On a category page the common practices always show; a reader switches on a platform's pill (for example AWS on the Cloud page) to add that platform's lines under the matching rows, marked "On AWS". A platform's lines appear on every category page it belongs to. The `runs_on` line in the catalog links platforms together: SQL Server runs on Windows Server, and its notes box links there.
 
 **A category file** (the file is named after the category key: `application`, `database`, `operating_system`, `jobs`, `network`, `identity`, `cloud`, `engineering_tools`, `logging`):
 
@@ -142,7 +142,7 @@ references: []
 
 **The catalog** (`catalog.yaml`) has a commented example at the top. It lists each platform (name, categories, hosting, `runs_on`, documentation link) and each risk-area question (topic prefix, label, question). `seed_platforms` only adds platforms and questions the site does not have; it never deletes and never overwrites, so once a site is live change existing platforms and questions in the site (Manage), and use the file for new ones.
 
-The commands are `check_platforms`, `sync_platforms` and `export_platforms`; `check_content`, `sync_content` and `export_content` run them after the guides and controls. They work like the others, including `--dry-run`, `--force` and `--publish`. A site edit to guidance (Edit guidance on a category or platform page) is brought back into the files by `export_platforms`.
+The commands are `check_platforms`, `sync_platforms` and `export_platforms`; `check_content`, `sync_content` and `export_content` run them after the guides and controls. They work like the others, including `--dry-run`, `--force` and `--publish`. A site edit to guidance (Edit guidance on a category page, or in a platform's box) is brought back into the files by `export_platforms`.
 
 ## Risk engine files and drivers.json
 
@@ -170,7 +170,7 @@ The files that ship are samples (the first line of each YAML file says so). To r
       {"type": "leading", "text": "Number of systems that keep their own user lists."},
       {"type": "lagging", "text": "Leavers whose access was removed late."}
     ],
-    "trac_risks": ["R-AC-03"]
+    "trac_risks": ["R-MA-03"]
   }
 }
 ```
@@ -181,7 +181,7 @@ The files that ship are samples (the first line of each YAML file says so). To r
 | `category` | An optional group, such as People or Technology. |
 | `owner_role` | The role accountable for the driver. Empty shows "Not assigned yet". |
 | `indicators` | How you would know the driver is present or growing. Each has a `type` of `leading` or `lagging`, and `text`. |
-| `trac_risks` | Ids of TRAC risks (such as R-AC-03) that this driver raises. They show on the driver page, on the risk page ("What raises it") and in the explorer's Drivers column. The risk's own driver choice on its edit form works too. |
+| `trac_risks` | Ids of TRAC risks (such as R-MA-03) that this driver raises. They show on the driver page, on the risk page ("What raises it") and in the explorer's Drivers column. The risk's own driver choice on its edit form works too. |
 
 `sync_engine` adds an empty entry for every engine driver the file lacks, and never deletes an entry. An entry for a driver that is no longer in the engine is kept and ignored (a warning says so). `check_engine` reports a mistake with the file name and the driver, for example an indicator type that is not leading or lagging.
 

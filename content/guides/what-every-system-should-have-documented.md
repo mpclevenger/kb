@@ -3,7 +3,7 @@ title: What every system should have documented
 section: best_practice
 order: 5
 ---
-Without current documentation, a system depends on what a few people remember. During an outage, a handover or a departure, teams can then misconfigure it, miss an unauthorized connection or recover it slowly, and a reviewer cannot confirm that controls cover the whole system. Every system that supports financial reporting or is BCP tier 0 or tier 1 should have all of the documents below, kept where the team works and linked from the system's platform page in TRAC.
+Without current documentation, a system depends on what a few people remember. During an outage, a handover or a departure, teams can then misconfigure it, miss an unauthorized connection or recover it slowly, and a reviewer cannot confirm that controls cover the whole system. Every system that supports financial reporting or is BCP tier 0 or tier 1 should have all of the documents below, kept where the team works and easy to find from the team's own system page.
 
 ## What risk does each document address?
 
@@ -49,7 +49,7 @@ Without current documentation, a system depends on what a few people remember. D
 
 - Every document is reviewed at least once a year and after any major change.
 - Each document carries the date and name of its last reviewer.
-- Store documents where the team works, such as the repository or team wiki, and link them from the platform page.
+- Store documents where the team works, such as the repository or team wiki, and link them from the team's system page.
 - Evidence a reviewer would expect: the documents themselves, with a review date and reviewer, and a record that they were updated after the last major change.
 
 If you're unsure, Tech Risk can help.
